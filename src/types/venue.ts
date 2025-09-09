@@ -29,6 +29,33 @@ export type Venue = {
   rating?: number;
 };
 
+export type JwtPayload = {
+  email?: string;
+  name?: string;
+  venueManager?: boolean;
+  [k: string]: unknown;
+};
+
+export type Booking = {
+  id: string;
+  venueName: string;
+  when: string;
+  total: number; // EUR
+  image?: string;
+};
+
+export type VenueBooking = {
+  id: string;
+  venueName: string;
+  guestName: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  guests: number;
+  total: number; // EUR
+  status: 'Upcoming' | 'Pending' | 'Completed' | 'Canceled';
+};
+
 /* --- API--- */
 export type VenueListResponse = { data: Venue[] };
 export type VenueResponse = Venue | { data: Venue };

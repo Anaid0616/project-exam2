@@ -5,6 +5,9 @@ export default function HomePage() {
   return (
     <main className="mx-auto max-w-6xl p-6">
       <nav className="mt-3 flex gap-3 text-sm">
+        <Link href="/profile" className="btn btn-ghost mt-4">
+          Gå till profil
+        </Link>
         <Link href="/auth/login" className="btn-ghost">
           Log in
         </Link>
