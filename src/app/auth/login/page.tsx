@@ -1,38 +1,52 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { api, API } from '@/lib/api';
+import { loginSchema, type LoginForm } from '@/validation/auth';
 
+/** Expected shape coming from your API. Adjust if needed. */
 type LoginResponse = {
   data: { accessToken: string };
   meta?: unknown;
 };
 
+/** Turns an unknown error into a human-friendly message. */
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : 'Login failed';
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  // RHF with Yup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: yupResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+    mode: 'onTouched',
+  });
 
+  /**
+   * Submits validated values to the login endpoint.
+   * Saves token and redirects.
+   */
+  async function onSubmit(values: LoginForm) {
+    setApiError(null);
     try {
-      const payload = { email, password };
-      const { data } = await api<LoginResponse>(API.login, {
+      const res = await api<LoginResponse>(API.login, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify(values),
       });
-
-      localStorage.setItem('token', data.accessToken);
+      localStorage.setItem('token', res.data.accessToken);
       window.location.href = '/';
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setLoading(false);
+      setApiError(getErrorMessage(err));
     }
   }
 
@@ -40,17 +54,23 @@ export default function LoginPage() {
     <main className="mx-auto max-w-md p-6">
       <h1 className="text-2xl font-bold">Log in</h1>
 
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 space-y-4"
+        noValidate
+      >
         <div>
           <label className="block text-sm font-medium mb-1">Email</label>
           <input
             className="input"
             type="email"
             placeholder="you@stud.noroff.no"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
+            aria-invalid={!!errors.email || undefined}
+            {...register('email')}
           />
+          {errors.email && (
+            <p className="text-red-600 text-sm">{errors.email.message}</p>
+          )}
         </div>
 
         <div>
@@ -60,21 +80,23 @@ export default function LoginPage() {
             type="password"
             placeholder="password"
             autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
+            aria-invalid={!!errors.password || undefined}
+            {...register('password')}
           />
+          {errors.password && (
+            <p className="text-red-600 text-sm">{errors.password.message}</p>
+          )}
         </div>
 
         <button
           type="submit"
           className="btn btn-primary w-full"
-          disabled={loading}
+          disabled={isSubmitting}
         >
-          {loading ? 'Signing in…' : 'Sign in'}
+          {isSubmitting ? 'Signing in…' : 'Sign in'}
         </button>
 
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {apiError && <p className="text-red-600 text-sm mt-2">{apiError}</p>}
       </form>
 
       <p className="mt-6 text-sm">

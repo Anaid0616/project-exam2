@@ -3,19 +3,15 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { api, API } from '@/lib/api';
+import { registerSchema, type RegisterForm } from '@/validation/auth';
 
 const HERO =
   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=70&auto=format&fit=crop';
 
-// Payload type API
-type RegisterPayload = {
-  name: string;
-  email: string;
-  password: string;
-  venueManager?: boolean;
-};
-
+/** Expected shape coming back from your register endpoint. Adjust if needed. */
 type RegisterResponse = {
   data: {
     name: string;
@@ -27,43 +23,54 @@ type RegisterResponse = {
   };
   meta?: unknown;
 };
-export default function RegisterPage() {
-  // Form state
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [venueManager, setVenueManager] = React.useState(false);
 
-  // UX state
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+/** Turns an unknown error into a human-friendly message. */
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : 'Registration failed';
+}
+
+export default function RegisterPage() {
+  const [apiError, setApiError] = React.useState<string | null>(null);
   const [result, setResult] = React.useState<RegisterResponse | null>(null);
 
-  function getErrorMessage(err: unknown): string {
-    return err instanceof Error ? err.message : 'Registration failed';
-  }
+  // RHF with Yup
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterForm>({
+    resolver: yupResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      venueManager: false,
+    },
+    mode: 'onTouched',
+  });
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  /**
+   * Submits validated values to the register endpoint.
+   * Shows the response; optionally redirect to login.
+   */
+  async function onSubmit(values: RegisterForm) {
+    setApiError(null);
     setResult(null);
-
     try {
-      const body: RegisterPayload = { name, email, password, venueManager };
       const data = await api<RegisterResponse>(API.register, {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: JSON.stringify(values),
       });
       setResult(data);
-
       if (data?.data?.email) window.location.href = '/auth/login';
     } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setLoading(false);
+      setApiError(getErrorMessage(err));
     }
   }
+
+  const venueManager = watch('venueManager');
 
   return (
     <main className="mx-auto max-w-6xl p-6">
@@ -73,7 +80,11 @@ export default function RegisterPage() {
           <div>
             <h1 className="text-2xl font-bold">Register</h1>
 
-            <form onSubmit={onSubmit} className="mt-6 space-y-4">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="mt-6 space-y-4"
+              noValidate
+            >
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium mb-1">Name</label>
@@ -81,10 +92,12 @@ export default function RegisterPage() {
                   className="input"
                   type="text"
                   placeholder="Name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.currentTarget.value)}
+                  aria-invalid={!!errors.name || undefined}
+                  {...register('name')}
                 />
+                {errors.name && (
+                  <p className="text-red-600 text-sm">{errors.name.message}</p>
+                )}
               </div>
 
               {/* Email */}
@@ -95,10 +108,12 @@ export default function RegisterPage() {
                   type="email"
                   placeholder="Email address"
                   autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.currentTarget.value)}
+                  aria-invalid={!!errors.email || undefined}
+                  {...register('email')}
                 />
+                {errors.email && (
+                  <p className="text-red-600 text-sm">{errors.email.message}</p>
+                )}
               </div>
 
               {/* Password */}
@@ -109,12 +124,16 @@ export default function RegisterPage() {
                 <input
                   className="input"
                   type="password"
-                  placeholder="Password"
+                  placeholder="Password (min 8 chars)"
                   autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.currentTarget.value)}
+                  aria-invalid={!!errors.password || undefined}
+                  {...register('password')}
                 />
+                {errors.password && (
+                  <p className="text-red-600 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               {/* Account type (radio) */}
@@ -131,47 +150,45 @@ export default function RegisterPage() {
                   role="radiogroup"
                   aria-labelledby="legend-account-type"
                 >
-                  <div className="inline-flex items-center gap-2">
+                  <label className="inline-flex items-center gap-2 select-none">
                     <input
-                      id="role-customer"
                       type="radio"
-                      name="role"
                       value="customer"
                       checked={!venueManager}
-                      onChange={() => setVenueManager(false)}
+                      onChange={() =>
+                        setValue('venueManager', false, { shouldDirty: true })
+                      }
                       className="h-4 w-4"
                     />
-                    <label htmlFor="role-customer" className="select-none">
-                      Customer
-                    </label>
-                  </div>
+                    Customer
+                  </label>
 
-                  <div className="inline-flex items-center gap-2">
+                  <label className="inline-flex items-center gap-2 select-none">
                     <input
-                      id="role-manager"
                       type="radio"
-                      name="role"
                       value="manager"
                       checked={venueManager}
-                      onChange={() => setVenueManager(true)}
+                      onChange={() =>
+                        setValue('venueManager', true, { shouldDirty: true })
+                      }
                       className="h-4 w-4"
                     />
-                    <label htmlFor="role-manager" className="select-none">
-                      Venue Manager
-                    </label>
-                  </div>
+                    Venue Manager
+                  </label>
                 </div>
               </fieldset>
 
               <button
                 type="submit"
                 className="btn btn-primary w-full"
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? 'Registering…' : 'Register'}
+                {isSubmitting ? 'Registering…' : 'Register'}
               </button>
 
-              {error && <p className="text-red-600 text-sm">{error}</p>}
+              {apiError && (
+                <p className="text-red-600 text-sm mt-2">{apiError}</p>
+              )}
               {result && (
                 <pre className="mt-3 rounded-xl bg-shell p-3 text-xs border">
                   {JSON.stringify(result, null, 2)}
