@@ -1,3 +1,4 @@
+// src/components/SegButton.tsx
 export default function SegButton({
   active,
   children,
@@ -10,7 +11,7 @@ export default function SegButton({
   return (
     <button
       onClick={onClick}
-      className={`btn ${active ? 'btn-primary' : 'btn-ghost'}`}
+      className={active ? 'btn btn-primary' : 'btn btn-outline'}
     >
       {children}
     </button>

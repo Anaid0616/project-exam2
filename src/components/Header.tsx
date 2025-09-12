@@ -47,21 +47,21 @@ function ProfileMenu({ payload }: { payload: JwtPayload }) {
           <Link
             href="/profile"
             role="menuitem"
-            className="block rounded-xl px-3 py-2 text-sm hover:bg-sand"
+            className="block rounded-app px-3 py-2 text-sm hover:bg-sand"
           >
             My Profile
           </Link>
           <Link
             href="/contact"
             role="menuitem"
-            className="block rounded-xl px-3 py-2 text-sm hover:bg-sand"
+            className="block rounded-app px-3 py-2 text-sm hover:bg-sand"
           >
             Contact
           </Link>
           <button
             role="menuitem"
             onClick={logout}
-            className="block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sand"
+            className="block w-full rounded-app px-3 py-2 text-left text-sm hover:bg-sand"
           >
             Logout
           </button>
@@ -89,7 +89,7 @@ export default function Header() {
   const isManager = !!payload?.venueManager;
 
   return (
-    <div className="bg-white backdrop-blur supports-[backdrop-filter]:bg-white/70">
+    <div className="sticky top-0 z-50 bg-white backdrop-blur supports-[backdrop-filter]:bg-white/70">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <div className="relative h-[40px] w-[130px]">
@@ -111,7 +111,7 @@ export default function Header() {
           <nav className="flex items-center gap-2">
             {/* Only managers */}
             {isManager && (
-              <Link href="/venues/new" className="">
+              <Link href="/venues/create" className="">
                 Create venue
               </Link>
             )}

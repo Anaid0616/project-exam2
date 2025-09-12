@@ -28,7 +28,7 @@ export default function VenueCard({
         alt={v.media?.[0]?.alt ?? v.name}
         width={800}
         height={450}
-        className="mb-2 aspect-[16/9] w-full rounded-xl object-cover"
+        className="mb-2 aspect-[16/9] w-full rounded-app object-cover"
         unoptimized
       />
       <h4 className="font-semibold leading-tight">{v.name}</h4>

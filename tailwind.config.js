@@ -20,9 +20,7 @@ module.exports = {
         sunset: '#C13033',
       },
       borderRadius: {
-        lg: '1rem',
-        xl: '1.25rem',
-        '2xl': '1.5rem',
+        app: '15px',
       },
       boxShadow: {
         elev: '0 2px 2px 0 rgba(0,0,0,0.10)',

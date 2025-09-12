@@ -27,6 +27,7 @@ export type Venue = {
   meta: Meta;
   location?: Location;
   rating?: number;
+  tags?: string[];
 };
 
 export type JwtPayload = {
@@ -34,6 +35,15 @@ export type JwtPayload = {
   name?: string;
   venueManager?: boolean;
   [k: string]: unknown;
+};
+
+export type Profile = {
+  name: string;
+  email: string;
+  bio?: string | null;
+  avatar?: Media | null;
+  banner?: Media | null;
+  venueManager: boolean;
 };
 
 export type Booking = {

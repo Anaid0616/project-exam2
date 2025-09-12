@@ -20,7 +20,7 @@ export default function InfoCard({
         alt="Avatar"
         width={64}
         height={64}
-        className="rounded-full object-cover"
+        className="rounded-app object-cover"
         unoptimized
       />
       <div className="flex-1">

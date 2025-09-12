@@ -190,7 +190,7 @@ export default function RegisterPage() {
                 <p className="text-red-600 text-sm mt-2">{apiError}</p>
               )}
               {result && (
-                <pre className="mt-3 rounded-xl bg-shell p-3 text-xs border">
+                <pre className="mt-3 rounded-app bg-shell p-3 text-xs border">
                   {JSON.stringify(result, null, 2)}
                 </pre>
               )}
@@ -212,7 +212,7 @@ export default function RegisterPage() {
             alt="Coastal landscape"
             fill
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="rounded-2xl object-cover"
+            className="rounded-app object-cover"
             unoptimized
           />
         </div>

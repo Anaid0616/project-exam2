@@ -15,7 +15,7 @@ export default function BookingCard({ b }: { b: Booking }) {
           alt={b.venueName}
           width={140}
           height={90}
-          className="rounded-xl object-cover aspect-[4/3]"
+          className="rounded-app object-cover aspect-[4/3]"
           unoptimized
         />
         <div className="flex-1">

@@ -8,12 +8,12 @@ export const API = {
   bookings: '/holidaze/bookings',
   login: '/auth/login',
   register: '/auth/register',
+  profiles: '/holidaze/profiles',
 } as const;
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`;
 
-  // Normalize headers safely (Headers can be an object or a Headers instance)
   const headers = new Headers(init?.headers);
   headers.set('Content-Type', 'application/json');
 
@@ -34,4 +34,20 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 
   // Parse as JSON into the generic T
   return (await res.json()) as T;
+}
+
+export async function authApi<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+  const token = getToken();
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  return api<T>(path, { ...init, headers });
+}
+
+export function getToken() {
+  if (typeof window === 'undefined') return '';
+  try {
+    return localStorage.getItem('accessToken') || '';
+  } catch {
+    return '';
+  }
 }

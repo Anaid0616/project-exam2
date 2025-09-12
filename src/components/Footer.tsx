@@ -38,7 +38,7 @@ export default function Footer() {
             alt="Holidaze mark"
             width={56}
             height={56}
-            className="rounded-full"
+            className="rounded-app"
             priority={false}
           />
         </div>

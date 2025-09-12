@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 
-import InfoCard from '@/components/InfoCard';
+import InfoCard from '../../../components/InfoCard';
 import SegButton from '@/components/SegButton';
 import BookingCard from '@/components/BookingCard';
 import VenueCard from '@/components/VenueCard';
@@ -106,7 +106,7 @@ export default function ProfileScreen() {
               >
                 Venue Bookings
               </SegButton>
-              <Link href="/venues/new" className="btn btn-primary">
+              <Link href="/venues/create" className="btn btn-primary">
                 Create venue
               </Link>
             </div>

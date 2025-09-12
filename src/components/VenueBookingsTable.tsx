@@ -10,7 +10,7 @@ function StatusPill({ value }: { value: VenueBooking['status'] }) {
   };
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-xs font-medium ${map[value]}`}
+      className={`rounded-app px-2 py-0.5 text-xs font-medium ${map[value]}`}
     >
       {value}
     </span>
