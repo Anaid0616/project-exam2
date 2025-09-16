@@ -7,7 +7,7 @@ export type VenueFormValues = {
   price?: number | null;
   maxGuests?: number | null;
   description?: string;
-  tags?: string;
+
   media: MediaField[];
   city?: string;
   country?: string;
@@ -24,7 +24,7 @@ export function createDefaultValues(initial?: Venue): VenueFormValues {
       price: initial.price,
       maxGuests: initial.maxGuests,
       description: initial.description ?? '',
-      tags: initial.tags?.join(', ') ?? '',
+
       media: (initial.media ?? []).length
         ? initial.media.map((m) => ({ url: m.url, alt: m.alt ?? '' }))
         : [{ url: '', alt: '' }],
@@ -41,7 +41,7 @@ export function createDefaultValues(initial?: Venue): VenueFormValues {
   return {
     name: '',
     description: '',
-    tags: '',
+
     media: [{ url: '', alt: '' }],
     city: '',
     country: '',

@@ -39,7 +39,7 @@ export default async function VenueDetailsPage({
 
   return (
     <>
-      {/* BREADCRUMBS + HERO (hero lite bredare än main, men inte full-bleed) */}
+      {/* BREADCRUMBS  */}
       <div className="mx-auto max-w-7xl px-6">
         <nav className="mb-2 pt-3 text-xs text-ink/70">
           <ol className="flex gap-2">

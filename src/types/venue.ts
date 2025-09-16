@@ -17,6 +17,11 @@ export type Location = {
   zip?: string | null;
 };
 
+export type Owner = {
+  name?: string | null;
+  email?: string | null;
+};
+
 export type Venue = {
   id: string;
   name: string;
@@ -27,7 +32,7 @@ export type Venue = {
   meta: Meta;
   location?: Location;
   rating?: number;
-  tags?: string[];
+  owner?: Owner;
 };
 
 export type JwtPayload = {

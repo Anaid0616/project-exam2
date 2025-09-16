@@ -1,21 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-
-import VenueForm from '@/components/VenueForm';
+import VenueForm from '@/app/venues/_components/VenueForm';
 import type { VenueFormValues } from '@/features/venues/forms/types';
-
 import { createVenue } from '@/lib/venuescrud';
 
 export default function NewVenuePage() {
   const router = useRouter();
 
   async function handleSubmit(values: VenueFormValues) {
-    const tags = (values.tags || '')
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     const media = (values.media || [])
       .map((m) => ({
         url: (m.url || '').trim(),
@@ -26,7 +19,6 @@ export default function NewVenuePage() {
     const payload = {
       name: values.name,
       description: values.description || null,
-      ...(tags.length ? { tags } : {}),
       price: Number(values.price),
       maxGuests: Number(values.maxGuests),
       media,

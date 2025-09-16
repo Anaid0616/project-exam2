@@ -3,8 +3,6 @@
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { Venue } from '@/types/venue';
-
-// Make sure this file exists at src/features/venues/forms/schema.ts
 import { venueSchema } from '@/features/venues/forms/schema';
 import {
   createDefaultValues,
@@ -112,18 +110,6 @@ export default function VenueForm({
             {...register('country')}
           />
         </div>
-      </div>
-
-      <div>
-        <label className="label">Tags</label>
-        <input
-          className="input"
-          placeholder="e.g. beach, pool, family"
-          {...register('tags')}
-        />
-        <p className="mt-1 text-xs text-ink/60">
-          Separate with commas (beach, pool, family)
-        </p>
       </div>
 
       <div className="flex flex-wrap gap-4">

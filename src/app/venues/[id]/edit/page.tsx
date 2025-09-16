@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-import VenueForm from '@/components/VenueForm';
+import VenueForm from '@/app/venues/_components/VenueForm';
 import type { VenueFormValues } from '@/features/venues/forms/types';
 
 import { authApi } from '@/lib/api';
@@ -20,11 +20,6 @@ export default function EditVenuePage() {
   }, [id]);
 
   async function handleSubmit(values: VenueFormValues) {
-    const tags = (values.tags || '')
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     const media = (values.media || [])
       .map((m) => ({
         url: (m.url || '').trim(),
@@ -35,7 +30,7 @@ export default function EditVenuePage() {
     const payload = {
       name: values.name,
       description: values.description || null,
-      ...(tags.length ? { tags } : {}),
+
       price: Number(values.price),
       maxGuests: Number(values.maxGuests),
       media,

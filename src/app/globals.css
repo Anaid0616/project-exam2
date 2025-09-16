@@ -7,7 +7,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Bas-stilar */
+/* basic styles */
 @layer base {
   * {
     @apply border-border;
@@ -17,10 +17,10 @@ body {
     @apply bg-sand text-ink antialiased;
   }
   h1 {
-    @apply font-display text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight;
+    @apply font-display text-3xl sm:text-4xl font-extrabold leading-tight tracking-tight;
   }
   h2 {
-    @apply font-display text-3xl sm:text-4xl font-bold leading-snug;
+    @apply font-display text-2xl sm:text-3xl font-bold leading-snug;
   }
   h3 {
     @apply font-display text-xl sm:text-2xl font-semibold leading-snug;

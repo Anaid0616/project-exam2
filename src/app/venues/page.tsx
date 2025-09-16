@@ -6,16 +6,21 @@ export const revalidate = 0;
 export default async function VenuesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; tag?: string; q?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    tag?: string;
+    q?: string;
+    loc?: string;
+  }>;
 }) {
-  const { page: p, tag, q } = await searchParams;
+  const { page: p, tag, q, loc } = await searchParams;
   const page = Number(p ?? '1');
 
   return (
     <main className="mx-auto max-w-6xl p-6 space-y-4">
       <h1 className="text-2xl font-bold">All venues</h1>
 
-      {/* VenueGrid hämtar själv och visar Pagination */}
+      {/* VenueGrid and Pagination */}
       <VenueGrid
         page={page}
         pageSize={24}
