@@ -50,12 +50,7 @@ export default function ChipsBar() {
           <Link
             key={label}
             href={href}
-            className={`rounded-full border px-3 py-1 text-sm transition
-               ${
-                 isActive
-                   ? 'bg-aegean text-white border-aegean'
-                   : 'bg-shell/80 border-ink/15 hover:bg-shell'
-               }`}
+            className={isActive ? 'chip chip-active' : 'chip'}
           >
             {label}
           </Link>

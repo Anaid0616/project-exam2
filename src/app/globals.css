@@ -82,9 +82,10 @@ body {
 
   .chip {
     @apply rounded-full border-2 border-aegean bg-white px-3 py-1 text-sm text-ink/80 shadow-sm hover:bg-ink/5 transition;
+    @apply no-underline hover:no-underline focus:no-underline active:no-underline visited:no-underline;
   }
   .chip-active {
-    @apply bg-aegean text-white border-aegean;
+    @apply bg-aegean text-white border-aegean hover:bg-aegean/85 transition;
   }
 }
 
