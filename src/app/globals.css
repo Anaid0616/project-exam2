@@ -29,7 +29,7 @@ body {
     @apply text-[15px] leading-7 text-ink/80;
   }
   a {
-    @apply text-aegean underline-offset-4 hover:underline;
+    @apply text-aegean no-underline hover:no-underline;
   }
   :focus-visible {
     outline: none;
