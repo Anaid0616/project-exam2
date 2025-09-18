@@ -49,3 +49,21 @@ export async function getMyVenues(profileName: string): Promise<Venue[]> {
   );
   return unwrap(res);
 }
+
+export type NewVenuePayload = {
+  name: string;
+  description: string;
+  media: { url: string; alt?: string | null }[];
+  price: number;
+  maxGuests: number;
+  meta: { wifi: boolean; parking: boolean; breakfast: boolean; pets: boolean };
+  location: {
+    address?: string | null;
+    city?: string | null;
+    zip?: string | null;
+    country?: string | null;
+    continent?: string | null;
+    lat?: number | null;
+    lng?: number | null;
+  };
+};

@@ -1,17 +1,21 @@
 'use client';
 
+import type { BaseSyntheticEvent } from 'react';
 import {
   useForm,
   type SubmitHandler,
   type SubmitErrorHandler,
+  type Resolver,
+  type Control,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+
 import type { Venue } from '@/types/venue';
-import { venueSchema } from '@/features/venues/forms/schema';
 import {
-  createDefaultValues,
+  venueSchema,
   type VenueFormValues,
-} from '@/features/venues/forms/types';
+} from '@/features/venues/forms/schema';
+import { createDefaultValues } from '@/features/venues/forms/types';
 import GalleryFields from '@/features/venues/forms/GalleryFields';
 
 type Props = {
@@ -25,6 +29,9 @@ export default function VenueForm({
   onSubmit,
   submitLabel = 'Save',
 }: Props) {
+  // ✅ gör resolvern explicit – annars gnäller TS
+  const resolver = yupResolver(venueSchema) as Resolver<VenueFormValues>;
+
   const {
     register,
     handleSubmit,
@@ -34,18 +41,21 @@ export default function VenueForm({
     setFocus,
     formState: { errors, isSubmitting },
   } = useForm<VenueFormValues>({
-    resolver: yupResolver(venueSchema),
+    resolver,
     defaultValues: createDefaultValues(initial),
   });
 
-  // Visar tydligt vilket fält som stoppar och fokuserar första URL-felet
+  // ✅ tydlig signatur för invalid
   const onInvalid: SubmitErrorHandler<VenueFormValues> = (errs) => {
     console.log('Form errors:', errs);
     if (errs.media?.[0]?.url) setFocus('media.0.url');
   };
 
-  // Liten proxy: logga värden precis innan submit och skicka vidare
-  const submitProxy: SubmitHandler<VenueFormValues> = (values, ev) => {
+  // ✅ tydlig signatur (values + ev)
+  const submitProxy: SubmitHandler<VenueFormValues> = (
+    values: VenueFormValues,
+    ev?: BaseSyntheticEvent
+  ) => {
     console.log('media before submit =', getValues('media'));
     return onSubmit(values, ev);
   };
@@ -56,6 +66,7 @@ export default function VenueForm({
       onSubmit={handleSubmit(submitProxy, onInvalid)}
       className="space-y-5"
     >
+      {/* Name */}
       <div>
         <label className="label">Venue name</label>
         <input
@@ -68,6 +79,7 @@ export default function VenueForm({
         )}
       </div>
 
+      {/* Description */}
       <div>
         <label className="label">Description</label>
         <textarea
@@ -81,13 +93,15 @@ export default function VenueForm({
         )}
       </div>
 
+      {/* Gallery */}
       <GalleryFields
-        control={control}
+        control={control as Control<VenueFormValues>} // ✅ säker typ
         register={register}
         watch={watch}
         errors={errors}
       />
 
+      {/* Price / Guests */}
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="label">Price / night</label>
@@ -117,6 +131,7 @@ export default function VenueForm({
         </div>
       </div>
 
+      {/* Location */}
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="label">City</label>
@@ -132,6 +147,7 @@ export default function VenueForm({
         </div>
       </div>
 
+      {/* Meta */}
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2">
           <input type="checkbox" {...register('wifi')} /> Wifi
@@ -147,12 +163,12 @@ export default function VenueForm({
         </label>
       </div>
 
+      {/* Submit */}
       <div className="flex justify-start">
         <button
-          type="button"
+          type="submit"
           className="btn btn-primary"
           disabled={isSubmitting}
-          onClick={handleSubmit(submitProxy, onInvalid)}
         >
           {submitLabel}
         </button>

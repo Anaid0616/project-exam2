@@ -1,30 +1,33 @@
 // src/features/venues/forms/mappers.ts
-import type { Venue } from '@/types/venue';
-import type { VenueFormValues } from './types';
+import type { NewVenuePayload } from '@/lib/venuescrud';
+import type { VenueFormValues } from './schema';
 
-export function toVenuePayload(v: VenueFormValues): Partial<Venue> {
-  const media = (v.media ?? [])
-    .map(({ url, alt }) => ({
-      url: (url ?? '').trim(),
-      alt: (alt ?? '').trim() || undefined,
-    }))
-    .filter((m) => m.url.length > 0);
-
+export function toVenuePayload(values: VenueFormValues): NewVenuePayload {
   return {
-    name: v.name.trim(),
-    description: v.description?.trim() || undefined,
-    media,
-    price: typeof v.price === 'number' ? v.price : undefined,
-    maxGuests: typeof v.maxGuests === 'number' ? v.maxGuests : undefined,
+    name: values.name.trim(),
+    description: (values.description ?? '').trim(),
+    media: (values.media || [])
+      .map((m) => ({
+        url: String(m.url ?? '').trim(),
+        alt: (m.alt ?? '').trim().slice(0, 80) || null, // curt alt to 80 chars
+      }))
+      .filter((m) => m.url),
+    price: Number(values.price),
+    maxGuests: Number(values.maxGuests),
     meta: {
-      wifi: !!v.wifi,
-      parking: !!v.parking,
-      breakfast: !!v.breakfast,
-      pets: !!v.pets,
+      wifi: !!values.wifi,
+      parking: !!values.parking,
+      breakfast: !!values.breakfast,
+      pets: !!values.pets,
     },
     location: {
-      city: v.city?.trim() || undefined,
-      country: v.country?.trim() || undefined,
+      city: values.city?.trim() || null,
+      country: values.country?.trim() || null,
+      address: null,
+      zip: null,
+      continent: null,
+      lat: null,
+      lng: null,
     },
   };
 }

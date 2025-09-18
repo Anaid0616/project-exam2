@@ -8,7 +8,17 @@ import {
   type UseFormRegister,
   type UseFormWatch,
 } from 'react-hook-form';
-import type { VenueFormValues } from './types';
+import type { VenueFormValues } from './schema';
+
+// överst i filen
+const isValidUrl = (s: string) => {
+  try {
+    new URL(s);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export default function GalleryFields({
   control,
@@ -37,8 +47,8 @@ export default function GalleryFields({
       </div>
 
       {fields.map((f, i) => {
-        const url = watch(`media.${i}.url`) || '';
-        const urlErr = errors.media?.[i]?.url?.message as string | undefined;
+        const url = (watch(`media.${i}.url`) || '').trim();
+        const isValid = isValidUrl(url);
 
         return (
           <div
@@ -46,7 +56,7 @@ export default function GalleryFields({
             className="grid grid-cols-[8rem,1fr,auto] items-center gap-3 rounded-app border border-ink/10 p-3"
           >
             <div className="relative w-32 h-24 rounded-xl overflow-hidden bg-ink/5">
-              {url ? (
+              {isValid ? (
                 <Image
                   src={url}
                   alt=""
@@ -72,7 +82,6 @@ export default function GalleryFields({
                 })}
               />
 
-              {urlErr && <p className="mt-1 text-xs text-red-600">{urlErr}</p>}
               <input
                 className="input h-11"
                 placeholder="Alt text"

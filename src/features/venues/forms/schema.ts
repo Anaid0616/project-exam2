@@ -1,59 +1,48 @@
-// src/features/venues/forms/schema.ts
 import * as yup from 'yup';
-import type { VenueFormValues } from './types';
-import { toNum, emptyStrToUndef } from './transforms';
+
+const urlField = yup
+  .string()
+  .trim()
+  .test('optional-or-url', 'Must be a valid URL starting with http(s)', (v) => {
+    if (!v) return true;
+    try {
+      new URL(v!);
+      return true;
+    } catch {
+      return false;
+    }
+  });
 
 const mediaItem = yup.object({
-  url: yup
-    .string()
-    .transform(emptyStrToUndef)
-    .trim()
-
-    .optional(),
-  alt: yup.string().transform(emptyStrToUndef).trim().max(80).optional(),
+  url: urlField.optional(),
+  alt: yup.string().trim().max(80, 'Alt must be ≤ 80 chars').optional(),
 });
 
-export const venueSchema: yup.ObjectSchema<VenueFormValues> = yup
+export const venueSchema = yup
   .object({
     name: yup.string().trim().required('Required'),
-    price: yup
-      .number()
-      .transform(toNum)
-      .typeError('Number')
-      .min(1)
-      .required('Required'),
-    maxGuests: yup
-      .number()
-      .transform(toNum)
-      .typeError('Number')
-      .min(1)
-      .required('Required'),
-
-    // Optional fields
-    description: yup
-      .string()
-      .transform(emptyStrToUndef)
-      .trim()
-      .max(2000)
-      .optional(),
-
-    tags: yup.string().transform(emptyStrToUndef).trim().optional(),
-
+    description: yup.string().trim().required('Required').max(2000),
     media: yup
       .array()
       .of(mediaItem)
       .min(1, 'Add at least one image')
-      // Custom test: at least one item must have a URL
-      .test('at-least-one-url', 'Add at least one image URL', (arr) =>
-        Array.isArray(arr) ? arr.some((m) => !!m?.url) : false
+      .test(
+        'at-least-one-url',
+        'Add at least one image URL',
+        (arr) =>
+          Array.isArray(arr) &&
+          arr.some((m) => (m?.url ?? '').trim().length > 0)
       )
       .required(),
-
-    city: yup.string().transform(emptyStrToUndef).trim().optional(),
-    country: yup.string().transform(emptyStrToUndef).trim().optional(),
+    price: yup.number().typeError('Number').min(1).required('Required'),
+    maxGuests: yup.number().typeError('Number').min(1).required('Required'),
+    city: yup.string().trim().optional(),
+    country: yup.string().trim().optional(),
     wifi: yup.boolean().optional(),
     parking: yup.boolean().optional(),
     breakfast: yup.boolean().optional(),
     pets: yup.boolean().optional(),
   })
   .required();
+
+export type VenueFormValues = yup.InferType<typeof venueSchema>;

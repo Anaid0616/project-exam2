@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import type { SubmitHandler } from 'react-hook-form';
 import VenueForm from '@/app/venues/_components/VenueForm';
-import type { VenueFormValues } from '@/features/venues/forms/types';
+import type { VenueFormValues } from '@/features/venues/forms/schema';
 import { toVenuePayload } from '@/features/venues/forms/mappers';
 import { createVenue } from '@/lib/venuescrud';
 import { toast } from '@/lib/toast';
@@ -14,6 +14,7 @@ export default function NewVenuePage() {
   const handleSubmit: SubmitHandler<VenueFormValues> = async (values) => {
     try {
       const payload = toVenuePayload(values);
+      console.log('POST payload:', payload);
       const created = await createVenue(payload); // POST
       toast.success({ title: 'Venue created' });
       router.push(`/venues/${created.id}`);
