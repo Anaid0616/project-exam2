@@ -1,10 +1,21 @@
+// src/features/venues/forms/schema.ts
 import * as yup from 'yup';
 import type { VenueFormValues } from './types';
 import { toNum, emptyStrToUndef } from './transforms';
 
+const mediaItem = yup.object({
+  url: yup
+    .string()
+    .transform(emptyStrToUndef)
+    .trim()
+
+    .optional(),
+  alt: yup.string().transform(emptyStrToUndef).trim().max(80).optional(),
+});
+
 export const venueSchema: yup.ObjectSchema<VenueFormValues> = yup
   .object({
-    name: yup.string().required('Required'),
+    name: yup.string().trim().required('Required'),
     price: yup
       .number()
       .transform(toNum)
@@ -17,24 +28,29 @@ export const venueSchema: yup.ObjectSchema<VenueFormValues> = yup
       .typeError('Number')
       .min(1)
       .required('Required'),
-    description: yup.string().max(2000).optional(),
-    tags: yup.string().optional(),
+
+    // Optional fields
+    description: yup
+      .string()
+      .transform(emptyStrToUndef)
+      .trim()
+      .max(2000)
+      .optional(),
+
+    tags: yup.string().transform(emptyStrToUndef).trim().optional(),
+
     media: yup
       .array()
-      .of(
-        yup.object({
-          url: yup
-            .string()
-            .transform(emptyStrToUndef)
-            .url('Invalid URL')
-            .optional(),
-          alt: yup.string().transform(emptyStrToUndef).max(80).optional(),
-        })
+      .of(mediaItem)
+      .min(1, 'Add at least one image')
+      // Custom test: at least one item must have a URL
+      .test('at-least-one-url', 'Add at least one image URL', (arr) =>
+        Array.isArray(arr) ? arr.some((m) => !!m?.url) : false
       )
-      .min(1)
       .required(),
-    city: yup.string().optional(),
-    country: yup.string().optional(),
+
+    city: yup.string().transform(emptyStrToUndef).trim().optional(),
+    country: yup.string().transform(emptyStrToUndef).trim().optional(),
     wifi: yup.boolean().optional(),
     parking: yup.boolean().optional(),
     breakfast: yup.boolean().optional(),

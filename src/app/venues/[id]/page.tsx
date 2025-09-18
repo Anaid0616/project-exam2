@@ -1,6 +1,6 @@
 // src/app/venues/[id]/page.tsx
 import Link from 'next/link';
-import Image from 'next/image';
+
 import { api, API } from '@/lib/api';
 import { type Venue, type VenueResponse, toVenue } from '@/types/venue';
 import BookingPanel from './_components/BookingPanel';
@@ -62,7 +62,7 @@ export default async function VenueDetailsPage({
         <HeroCarousel
           images={v.media}
           fallback={heroFallback}
-          height={480}
+          height={520}
           fullBleed={false}
           showFavorite={true}
         />

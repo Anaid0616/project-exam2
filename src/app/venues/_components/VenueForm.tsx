@@ -1,6 +1,10 @@
 'use client';
 
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import {
+  useForm,
+  type SubmitHandler,
+  type SubmitErrorHandler,
+} from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { Venue } from '@/types/venue';
 import { venueSchema } from '@/features/venues/forms/schema';
@@ -10,30 +14,46 @@ import {
 } from '@/features/venues/forms/types';
 import GalleryFields from '@/features/venues/forms/GalleryFields';
 
+type Props = {
+  initial?: Venue;
+  onSubmit: SubmitHandler<VenueFormValues>;
+  submitLabel?: string;
+};
+
 export default function VenueForm({
   initial,
   onSubmit,
   submitLabel = 'Save',
-}: {
-  initial?: Venue;
-  onSubmit: SubmitHandler<VenueFormValues>;
-  submitLabel?: string;
-}) {
+}: Props) {
   const {
     register,
     handleSubmit,
     control,
     watch,
+    getValues,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<VenueFormValues>({
     resolver: yupResolver(venueSchema),
     defaultValues: createDefaultValues(initial),
   });
 
+  // Visar tydligt vilket fält som stoppar och fokuserar första URL-felet
+  const onInvalid: SubmitErrorHandler<VenueFormValues> = (errs) => {
+    console.log('Form errors:', errs);
+    if (errs.media?.[0]?.url) setFocus('media.0.url');
+  };
+
+  // Liten proxy: logga värden precis innan submit och skicka vidare
+  const submitProxy: SubmitHandler<VenueFormValues> = (values, ev) => {
+    console.log('media before submit =', getValues('media'));
+    return onSubmit(values, ev);
+  };
+
   return (
     <form
       autoComplete="off"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(submitProxy, onInvalid)}
       className="space-y-5"
     >
       <div>
@@ -114,25 +134,26 @@ export default function VenueForm({
 
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2">
-          <input type="checkbox" {...register('wifi')} />
-          Wifi
+          <input type="checkbox" {...register('wifi')} /> Wifi
         </label>
         <label className="flex items-center gap-2">
-          <input type="checkbox" {...register('parking')} />
-          Parking
+          <input type="checkbox" {...register('parking')} /> Parking
         </label>
         <label className="flex items-center gap-2">
-          <input type="checkbox" {...register('breakfast')} />
-          Breakfast
+          <input type="checkbox" {...register('breakfast')} /> Breakfast
         </label>
         <label className="flex items-center gap-2">
-          <input type="checkbox" {...register('pets')} />
-          Pets
+          <input type="checkbox" {...register('pets')} /> Pets
         </label>
       </div>
 
       <div className="flex justify-start">
-        <button className="btn btn-primary" disabled={isSubmitting}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={isSubmitting}
+          onClick={handleSubmit(submitProxy, onInvalid)}
+        >
           {submitLabel}
         </button>
       </div>

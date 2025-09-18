@@ -39,12 +39,10 @@ function IconBtn({
         alt=""
         width={20}
         height={20}
-        unoptimized
-        className="
-          transition duration-150
-          group-hover:scale-110 group-active:scale-95
-          group-hover:opacity-80
-        "
+        priority
+        sizes="20px"
+        style={{ width: 20, height: 20 }}
+        className="transition duration-150 group-hover:opacity-80"
       />
     </button>
   );
@@ -120,11 +118,10 @@ export default function BookingPanel({
               disabled={guests <= 1}
             />
 
-            {/* Ren siffra i mitten, med jämnbreda siffror och live-uppdatering för skärmläsare */}
             <span
               aria-live="polite"
               className="inline-block w-6 text-center select-none"
-              style={{ fontVariantNumeric: 'tabular-nums' }} // ger jämnbreda siffror
+              style={{ fontVariantNumeric: 'tabular-nums' }}
             >
               {guests}
             </span>

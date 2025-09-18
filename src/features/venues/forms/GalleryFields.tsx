@@ -38,6 +38,8 @@ export default function GalleryFields({
 
       {fields.map((f, i) => {
         const url = watch(`media.${i}.url`) || '';
+        const urlErr = errors.media?.[i]?.url?.message as string | undefined;
+
         return (
           <div
             key={f.id}
@@ -62,10 +64,15 @@ export default function GalleryFields({
 
             <div className="grid gap-3 md:grid-cols-2">
               <input
-                className="input h-11"
+                type="text" // <— undvik webbläsarens url-krav
+                className="input h-11 font-mono"
                 placeholder="Image URL"
-                {...register(`media.${i}.url` as const)}
+                {...register(`media.${i}.url` as const, {
+                  setValueAs: (v) => String(v ?? '').trim(),
+                })}
               />
+
+              {urlErr && <p className="mt-1 text-xs text-red-600">{urlErr}</p>}
               <input
                 className="input h-11"
                 placeholder="Alt text"
@@ -91,12 +98,8 @@ export default function GalleryFields({
         );
       })}
 
-      {errors.media && (
-        <p className="text-xs text-red-600">
-          {typeof errors.media?.message === 'string'
-            ? errors.media.message
-            : 'Check your images'}
-        </p>
+      {typeof errors.media?.message === 'string' && (
+        <p className="text-xs text-red-600">{errors.media.message}</p>
       )}
     </div>
   );

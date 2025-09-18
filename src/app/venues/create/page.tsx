@@ -1,44 +1,32 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import type { SubmitHandler } from 'react-hook-form';
 import VenueForm from '@/app/venues/_components/VenueForm';
 import type { VenueFormValues } from '@/features/venues/forms/types';
+import { toVenuePayload } from '@/features/venues/forms/mappers';
 import { createVenue } from '@/lib/venuescrud';
+import { toast } from '@/lib/toast';
 
 export default function NewVenuePage() {
   const router = useRouter();
 
-  async function handleSubmit(values: VenueFormValues) {
-    const media = (values.media || [])
-      .map((m) => ({
-        url: (m.url || '').trim(),
-        alt: (m.alt || '').trim() || null,
-      }))
-      .filter((m) => m.url);
-
-    const payload = {
-      name: values.name,
-      description: values.description || null,
-      price: Number(values.price),
-      maxGuests: Number(values.maxGuests),
-      media,
-      location: { city: values.city || null, country: values.country || null },
-      meta: {
-        wifi: !!values.wifi,
-        parking: !!values.parking,
-        breakfast: !!values.breakfast,
-        pets: !!values.pets,
-      },
-    };
-
-    const v = await createVenue(payload);
-    router.push(`/venues/${v.id}`);
-  }
+  const handleSubmit: SubmitHandler<VenueFormValues> = async (values) => {
+    try {
+      const payload = toVenuePayload(values);
+      const created = await createVenue(payload); // POST
+      toast.success({ title: 'Venue created' });
+      router.push(`/venues/${created.id}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unexpected error';
+      toast.error({ title: 'Save failed', description: message });
+    }
+  };
 
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-4">
       <div className="card p-5">
-        <h1 className="text-xl font-semibold my-4 text-center">Create venue</h1>
+        <h1 className="my-4 text-center text-xl font-semibold">Create venue</h1>
         <VenueForm onSubmit={handleSubmit} submitLabel="Create venue" />
       </div>
     </main>

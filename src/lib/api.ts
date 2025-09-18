@@ -1,53 +1,83 @@
+// src/lib/api.ts
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
-if (!API_BASE) {
+if (!API_BASE)
   throw new Error('Missing NEXT_PUBLIC_API_BASE_URL in .env.local');
-}
 
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '';
+
+/** Relative paths */
 export const API = {
   venues: '/holidaze/venues',
   bookings: '/holidaze/bookings',
+  profiles: '/holidaze/profiles',
+  auth: '/holidaze/auth',
   login: '/auth/login',
   register: '/auth/register',
-  profiles: '/holidaze/profiles',
 } as const;
 
-export async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = `${API_BASE}${path}`;
+/* Converts a path or full URL to a full URL */
+function toUrl(pathOrUrl: string) {
+  return /^https?:\/\//i.test(pathOrUrl)
+    ? pathOrUrl
+    : `${API_BASE}${pathOrUrl}`;
+}
 
-  const headers = new Headers(init?.headers);
-  headers.set('Content-Type', 'application/json');
+/** Base headers for all requests */
+function baseHeaders(extra?: HeadersInit): Headers {
+  const h = new Headers({
+    'Content-Type': 'application/json',
+    'X-Noroff-API-Key': API_KEY,
+  });
 
+  if (extra) new Headers(extra).forEach((v, k) => h.set(k, v));
+  return h;
+}
+
+function getToken(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    return (
+      localStorage.getItem('token') || localStorage.getItem('accessToken') || ''
+    );
+  } catch {
+    return '';
+  }
+}
+
+/** Simple fetch wrapper for the Holidaze API */
+export async function api<T>(
+  pathOrUrl: string,
+  init?: RequestInit
+): Promise<T> {
+  const url = toUrl(pathOrUrl);
   const res = await fetch(url, {
     ...init,
-    headers,
+    headers: baseHeaders(init?.headers),
     cache: 'no-store',
   });
 
+  // 204/205 No Content
+  if (res.status === 204 || res.status === 205) return undefined as T;
+
+  const text = await res.text().catch(() => '');
   if (!res.ok) {
-    // Read response body to include useful error info
-    const text = await res.text().catch(() => '');
-    // Throw with status + body snippet
     throw new Error(
       `API ${res.status} ${res.statusText}${text ? `: ${text}` : ''}`
     );
   }
-
-  // Parse as JSON into the generic T
-  return (await res.json()) as T;
+  return (text ? JSON.parse(text) : undefined) as T;
 }
 
-export async function authApi<T>(path: string, init?: RequestInit): Promise<T> {
-  const headers = new Headers(init?.headers);
+/** Requests med token – SAFE i client components */
+export async function authApi<T>(
+  pathOrUrl: string,
+  init?: RequestInit
+): Promise<T> {
+  const headers = new Headers(baseHeaders(init?.headers));
+
   const token = getToken();
-  if (token) headers.set('Authorization', `Bearer ${token}`);
-  return api<T>(path, { ...init, headers });
-}
 
-export function getToken() {
-  if (typeof window === 'undefined') return '';
-  try {
-    return localStorage.getItem('accessToken') || '';
-  } catch {
-    return '';
-  }
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  return api<T>(pathOrUrl, { ...init, headers });
 }

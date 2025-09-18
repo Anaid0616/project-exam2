@@ -37,7 +37,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    setValue,
+
     watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
@@ -55,12 +55,14 @@ export default function RegisterPage() {
    * Submits validated values to the register endpoint.
    * Shows the response; optionally redirect to login.
    */
+  // --- onSubmit: skicka som det är (boolean) ---
   async function onSubmit(values: RegisterForm) {
     setApiError(null);
     setResult(null);
     try {
       const data = await api<RegisterResponse>(API.register, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
       });
       setResult(data);
@@ -69,8 +71,6 @@ export default function RegisterPage() {
       setApiError(getErrorMessage(err));
     }
   }
-
-  const venueManager = watch('venueManager');
 
   return (
     <main className="mx-auto max-w-6xl p-6">
@@ -99,7 +99,6 @@ export default function RegisterPage() {
                   <p className="text-red-600 text-sm">{errors.name.message}</p>
                 )}
               </div>
-
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
@@ -115,7 +114,6 @@ export default function RegisterPage() {
                   <p className="text-red-600 text-sm">{errors.email.message}</p>
                 )}
               </div>
-
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -135,8 +133,8 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
-
               {/* Account type (radio) */}
+
               <fieldset className="mt-2">
                 <legend
                   id="legend-account-type"
@@ -150,34 +148,39 @@ export default function RegisterPage() {
                   role="radiogroup"
                   aria-labelledby="legend-account-type"
                 >
-                  <label className="inline-flex items-center gap-2 select-none">
+                  <label
+                    htmlFor="acct-customer"
+                    className="inline-flex items-center gap-2 cursor-pointer select-none"
+                  >
                     <input
+                      id="acct-customer"
                       type="radio"
-                      value="customer"
-                      checked={!venueManager}
-                      onChange={() =>
-                        setValue('venueManager', false, { shouldDirty: true })
-                      }
+                      value="false"
+                      {...register('venueManager', {
+                        setValueAs: (v) => v === 'true',
+                      })}
                       className="h-4 w-4"
                     />
                     Customer
                   </label>
 
-                  <label className="inline-flex items-center gap-2 select-none">
+                  <label
+                    htmlFor="acct-manager"
+                    className="inline-flex items-center gap-2 cursor-pointer select-none"
+                  >
                     <input
+                      id="acct-manager"
                       type="radio"
-                      value="manager"
-                      checked={venueManager}
-                      onChange={() =>
-                        setValue('venueManager', true, { shouldDirty: true })
-                      }
+                      value="true"
+                      {...register('venueManager', {
+                        setValueAs: (v) => v === 'true',
+                      })}
                       className="h-4 w-4"
                     />
                     Venue Manager
                   </label>
                 </div>
               </fieldset>
-
               <button
                 type="submit"
                 className="btn btn-primary w-full"
@@ -185,7 +188,6 @@ export default function RegisterPage() {
               >
                 {isSubmitting ? 'Registering…' : 'Register'}
               </button>
-
               {apiError && (
                 <p className="text-red-600 text-sm mt-2">{apiError}</p>
               )}

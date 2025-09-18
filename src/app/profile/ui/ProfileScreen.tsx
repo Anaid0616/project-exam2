@@ -3,7 +3,8 @@
 import * as React from 'react';
 import Link from 'next/link';
 
-import InfoCard from '../../../components/InfoCard';
+import { getProfile } from '@/lib/venuescrud';
+import InfoCard from '@/components/InfoCard';
 import SegButton from '@/components/SegButton';
 import BookingCard from '@/components/BookingCard';
 import VenueCard from '@/components/VenueCard';
@@ -15,12 +16,16 @@ import {
   MOCK_VENUES,
   MOCK_VENUE_BOOKINGS,
 } from '@/components/utils';
-import type { JwtPayload } from '@/types/venue';
+import type { JwtPayload, Profile } from '@/types/venue';
+
+type Role = 'customer' | 'manager';
 
 export default function ProfileScreen() {
   const [payload, setPayload] = React.useState<JwtPayload | null>(null);
 
-  const [role, setRole] = React.useState<'customer' | 'manager'>('customer');
+  const [role, setRole] = React.useState<Role>('customer');
+  const [profile, setProfile] = React.useState<Profile | null>(null);
+
   const [custTab, setCustTab] = React.useState<'bookings' | 'saved'>(
     'bookings'
   );
@@ -29,15 +34,25 @@ export default function ProfileScreen() {
   >('myVenues');
 
   React.useEffect(() => {
-    const t = localStorage.getItem('token');
+    const t =
+      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const p = t ? decodeJwt(t) : null;
     setPayload(p);
-    if (p?.venueManager) setRole('manager');
+
+    const name = p?.name;
+    if (t && name) {
+      getProfile(name)
+        .then((pData) => {
+          setProfile(pData);
+          setRole(pData.venueManager ? 'manager' : 'customer');
+        })
+        .catch(() => setRole('customer'));
+    }
   }, []);
 
   return (
-    <main className="mx-auto max-w-6xl p-6 space-y-6">
-      <InfoCard payload={payload} role={role} setRole={setRole} />
+    <main className="mx-auto max-w-6xl space-y-6 px-6 pt-0">
+      <InfoCard payload={payload} role={role} profile={profile ?? undefined} />
 
       {role === 'customer' && (
         <section className="space-y-4">
@@ -62,13 +77,13 @@ export default function ProfileScreen() {
           </div>
 
           {custTab === 'bookings' ? (
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className="grid gap-3 md:grid-cols-2">
               {MOCK_BOOKINGS.map((b) => (
                 <BookingCard key={b.id} b={b} />
               ))}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {MOCK_VENUES.map((v) => (
                 <VenueCard key={v.id} v={v} />
               ))}
@@ -113,7 +128,7 @@ export default function ProfileScreen() {
           </div>
 
           {mgrTab === 'bookings' && (
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className="grid gap-3 md:grid-cols-2">
               {MOCK_BOOKINGS.map((b) => (
                 <BookingCard key={b.id} b={b} />
               ))}
@@ -121,7 +136,7 @@ export default function ProfileScreen() {
           )}
 
           {mgrTab === 'myVenues' && (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {MOCK_VENUES.map((v) => (
                 <VenueCard
                   key={v.id}

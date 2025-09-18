@@ -1,4 +1,3 @@
-// src/app/venues/page.tsx
 import VenueGrid from '@/components/VenueGrid';
 
 export const revalidate = 0;

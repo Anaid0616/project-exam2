@@ -7,13 +7,30 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { api, API } from '@/lib/api';
 import { loginSchema, type LoginForm } from '@/validation/auth';
 
-/** Expected shape coming from your API. Adjust if needed. */
-type LoginResponse = {
-  data: { accessToken: string };
-  meta?: unknown;
-};
+type LoginResponse =
+  | { data: { accessToken: string } }
+  | { accessToken: string };
 
-/** Turns an unknown error into a human-friendly message. */
+function extractAccessToken(res: unknown): string | null {
+  if (typeof res !== 'object' || res === null) return null;
+
+  const r = res as Record<string, unknown>;
+
+  // Fall 1: { data: { accessToken: string } }
+  const data = r['data'];
+  if (typeof data === 'object' && data !== null) {
+    const d = data as Record<string, unknown>;
+    const at = d['accessToken'];
+    if (typeof at === 'string') return at;
+  }
+
+  // Fall 2: { accessToken: string }
+  const at = r['accessToken'];
+  if (typeof at === 'string') return at;
+
+  return null;
+}
+
 function getErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : 'Login failed';
 }
@@ -21,7 +38,6 @@ function getErrorMessage(err: unknown): string {
 export default function LoginPage() {
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // RHF with Yup
   const {
     register,
     handleSubmit,
@@ -32,10 +48,6 @@ export default function LoginPage() {
     mode: 'onTouched',
   });
 
-  /**
-   * Submits validated values to the login endpoint.
-   * Saves token and redirects.
-   */
   async function onSubmit(values: LoginForm) {
     setApiError(null);
     try {
@@ -43,7 +55,12 @@ export default function LoginPage() {
         method: 'POST',
         body: JSON.stringify(values),
       });
-      localStorage.setItem('token', res.data.accessToken);
+
+      const token = extractAccessToken(res);
+      if (!token) throw new Error('No access token returned');
+
+      localStorage.setItem('token', token);
+
       window.location.href = '/';
     } catch (err) {
       setApiError(getErrorMessage(err));

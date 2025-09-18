@@ -51,6 +51,9 @@ export type Profile = {
   venueManager: boolean;
 };
 
+export type ApiEnvelope<T> = { data: T; meta?: unknown };
+export type MaybeEnvelope<T> = T | ApiEnvelope<T>;
+
 export type Booking = {
   id: string;
   venueName: string;

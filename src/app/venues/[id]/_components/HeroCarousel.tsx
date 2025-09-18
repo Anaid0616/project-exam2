@@ -50,6 +50,10 @@ export default function HeroCarousel({
     ? 'relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen'
     : 'relative w-full rounded-app shadow-elev overflow-hidden';
 
+  const sizesAttr = fullBleed
+    ? '100vw'
+    : '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1152px';
+
   return (
     <div
       className={wrapperClass}
@@ -63,8 +67,8 @@ export default function HeroCarousel({
         src={slides[i].url}
         alt={slides[i].alt ?? ''}
         fill
+        sizes={sizesAttr}
         className="object-cover"
-        unoptimized
         priority
       />
 

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ToastProvider from '@/components/ToastProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,6 +32,7 @@ export default function RootLayout({
         <Header />
         <main> {children}</main>
         <Footer />
+        <ToastProvider />
       </body>
     </html>
   );

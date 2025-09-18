@@ -2,57 +2,62 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import type { SubmitHandler } from 'react-hook-form';
 
 import VenueForm from '@/app/venues/_components/VenueForm';
 import type { VenueFormValues } from '@/features/venues/forms/types';
-
-import { authApi } from '@/lib/api';
+import { toVenuePayload } from '@/features/venues/forms/mappers';
 import { updateVenue } from '@/lib/venuescrud';
+import { authApi, API } from '@/lib/api';
 import type { Venue } from '@/types/venue';
+import { toast } from '@/lib/toast';
 
 export default function EditVenuePage() {
-  const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [venue, setVenue] = useState<Venue | null>(null);
+  const params = useParams();
+  const id = String(params?.id); // id is always defined here
 
+  const [venue, setVenue] = useState<Venue | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load venue data
   useEffect(() => {
-    authApi<Venue>(`/holidaze/venues/${id}`).then(setVenue);
+    let alive = true;
+    (async () => {
+      try {
+        const v = await authApi<Venue>(`${API.venues}/${id}`);
+        if (alive) setVenue(v);
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to load venue';
+        toast.error({ title: 'Load error', description: message });
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, [id]);
 
-  async function handleSubmit(values: VenueFormValues) {
-    const media = (values.media || [])
-      .map((m) => ({
-        url: (m.url || '').trim(),
-        alt: (m.alt || '').trim() || null,
-      }))
-      .filter((m) => m.url);
+  const handleSubmit: SubmitHandler<VenueFormValues> = async (values) => {
+    try {
+      await updateVenue(id, toVenuePayload(values)); // PUT
+      toast.success({ title: 'Changes saved' });
+      router.push(`/venues/${id}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unexpected error';
+      toast.error({ title: 'Save failed', description: message });
+    }
+  };
 
-    const payload = {
-      name: values.name,
-      description: values.description || null,
-
-      price: Number(values.price),
-      maxGuests: Number(values.maxGuests),
-      media,
-      location: { city: values.city || null, country: values.country || null },
-      meta: {
-        wifi: !!values.wifi,
-        parking: !!values.parking,
-        breakfast: !!values.breakfast,
-        pets: !!values.pets,
-      },
-    };
-
-    await updateVenue(id, payload);
-    router.push(`/venues/${id}`);
-  }
-
-  if (!venue) return <main className="p-6">Loading…</main>;
+  if (loading) return <main className="p-6">Loading…</main>;
+  if (!venue) return <main className="p-6">Not found</main>;
 
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-4">
       <div className="card p-5">
-        <h1 className="text-xl font-semibold my-4 text-center">Edit venue</h1>
+        <h1 className="my-4 text-center text-xl font-semibold">Edit venue</h1>
         <VenueForm
           initial={venue}
           onSubmit={handleSubmit}
