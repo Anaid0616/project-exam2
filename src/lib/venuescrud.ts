@@ -50,6 +50,11 @@ export async function getMyVenues(profileName: string): Promise<Venue[]> {
   return unwrap(res);
 }
 
+export async function getVenue(id: string): Promise<Venue> {
+  const res = await authApi<MaybeEnvelope<Venue>>(`${API.venues}/${id}`);
+  return unwrap(res);
+}
+
 export type NewVenuePayload = {
   name: string;
   description: string;

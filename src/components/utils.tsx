@@ -38,37 +38,6 @@ export const MOCK_BOOKINGS: Booking[] = [
   },
 ];
 
-export const MOCK_VENUES: Venue[] = [
-  {
-    id: 'v1',
-    name: 'Seaside apartment',
-    price: 120,
-    maxGuests: 2, // ← lägg till
-    meta: {}, // ← lägg till (tomt funkar om dina fält i Meta är optional)
-    location: { city: 'Santorini', country: 'Greece' },
-    media: [
-      {
-        url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=60&auto=format&fit=crop',
-        alt: 'Seaside apartment',
-      },
-    ],
-  },
-  {
-    id: 'v2',
-    name: 'Cliffside Villa',
-    price: 340,
-    maxGuests: 4, // ← lägg till
-    meta: {}, // ← lägg till
-    location: { city: 'Oia', country: 'Greece' },
-    media: [
-      {
-        url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=60&auto=format&fit=crop',
-        alt: 'Cliffside Villa',
-      },
-    ],
-  },
-];
-
 export const MOCK_VENUE_BOOKINGS: VenueBooking[] = [
   {
     id: 'vb1',

@@ -1,6 +1,7 @@
 'use client';
 
 import type { BaseSyntheticEvent } from 'react';
+import { useEffect } from 'react';
 import {
   useForm,
   type SubmitHandler,
@@ -29,7 +30,6 @@ export default function VenueForm({
   onSubmit,
   submitLabel = 'Save',
 }: Props) {
-  // ✅ gör resolvern explicit – annars gnäller TS
   const resolver = yupResolver(venueSchema) as Resolver<VenueFormValues>;
 
   const {
@@ -39,19 +39,25 @@ export default function VenueForm({
     watch,
     getValues,
     setFocus,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<VenueFormValues>({
     resolver,
     defaultValues: createDefaultValues(initial),
   });
 
-  // ✅ tydlig signatur för invalid
+  // Prefill when initial changes (after fetch)
+  useEffect(() => {
+    if (initial) reset(createDefaultValues(initial));
+  }, [initial, reset]);
+
+  // Focus first error field on invalid
   const onInvalid: SubmitErrorHandler<VenueFormValues> = (errs) => {
     console.log('Form errors:', errs);
     if (errs.media?.[0]?.url) setFocus('media.0.url');
   };
 
-  // ✅ tydlig signatur (values + ev)
+  // Proxy to log media before submit
   const submitProxy: SubmitHandler<VenueFormValues> = (
     values: VenueFormValues,
     ev?: BaseSyntheticEvent

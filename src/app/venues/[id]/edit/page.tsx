@@ -5,29 +5,30 @@ import { useParams, useRouter } from 'next/navigation';
 import type { SubmitHandler } from 'react-hook-form';
 
 import VenueForm from '@/app/venues/_components/VenueForm';
-import type { VenueFormValues } from '@/features/venues/forms/types';
+import type { VenueFormValues } from '@/features/venues/forms/schema';
 import { toVenuePayload } from '@/features/venues/forms/mappers';
-import { updateVenue } from '@/lib/venuescrud';
-import { authApi, API } from '@/lib/api';
+import { updateVenue, getVenue } from '@/lib/venuescrud';
+
 import type { Venue } from '@/types/venue';
 import { toast } from '@/lib/toast';
 
 export default function EditVenuePage() {
   const router = useRouter();
   const params = useParams();
-  const id = String(params?.id); // id is always defined here
+  const id = String(params?.id); // id is defined here
 
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Load venue data
+
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const v = await authApi<Venue>(`${API.venues}/${id}`);
+        const v = await getVenue(id);
         if (alive) setVenue(v);
-      } catch (err: unknown) {
+      } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Failed to load venue';
         toast.error({ title: 'Load error', description: message });

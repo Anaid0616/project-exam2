@@ -1,11 +1,10 @@
-// src/app/venues/[id]/page.tsx
 import Link from 'next/link';
-
 import { api, API } from '@/lib/api';
 import { type Venue, type VenueResponse, toVenue } from '@/types/venue';
 import BookingPanel from './_components/BookingPanel';
 import HeroCarousel from './_components/HeroCarousel';
 import Rating from './_components/Rating';
+import OwnerActions from './_components/OwnerActions';
 
 export const revalidate = 0;
 
@@ -23,7 +22,7 @@ export default async function VenueDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const raw = await api<VenueResponse>(`${API.venues}/${id}`);
+  const raw = await api<VenueResponse>(`${API.venues}/${id}?_owner=true`);
   const v: Venue = toVenue(raw);
 
   const heroFallback = {
@@ -91,6 +90,9 @@ export default async function VenueDetailsPage({
                 )}
               </p>
             </div>
+
+            {/* 👇 Edit & Delete if owner */}
+            <OwnerActions venueId={v.id} ownerName={v.owner?.name} />
 
             <hr className="border-ink/10" />
 

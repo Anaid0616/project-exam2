@@ -3,7 +3,8 @@
 import * as React from 'react';
 import Link from 'next/link';
 
-import { getProfile } from '@/lib/venuescrud';
+import { getProfile, getMyVenues, deleteVenue } from '@/lib/venuescrud';
+import type { Venue } from '@/types/venue';
 import InfoCard from '@/components/InfoCard';
 import SegButton from '@/components/SegButton';
 import BookingCard from '@/components/BookingCard';
@@ -13,7 +14,6 @@ import VenueBookingsTable from '@/components/VenueBookingsTable';
 import {
   decodeJwt,
   MOCK_BOOKINGS,
-  MOCK_VENUES,
   MOCK_VENUE_BOOKINGS,
 } from '@/components/utils';
 import type { JwtPayload, Profile } from '@/types/venue';
@@ -22,9 +22,10 @@ type Role = 'customer' | 'manager';
 
 export default function ProfileScreen() {
   const [payload, setPayload] = React.useState<JwtPayload | null>(null);
-
   const [role, setRole] = React.useState<Role>('customer');
   const [profile, setProfile] = React.useState<Profile | null>(null);
+  const [myVenues, setMyVenues] = React.useState<Venue[]>([]);
+  const [loadingVenues, setLoadingVenues] = React.useState(false);
 
   const [custTab, setCustTab] = React.useState<'bookings' | 'saved'>(
     'bookings'
@@ -40,15 +41,37 @@ export default function ProfileScreen() {
     setPayload(p);
 
     const name = p?.name;
-    if (t && name) {
-      getProfile(name)
-        .then((pData) => {
-          setProfile(pData);
-          setRole(pData.venueManager ? 'manager' : 'customer');
-        })
-        .catch(() => setRole('customer'));
-    }
+    if (!t || !name) return;
+
+    (async () => {
+      try {
+        const pData = await getProfile(name);
+        setProfile(pData);
+        const r: Role = pData.venueManager ? 'manager' : 'customer';
+        setRole(r);
+
+        if (r === 'manager') {
+          setLoadingVenues(true);
+          const venues = await getMyVenues(name);
+          setMyVenues(venues ?? []);
+        }
+      } catch {
+        setRole('customer');
+      } finally {
+        setLoadingVenues(false);
+      }
+    })();
   }, []);
+
+  async function handleDeleteVenue(id: string) {
+    if (!confirm('Delete this venue?')) return;
+    try {
+      await deleteVenue(id);
+      setMyVenues((prev) => prev.filter((v) => v.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Delete failed');
+    }
+  }
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-6 pt-0">
@@ -83,11 +106,7 @@ export default function ProfileScreen() {
               ))}
             </div>
           ) : (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {MOCK_VENUES.map((v) => (
-                <VenueCard key={v.id} v={v} />
-              ))}
-            </div>
+            <p className="text-sm text-ink/60">No saved venues yet.</p>
           )}
         </section>
       )}
@@ -136,21 +155,26 @@ export default function ProfileScreen() {
           )}
 
           {mgrTab === 'myVenues' && (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {MOCK_VENUES.map((v) => (
-                <VenueCard
-                  key={v.id}
-                  v={v}
-                  showManage
-                  onDelete={(id) => {
-                    if (confirm('Delete this venue?')) {
-                      console.log('Delete venue', id);
-                      // TODO: call DELETE /venues/:id with token
-                    }
-                  }}
-                />
-              ))}
-            </div>
+            <>
+              {loadingVenues ? (
+                <p className="text-sm text-ink/60">Loading your venues…</p>
+              ) : myVenues.length === 0 ? (
+                <p className="text-sm text-ink/60">
+                  You don’t have any venues yet.
+                </p>
+              ) : (
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {myVenues.map((v) => (
+                    <VenueCard
+                      key={v.id}
+                      v={v}
+                      showManage
+                      onDelete={handleDeleteVenue}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {mgrTab === 'venueBookings' && (
