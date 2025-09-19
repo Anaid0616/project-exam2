@@ -67,12 +67,12 @@ export default function InfoCard({
             fill
             className="object-cover"
             sizes="80px"
-            unoptimized // valfritt: enklast om ni inte whitelistar domäner
+            unoptimized
           />
           <button
             type="button"
             aria-label="Change avatar"
-            className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border border-white bg-ink text-white shadow-md"
+            className="absolute bottom-0 right-0 grid h-7 w-7 place-items-center rounded-full border border-aegean bg-sand text-ink shadow-md"
             title="Change avatar"
             onClick={onEdit}
           >

@@ -1,7 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import SavedVenues from '@/app/profile/_components/SavedVenues';
 
 import {
   getProfile,
@@ -70,12 +72,26 @@ export default function ProfileScreen() {
   const [myBookings, setMyBookings] = React.useState<UiBooking[]>([]);
   const [loadingBookings, setLoadingBookings] = React.useState(false);
 
+  const params = useSearchParams();
+
+  // initialt värde från URL
+  const initialCustTab: 'bookings' | 'saved' = params.get('saved')
+    ? 'saved'
+    : 'bookings';
+
   const [custTab, setCustTab] = React.useState<'bookings' | 'saved'>(
-    'bookings'
+    initialCustTab
   );
+
   const [mgrTab, setMgrTab] = React.useState<
     'bookings' | 'myVenues' | 'venueBookings'
   >('myVenues');
+
+  React.useEffect(() => {
+    if (role === 'customer') {
+      setCustTab(params.get('saved') ? 'saved' : 'bookings');
+    }
+  }, [params, role]);
 
   React.useEffect(() => {
     const t =
@@ -162,7 +178,8 @@ export default function ProfileScreen() {
               </div>
             )
           ) : (
-            <p className="text-sm text-ink/60">No saved venues yet.</p>
+            /* ← här! */
+            <SavedVenues />
           )}
         </section>
       )}

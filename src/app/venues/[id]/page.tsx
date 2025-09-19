@@ -22,15 +22,13 @@ export default async function VenueDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  // HÄMTA ALLT I EN GÅNG: venue + bookings (+ owner via _owner=true i venuescrud)
   const v: VenueWithBookings = await getVenueWithBookings(id);
 
   const heroFallback = {
     url:
       v.media?.[0]?.url ??
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=60&auto=format&fit=crop',
-    alt: v.media?.[0]?.alt ?? v.name,
+    alt: v.media?.[0]?.alt ?? v.name ?? 'Venue',
   };
 
   const loc =
@@ -41,7 +39,6 @@ export default async function VenueDetailsPage({
 
   return (
     <>
-      {/* BREADCRUMBS */}
       <div className="mx-auto max-w-7xl px-6">
         <nav className="mb-2 pt-3 text-xs text-ink/70">
           <ol className="flex gap-2">
@@ -66,13 +63,13 @@ export default async function VenueDetailsPage({
           fallback={heroFallback}
           height={520}
           fullBleed={false}
-          showFavorite={true}
+          venueId={v.id}
+          showFavorite
         />
       </div>
 
       <main className="relative z-10 -mt-10 md:-mt-14 mx-auto max-w-6xl px-6">
         <section className="grid gap-6 md:grid-cols-[2fr,1fr] items-start">
-          {/* Left: title + description */}
           <div className="card p-5 space-y-5">
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -81,9 +78,7 @@ export default async function VenueDetailsPage({
                 </h1>
                 <Rating value={v.rating ?? 0} />
               </div>
-
               {loc && <p className="mt-1 text-sm text-ink/70">{loc}</p>}
-
               <p className="mt-2 text-sm text-ink/70">
                 Guests: up to {v.maxGuests}
                 {typeof v.price === 'number' && (
@@ -92,12 +87,10 @@ export default async function VenueDetailsPage({
               </p>
             </div>
 
-            {/* Edit & Delete if owner */}
             <OwnerActions venueId={v.id} ownerName={v.owner?.name} />
 
             <hr className="border-ink/10" />
 
-            {/* Description */}
             <div>
               <h2 className="text-base font-semibold">Description</h2>
               <p className="mt-2 text-ink/80">
@@ -105,7 +98,6 @@ export default async function VenueDetailsPage({
               </p>
             </div>
 
-            {/* Amenities */}
             <div>
               <h3 className="text-base font-semibold">Amenities</h3>
               <ul className="mt-2 grid grid-cols-2 gap-2 text-sm">
@@ -116,7 +108,6 @@ export default async function VenueDetailsPage({
               </ul>
             </div>
 
-            {/* Policies */}
             <div>
               <h3 className="text-base font-semibold">Policies</h3>
               <ul className="mt-2 list-disc pl-5 text-sm text-ink/80">
@@ -126,7 +117,6 @@ export default async function VenueDetailsPage({
               </ul>
             </div>
 
-            {/* Location */}
             {loc && (
               <div>
                 <h3 className="text-base font-semibold">Location</h3>
@@ -136,7 +126,6 @@ export default async function VenueDetailsPage({
             )}
           </div>
 
-          {/* Right: booking-panel */}
           <BookingPanel
             venueId={v.id}
             price={v.price}
