@@ -119,12 +119,13 @@ export default function Header() {
             {/* Only customers */}
             {!isManager && (
               <Link
-                href="/favorites"
-                aria-label="Saved venues"
-                className=""
-                title="Saved"
+                href="/profile?saved=1" // <- leder direkt till "Saved"-vyn
+                className="inline-flex items-center gap-2 px-3 py-1"
+                aria-label="Go to saved venues"
+                title="Saved venues"
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5 hover:bg-ink/5" />
+                <span className="text-sm hidden">Saved</span>
               </Link>
             )}
 

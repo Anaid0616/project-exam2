@@ -1,4 +1,3 @@
-// src/lib/api.ts
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 if (!API_BASE)
   throw new Error('Missing NEXT_PUBLIC_API_BASE_URL in .env.local');
@@ -41,6 +40,18 @@ function getToken(): string {
     );
   } catch {
     return '';
+  }
+}
+
+/** Typed API error with HTTP status code */
+export class ApiError extends Error {
+  status: number;
+  body?: unknown;
+  constructor(message: string, status: number, body?: unknown) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.body = body;
   }
 }
 

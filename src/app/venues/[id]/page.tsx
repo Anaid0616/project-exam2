@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { api, API } from '@/lib/api';
-import { type Venue, type VenueResponse, toVenue } from '@/types/venue';
+import { getVenueWithBookings } from '@/lib/venuescrud';
+import type { VenueWithBookings, BookedLite } from '@/types/venue';
 import BookingPanel from './_components/BookingPanel';
 import HeroCarousel from './_components/HeroCarousel';
 import Rating from './_components/Rating';
@@ -22,8 +22,9 @@ export default async function VenueDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const raw = await api<VenueResponse>(`${API.venues}/${id}?_owner=true`);
-  const v: Venue = toVenue(raw);
+
+  // HÄMTA ALLT I EN GÅNG: venue + bookings (+ owner via _owner=true i venuescrud)
+  const v: VenueWithBookings = await getVenueWithBookings(id);
 
   const heroFallback = {
     url:
@@ -32,13 +33,15 @@ export default async function VenueDetailsPage({
     alt: v.media?.[0]?.alt ?? v.name,
   };
 
-  const loc = v.location
-    ? [v.location.city, v.location.country].filter(Boolean).join(', ')
-    : undefined;
+  const loc =
+    v.location &&
+    [v.location.city, v.location.country].filter(Boolean).join(', ');
+
+  const booked: BookedLite[] = v.bookings ?? [];
 
   return (
     <>
-      {/* BREADCRUMBS  */}
+      {/* BREADCRUMBS */}
       <div className="mx-auto max-w-7xl px-6">
         <nav className="mb-2 pt-3 text-xs text-ink/70">
           <ol className="flex gap-2">
@@ -69,15 +72,13 @@ export default async function VenueDetailsPage({
 
       <main className="relative z-10 -mt-10 md:-mt-14 mx-auto max-w-6xl px-6">
         <section className="grid gap-6 md:grid-cols-[2fr,1fr] items-start">
-          {/* Left titel+description */}
+          {/* Left: title + description */}
           <div className="card p-5 space-y-5">
-            {/* Header */}
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-3xl font-extrabold tracking-tight">
                   {v.name}
                 </h1>
-
                 <Rating value={v.rating ?? 0} />
               </div>
 
@@ -91,7 +92,7 @@ export default async function VenueDetailsPage({
               </p>
             </div>
 
-            {/* 👇 Edit & Delete if owner */}
+            {/* Edit & Delete if owner */}
             <OwnerActions venueId={v.id} ownerName={v.owner?.name} />
 
             <hr className="border-ink/10" />
@@ -137,8 +138,12 @@ export default async function VenueDetailsPage({
 
           {/* Right: booking-panel */}
           <BookingPanel
-            price={typeof v.price === 'number' ? v.price : undefined}
+            venueId={v.id}
+            price={v.price}
             maxGuests={v.maxGuests ?? 1}
+            booked={booked}
+            venueName={v.name}
+            location={loc}
           />
         </section>
       </main>

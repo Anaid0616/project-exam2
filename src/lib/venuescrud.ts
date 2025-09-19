@@ -1,5 +1,6 @@
 import { API, authApi } from '@/lib/api';
 import type { Venue, Profile, ApiEnvelope, MaybeEnvelope } from '@/types/venue';
+import type { VenueWithBookings, BookedLite } from '@/types/venue';
 
 // Type guard
 function isEnvelope<T>(res: MaybeEnvelope<T>): res is ApiEnvelope<T> {
@@ -72,3 +73,58 @@ export type NewVenuePayload = {
     lng?: number | null;
   };
 };
+
+// --- Bookings ---
+export type CreateBookingPayload = {
+  dateFrom: string; // ISO: YYYY-MM-DD
+  dateTo: string; // ISO
+  guests: number;
+  venueId: string;
+};
+
+export async function createBooking(input: CreateBookingPayload) {
+  return authApi(`${API.bookings}`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+export type ApiBooking = {
+  id: string;
+  dateFrom: string;
+  dateTo: string;
+  guests: number;
+  venue?: {
+    id?: string;
+    name?: string | null;
+    price?: number | null;
+    media?: { url: string; alt?: string | null }[];
+    location?: { city?: string | null; country?: string | null } | null;
+  } | null;
+};
+
+// My bookings
+export async function getMyBookings(
+  profileName: string
+): Promise<ApiBooking[]> {
+  const res = await authApi<MaybeEnvelope<ApiBooking[]>>(
+    `${API.profiles}/${encodeURIComponent(profileName)}/bookings?_venue=true`
+  );
+  return unwrap(res) ?? [];
+}
+
+export async function getBooking(id: string): Promise<ApiBooking> {
+  const res = await authApi<MaybeEnvelope<ApiBooking>>(
+    `${API.bookings}/${id}?_venue=true`
+  );
+  return unwrap(res);
+}
+
+export async function getVenueWithBookings(
+  id: string
+): Promise<VenueWithBookings> {
+  const res = await authApi<MaybeEnvelope<VenueWithBookings>>(
+    `${API.venues}/${id}?_bookings=true&_owner=true`
+  );
+  return unwrap(res);
+}

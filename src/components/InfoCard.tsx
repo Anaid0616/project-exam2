@@ -51,7 +51,7 @@ export default function InfoCard({
             fill
             priority
             className="object-cover"
-            unoptimized
+            sizes="100vw"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/10" />
         </div>
@@ -60,14 +60,14 @@ export default function InfoCard({
       {/* Info-kort */}
       <section className="panel relative mx-auto -mt-10 flex items-start gap-4 md:-mt-14 md:items-center">
         {/* Avatar */}
-        <div className="relative shrink-0">
+        <div className="relative w-20 h-20 rounded-full overflow-hidden ring-4 ring-white shrink-0">
           <Image
             src={avatarUrl}
             alt="Avatar"
-            width={80}
-            height={80}
-            className="rounded-full object-cover ring-4 ring-white"
-            unoptimized
+            fill
+            className="object-cover"
+            sizes="80px"
+            unoptimized // valfritt: enklast om ni inte whitelistar domäner
           />
           <button
             type="button"

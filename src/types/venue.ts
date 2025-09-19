@@ -56,6 +56,7 @@ export type MaybeEnvelope<T> = T | ApiEnvelope<T>;
 
 export type Booking = {
   id: string;
+  venueId?: string;
   venueName: string;
   when: string;
   total: number; // EUR
@@ -72,6 +73,15 @@ export type VenueBooking = {
   guests: number;
   total: number; // EUR
   status: 'Upcoming' | 'Pending' | 'Completed' | 'Canceled';
+};
+
+export type BookedLite = {
+  dateFrom: string; // ISO YYYY-MM-DD eller ISO-stamp från API
+  dateTo: string; // ISO
+};
+
+export type VenueWithBookings = Venue & {
+  bookings?: BookedLite[];
 };
 
 /* --- API--- */
