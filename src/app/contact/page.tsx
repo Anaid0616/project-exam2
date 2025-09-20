@@ -1,10 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import ContactForm, { ContactFormValues } from './_components/ContactForm';
 export default function ContactPage() {
-  const router = useRouter();
-
   const handleSubmit = async (values: ContactFormValues) => {
     try {
       const res = await fetch('/api/contact', {

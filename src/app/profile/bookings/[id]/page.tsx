@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getBooking, type ApiBooking } from '@/lib/venuescrud';
@@ -42,7 +42,6 @@ function fmtDate(s: string) {
 
 export default function BookingDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
 
   const [data, setData] = useState<ApiBooking | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,7 +69,7 @@ export default function BookingDetailsPage() {
 
   const venue = data.venue ?? {};
   const vName = venue.name ?? 'Venue';
-  const vId = venue.id;
+
   const cover =
     venue.media?.[0]?.url ??
     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=60&auto=format&fit=crop';

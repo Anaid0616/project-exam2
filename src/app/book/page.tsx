@@ -1,10 +1,11 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
-export default function BookConfirmationPage() {
+function BookContent() {
   const sp = useSearchParams();
 
   const venueName = sp.get('venueName') ?? '—';
@@ -51,7 +52,7 @@ export default function BookConfirmationPage() {
             <strong>Guests:</strong> {guests}
           </p>
           <p>
-            <strong>Total:</strong> {total ? ` for ${total} total` : '—'}
+            <strong>Total:</strong> {total ?? '—'}
           </p>
           <p>
             <strong>Booking reference:</strong> {venueId ?? '—'}
@@ -78,5 +79,13 @@ export default function BookConfirmationPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function BookConfirmationPage() {
+  return (
+    <Suspense fallback={<main className="p-6">Loading…</main>}>
+      <BookContent />
+    </Suspense>
   );
 }

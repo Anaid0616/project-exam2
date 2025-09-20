@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { subscribe, type Toast } from '@/lib/toast';
 
@@ -9,46 +9,64 @@ export default function ToastProvider() {
   const portalEl = useRef<HTMLDivElement | null>(null);
 
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const timers = useRef<Record<string, number>>({});
+  const timers = useRef<Record<string, number>>({}); // id -> timeoutId
 
-  // 1) Vänta tills klienten är monterad (för att undvika hydration mismatch)
+  // 1) Markera att vi kör i klienten (för SSR)
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // 2) Skapa / fäst en separat portal-root i <body> först EFTER mount
+  // 2) Skapa/demountera portal-elementet när vi är monterade
   useEffect(() => {
     if (!mounted) return;
+
     const el = document.createElement('div');
     el.id = 'toast-portal';
     document.body.appendChild(el);
     portalEl.current = el;
+
     return () => {
+      // städa alla timrar vid unmount
+      Object.values(timers.current).forEach(clearTimeout);
+      timers.current = {};
+
       document.body.removeChild(el);
       portalEl.current = null;
     };
   }, [mounted]);
 
-  // 3) Prenumerera på toast-events efter mount
-  useEffect(() => {
-    if (!mounted) return;
-    return subscribe((t) => {
-      setToasts((s) => [...s, t]);
-      const id = window.setTimeout(() => dismiss(t.id), t.duration ?? 3500);
-      timers.current[t.id] = id;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted]);
-
-  function dismiss(id: string) {
-    if (timers.current[id]) {
-      clearTimeout(timers.current[id]);
+  // Stable dismiss-funktion (används i effekten nedan)
+  const dismiss = useCallback((id: string) => {
+    const t = timers.current[id];
+    if (t) {
+      clearTimeout(t);
       delete timers.current[id];
     }
     setToasts((s) => s.filter((x) => x.id !== id));
-  }
+  }, []);
 
-  // Före mount finns ingen portal -> returnera null (ingen SSR/CSR-skillnad)
+  // 3) Prenumerera på nya toasts
+  useEffect(() => {
+    if (!mounted) return;
+
+    const unsubscribe = subscribe((t) => {
+      // lägg till toasten
+      setToasts((s) => [...s, t]);
+
+      // auto-dismiss efter duration (default 3500ms)
+      const timeoutId = window.setTimeout(
+        () => dismiss(t.id),
+        t.duration ?? 3500
+      );
+      timers.current[t.id] = timeoutId;
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [mounted, dismiss]); // inga eslint-disable behövs
+
+  // Ingen portal före mount
   if (!mounted || !portalEl.current) return null;
 
   return createPortal(

@@ -24,8 +24,15 @@ export default function VenueBookingsPanel({ rows, viewBasePath }: Props) {
     Set<VenueBooking['status']>
   >(new Set(ALL_STATUSES));
 
-  const fromDate = fromStr ? new Date(fromStr) : null;
-  const toDate = toStr ? new Date(toStr) : null;
+  const fromDate = React.useMemo(
+    () => (fromStr ? stripTime(new Date(fromStr)) : null),
+    [fromStr]
+  );
+
+  const toDate = React.useMemo(
+    () => (toStr ? endOfDay(new Date(toStr)) : null),
+    [toStr]
+  );
 
   function toggleStatus(s: VenueBooking['status']) {
     setActiveStatuses((prev) => {

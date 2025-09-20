@@ -12,7 +12,7 @@ export default async function VenuesPage({
     loc?: string;
   }>;
 }) {
-  const { page: p, tag, q, loc } = await searchParams;
+  const { page: p, tag, q } = await searchParams;
   const page = Number(p ?? '1');
 
   return (

@@ -1,6 +1,11 @@
 import { API, authApi } from '@/lib/api';
-import type { Venue, Profile, ApiEnvelope, MaybeEnvelope } from '@/types/venue';
-import type { VenueWithBookings, BookedLite } from '@/types/venue';
+import type {
+  Venue,
+  Profile,
+  ApiEnvelope,
+  MaybeEnvelope,
+  VenueWithBookings,
+} from '@/types/venue';
 
 // Type guard
 function isEnvelope<T>(res: MaybeEnvelope<T>): res is ApiEnvelope<T> {

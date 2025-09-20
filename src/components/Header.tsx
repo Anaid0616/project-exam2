@@ -20,7 +20,7 @@ function logout() {
   }
 }
 
-function ProfileMenu({ payload }: { payload: JwtPayload }) {
+function ProfileMenu() {
   const [open, setOpen] = React.useState(false);
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
@@ -129,7 +129,7 @@ export default function Header() {
             )}
 
             {/* Everyone (customer + manager) */}
-            <ProfileMenu payload={payload!} />
+            <ProfileMenu />
           </nav>
         )}
       </div>

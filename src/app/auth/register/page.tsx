@@ -38,7 +38,6 @@ export default function RegisterPage() {
     register,
     handleSubmit,
 
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
     resolver: yupResolver(registerSchema),
