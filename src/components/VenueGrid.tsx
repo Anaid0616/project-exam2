@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import Pagination from '@/components/Pagination';
+import Pagination from './Pagination';
 import { api, API } from '@/lib/api';
 import type { VenueListResponse, Venue } from '@/types/venue';
 
