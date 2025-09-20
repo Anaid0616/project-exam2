@@ -9,7 +9,6 @@ import BookingCard from '@/components/BookingCard';
 import VenueCard from '@/components/VenueCard';
 import SavedVenues from '@/app/profile/_components/SavedVenues';
 import VenueBookingsPanel from '@/components/VenueBookingsPanel';
-
 import {
   getProfile,
   getMyVenues,
@@ -17,9 +16,7 @@ import {
   getMyBookings,
   type ApiBooking,
 } from '@/lib/venuescrud';
-
 import { useOwnerVenueBookings } from '@/features/venue-bookings/useOwnerVenueBookings';
-
 import type { Venue, JwtPayload, Profile } from '@/types/venue';
 import { decodeJwt } from '@/components/utils';
 
