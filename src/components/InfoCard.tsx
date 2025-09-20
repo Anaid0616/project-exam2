@@ -14,12 +14,12 @@ export default function InfoCard({
   onEdit,
 }: {
   payload: JwtPayload | null;
-  role?: Role; // får du från ProfileScreen
-  profile?: Profile; // får du från ProfileScreen
+  role?: Role; // from ProfileScreen
+  profile?: Profile; // from ProfileScreen
   coverUrl?: string;
   onEdit?: () => void;
 }) {
-  // 1) Roll: prop -> profile -> JWT -> customer
+  // 1) Role: prop -> profile -> JWT -> customer
   const role: Role =
     roleProp ??
     (profile?.venueManager
@@ -28,7 +28,7 @@ export default function InfoCard({
       ? 'manager'
       : 'customer');
 
-  // 2) Visa helst data från profilen
+  // 2) Prefer to show data from profile
   const email = profile?.email ?? payload?.email ?? '—';
   const nameFromEmail =
     email && email.includes('@') ? email.split('@')[0] : 'Traveler';

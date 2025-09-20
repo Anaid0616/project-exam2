@@ -1,12 +1,13 @@
+// src/components/VenueBookingsTable.tsx
 import type { VenueBooking } from '@/types/venue';
 import { money } from './utils';
 
 function StatusPill({ value }: { value: VenueBooking['status'] }) {
   const map: Record<VenueBooking['status'], string> = {
     Upcoming: 'bg-lagoon/10 text-aegean',
-    Pending: 'bg-sand/60 text-ink/70',
+    Pending: 'bg-coral/60 text-black/70',
     Completed: 'bg-green-100 text-green-700',
-    Canceled: 'bg-red-100 text-red-600',
+    Canceled: 'bg-sunset-100 text-sunset-600',
   };
   return (
     <span
@@ -17,7 +18,14 @@ function StatusPill({ value }: { value: VenueBooking['status'] }) {
   );
 }
 
-export default function VenueBookingsTable({ rows }: { rows: VenueBooking[] }) {
+export default function VenueBookingsTable({
+  rows,
+  viewBasePath = '/profile/bookings',
+}: {
+  rows: VenueBooking[];
+  viewBasePath?: string;
+  onDelete?: (id: string) => void;
+}) {
   return (
     <div className="panel overflow-x-auto p-0">
       <table className="w-full text-sm">
@@ -51,9 +59,9 @@ export default function VenueBookingsTable({ rows }: { rows: VenueBooking[] }) {
               <td className="p-3">
                 <StatusPill value={b.status} />
               </td>
-              <td className="p-3">
+              <td className="p-3 flex items-center gap-3">
                 <a
-                  href={`/bookings/${b.id}`}
+                  href={`${viewBasePath}/${b.id}`}
                   className="text-aegean hover:underline"
                 >
                   View

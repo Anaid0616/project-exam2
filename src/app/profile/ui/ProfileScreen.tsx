@@ -3,7 +3,12 @@
 import * as React from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+
+import InfoCard from '@/components/InfoCard';
+import BookingCard from '@/components/BookingCard';
+import VenueCard from '@/components/VenueCard';
 import SavedVenues from '@/app/profile/_components/SavedVenues';
+import VenueBookingsPanel from '@/components/VenueBookingsPanel';
 
 import {
   getProfile,
@@ -12,25 +17,20 @@ import {
   getMyBookings,
   type ApiBooking,
 } from '@/lib/venuescrud';
-import type { Venue } from '@/types/venue';
-import InfoCard from '@/components/InfoCard';
-import SegButton from '@/components/SegButton';
-import BookingCard from '@/components/BookingCard';
-import VenueCard from '@/components/VenueCard';
-import VenueBookingsTable from '@/components/VenueBookingsTable';
 
-import { decodeJwt, MOCK_VENUE_BOOKINGS } from '@/components/utils';
-import type { JwtPayload, Profile } from '@/types/venue';
+import { useOwnerVenueBookings } from '@/features/venue-bookings/useOwnerVenueBookings';
+
+import type { Venue, JwtPayload, Profile } from '@/types/venue';
+import { decodeJwt } from '@/components/utils';
 
 type Role = 'customer' | 'manager';
 
-/** UI-typ för BookingCard */
 type UiBooking = {
   id: string;
-  venueId?: string; // <--- lägg till
+  venueId?: string;
   venueName: string;
   when: string;
-  total: number; // EUR
+  total: number;
   image?: string;
 };
 
@@ -47,19 +47,26 @@ function toUiBooking(b: ApiBooking): UiBooking {
   const name = b.venue?.name ?? 'Venue';
   const image = b.venue?.media?.[0]?.url;
   const price = Number(b.venue?.price ?? 0);
-
   const nights = nightsBetween(from, to);
   const total = price && nights ? price * nights : 0;
 
   return {
     id: b.id,
-    venueId: b.venue?.id, // <--- NY
+    venueId: b.venue?.id,
     venueName: name,
     when: `${from}–${to}`,
     total,
     image,
   };
 }
+
+// helper tab
+const tabClass = (active: boolean) =>
+  `px-3 py-2 -mb-px text-sm border-b-[4px] ${
+    active
+      ? 'border-lagoon text-ink'
+      : 'border-transparent text-ink/70 hover:text-ink'
+  }`;
 
 export default function ProfileScreen() {
   const [payload, setPayload] = React.useState<JwtPayload | null>(null);
@@ -73,12 +80,9 @@ export default function ProfileScreen() {
   const [loadingBookings, setLoadingBookings] = React.useState(false);
 
   const params = useSearchParams();
-
-  // initialt värde från URL
   const initialCustTab: 'bookings' | 'saved' = params.get('saved')
     ? 'saved'
     : 'bookings';
-
   const [custTab, setCustTab] = React.useState<'bookings' | 'saved'>(
     initialCustTab
   );
@@ -104,22 +108,30 @@ export default function ProfileScreen() {
 
     (async () => {
       try {
+        // profil + roll
         const pData = await getProfile(name);
         setProfile(pData);
         const r: Role = pData.venueManager ? 'manager' : 'customer';
         setRole(r);
 
+        // mina bookings (gäller båda roller)
+        setLoadingBookings(true);
+        try {
+          const apiBookings = await getMyBookings(name);
+          setMyBookings(apiBookings.map(toUiBooking));
+        } finally {
+          setLoadingBookings(false);
+        }
+
+        // mina venues (om manager)
         if (r === 'manager') {
           setLoadingVenues(true);
-          const venues = await getMyVenues(name);
-          setMyVenues(venues ?? []);
-          setLoadingVenues(false);
-        } else {
-          setLoadingBookings(true);
-          const apiBookings = await getMyBookings(name); // ApiBooking[]
-          const ui = apiBookings.map(toUiBooking);
-          setMyBookings(ui);
-          setLoadingBookings(false);
+          try {
+            const venues = await getMyVenues(name);
+            setMyVenues(venues ?? []);
+          } finally {
+            setLoadingVenues(false);
+          }
         }
       } catch {
         setRole('customer');
@@ -128,6 +140,18 @@ export default function ProfileScreen() {
       }
     })();
   }, []);
+
+  // ----- Venue bookings (ägare) via hook -----
+  const ownerName = profile?.name ?? payload?.name ?? undefined;
+  const {
+    rows: venueRows,
+    loading: loadingVenueRows,
+    error: venueRowsError,
+  } = useOwnerVenueBookings(
+    ownerName,
+    role === 'manager' && mgrTab === 'venueBookings'
+  );
+  // -------------------------------------------
 
   async function handleDeleteVenue(id: string) {
     if (!confirm('Delete this venue?')) return;
@@ -146,22 +170,23 @@ export default function ProfileScreen() {
       {role === 'customer' && (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">
-              {custTab === 'bookings' ? 'Upcoming bookings' : 'Saved venues'}
-            </h2>
-            <div className="flex gap-2">
-              <SegButton
-                active={custTab === 'bookings'}
+            <div className="flex gap-1 border-b border-ink/10">
+              <button
+                role="tab"
+                aria-selected={custTab === 'bookings'}
                 onClick={() => setCustTab('bookings')}
+                className={tabClass(custTab === 'bookings')}
               >
                 Bookings
-              </SegButton>
-              <SegButton
-                active={custTab === 'saved'}
+              </button>
+              <button
+                role="tab"
+                aria-selected={custTab === 'saved'}
                 onClick={() => setCustTab('saved')}
+                className={tabClass(custTab === 'saved')}
               >
                 Saved
-              </SegButton>
+              </button>
             </div>
           </div>
 
@@ -178,7 +203,6 @@ export default function ProfileScreen() {
               </div>
             )
           ) : (
-            /* ← här! */
             <SavedVenues />
           )}
         </section>
@@ -187,43 +211,50 @@ export default function ProfileScreen() {
       {role === 'manager' && (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">
-              {mgrTab === 'bookings'
-                ? 'Upcoming bookings'
-                : mgrTab === 'myVenues'
-                ? 'My Venues'
-                : 'Venue Bookings'}
-            </h2>
-            <div className="flex items-center gap-2">
-              <SegButton
-                active={mgrTab === 'bookings'}
+            <div className="flex gap-1 border-b border-ink/10">
+              <button
+                role="tab"
+                aria-selected={mgrTab === 'bookings'}
                 onClick={() => setMgrTab('bookings')}
+                className={tabClass(mgrTab === 'bookings')}
               >
                 Bookings
-              </SegButton>
-              <SegButton
-                active={mgrTab === 'myVenues'}
+              </button>
+              <button
+                role="tab"
+                aria-selected={mgrTab === 'myVenues'}
                 onClick={() => setMgrTab('myVenues')}
+                className={tabClass(mgrTab === 'myVenues')}
               >
                 My Venues
-              </SegButton>
-              <SegButton
-                active={mgrTab === 'venueBookings'}
+              </button>
+              <button
+                role="tab"
+                aria-selected={mgrTab === 'venueBookings'}
                 onClick={() => setMgrTab('venueBookings')}
+                className={tabClass(mgrTab === 'venueBookings')}
               >
                 Venue Bookings
-              </SegButton>
-              <Link href="/venues/create" className="btn btn-primary">
-                Create venue
-              </Link>
+              </button>
             </div>
+
+            <Link href="/venues/create" className="btn btn-primary">
+              Create venue
+            </Link>
           </div>
 
-          {mgrTab === 'bookings' && (
-            <p className="text-sm text-ink/60">
-              (Hook upp till manager-bookings när du vill)
-            </p>
-          )}
+          {mgrTab === 'bookings' &&
+            (loadingBookings ? (
+              <p className="text-sm text-ink/60">Loading bookings…</p>
+            ) : myBookings.length === 0 ? (
+              <p className="text-sm text-ink/60">No bookings yet.</p>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                {myBookings.map((b) => (
+                  <BookingCard key={b.id} b={b} />
+                ))}
+              </div>
+            ))}
 
           {mgrTab === 'myVenues' && (
             <>
@@ -249,7 +280,20 @@ export default function ProfileScreen() {
           )}
 
           {mgrTab === 'venueBookings' && (
-            <VenueBookingsTable rows={MOCK_VENUE_BOOKINGS} />
+            <>
+              {loadingVenueRows && (
+                <p className="text-sm text-ink/60">Loading venue bookings…</p>
+              )}
+              {venueRowsError && (
+                <p className="text-sm text-red-600">{venueRowsError}</p>
+              )}
+              {!loadingVenueRows && !venueRowsError && (
+                <VenueBookingsPanel
+                  rows={venueRows}
+                  viewBasePath="/profile/bookings"
+                />
+              )}
+            </>
           )}
         </section>
       )}

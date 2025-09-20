@@ -1,4 +1,3 @@
-// src/components/SaveButton.tsx
 'use client';
 import { Heart } from 'lucide-react';
 import { useFavorites } from '@/features/favorites/useFavorites';

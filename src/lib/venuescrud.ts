@@ -128,10 +128,3 @@ export async function getVenueWithBookings(
   );
   return unwrap(res);
 }
-
-export async function getVenuePublic(id: string): Promise<Venue> {
-  // enkel publik fetch av en venue
-  const res = await fetch(`${API.venues}/${id}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to load venue');
-  return res.json();
-}

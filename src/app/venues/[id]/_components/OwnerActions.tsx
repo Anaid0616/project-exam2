@@ -14,7 +14,7 @@ export default function OwnerActions({
 }) {
   const r = useRouter();
 
-  // kolla om inloggad användare äger venuen
+  //
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const me = token ? decodeJwt(token) : null;

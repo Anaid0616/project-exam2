@@ -14,15 +14,30 @@ function money(n: number) {
   }).format(n);
 }
 
-function nightsBetween(a: string, b: string) {
-  const A = new Date(a);
-  const B = new Date(b);
-  const d = Math.ceil((B.getTime() - A.getTime()) / (1000 * 60 * 60 * 24));
-  return d > 0 ? d : 0;
+// ---- helpers ----
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function parseUtcMidnight(s: string) {
+  // Gör ett millis-värde för UTC-midnatt den dagen
+  const d = new Date(s);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 }
 
-function fmt(d: string) {
-  return new Date(d).toISOString().slice(0, 10); // "YYYY-MM-DD"
+function nightsBetween(a: string, b: string) {
+  const from = parseUtcMidnight(a);
+  const to = parseUtcMidnight(b);
+  const diff = Math.max(0, Math.round((to - from) / DAY_MS));
+  return diff;
+}
+
+function fmtDate(s: string) {
+  // Visa snyggt utan tid (t.ex. 06 Oct 2025)
+  const d = new Date(s);
+  return d.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 }
 
 export default function BookingDetailsPage() {
@@ -70,7 +85,6 @@ export default function BookingDetailsPage() {
 
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-6">
-      {/* Header */}
       <div className="card p-4 flex items-center gap-4">
         <Image
           src={cover}
@@ -83,7 +97,9 @@ export default function BookingDetailsPage() {
         <div className="min-w-0">
           <h1 className="text-lg font-semibold truncate">{vName}</h1>
           {loc && <p className="text-sm text-ink/70">{loc}</p>}
-          <p className="text-sm text-ink/70">Booking ref: {data.id}</p>
+          <p className="text-sm text-ink/70">
+            Booking ref: <strong> {data.id}</strong>
+          </p>
         </div>
       </div>
 
@@ -92,10 +108,12 @@ export default function BookingDetailsPage() {
         <h2 className="font-semibold">Booking details</h2>
         <div className="grid gap-2 text-sm">
           <p>
-            Dates: <span className="font-medium">{data.dateFrom}</span> →{' '}
-            <span className="font-medium">{data.dateTo}</span> ({nights} night
+            Dates: <span className="font-medium">{fmtDate(data.dateFrom)}</span>{' '}
+            → <span className="font-medium">{fmtDate(data.dateTo)}</span> (
+            {nights} night
             {nights !== 1 ? 's' : ''})
           </p>
+
           <p>Guests: {data.guests}</p>
           <p>
             Price: {price ? `${money(price)} / night` : '—'} · Total:{' '}
@@ -104,7 +122,7 @@ export default function BookingDetailsPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/profile" className="btn btn-ghost">
+          <Link href="/profile" className="btn btn-outline">
             View my bookings
           </Link>
         </div>
