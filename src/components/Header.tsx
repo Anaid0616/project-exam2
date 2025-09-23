@@ -103,7 +103,7 @@ export default function Header() {
             <Link href="/auth/register" className="">
               Register
             </Link>
-            <Link href="/auth/login" className="btn btn-primary">
+            <Link href="/auth/login" className="btn btn-outline">
               Login
             </Link>
           </nav>

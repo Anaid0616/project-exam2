@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import VenueGrid from '@/components/VenueGrid';
+import VenueGridSkeleton from '@/components/skeletons/VenueGridSkeleton';
 
 export const revalidate = 0;
 
@@ -18,15 +20,16 @@ export default async function VenuesPage({
   return (
     <main className="mx-auto max-w-6xl p-6 space-y-4">
       <h1 className="text-2xl font-bold">All venues</h1>
-
-      {/* VenueGrid and Pagination */}
-      <VenueGrid
-        page={page}
-        pageSize={24}
-        tag={tag ?? null}
-        q={q ?? null}
-        path="/venues"
-      />
+      <Suspense fallback={<VenueGridSkeleton count={12} />}>
+        {/* VenueGrid and Pagination */}
+        <VenueGrid
+          page={page}
+          pageSize={24}
+          tag={tag ?? null}
+          q={q ?? null}
+          path="/venues"
+        />
+      </Suspense>
     </main>
   );
 }

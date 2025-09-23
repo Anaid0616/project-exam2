@@ -54,22 +54,30 @@ body {
   }
 
   .btn {
-    @apply inline-flex items-center justify-center rounded-app px-5 py-2.5 text-sm font-semibold shadow-elev transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 min-h-[44px];
+    @apply inline-flex items-center justify-center rounded-app
+         px-4 py-2 text-sm font-semibold shadow-elev transition-colors
+         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0
+         min-h-[44px] md:min-h-[36px];
   }
+
   .btn:disabled {
     @apply opacity-50 cursor-not-allowed;
   }
+
+  .btn-sm {
+    @apply px-3 py-1.5 min-h-[32px];
+  }
+
   .btn-primary {
     @apply bg-aegean text-white hover:bg-aegean/90 focus:outline-none focus:ring-2 focus:ring-aegean/90;
   }
 
   .btn-outline {
     @apply btn border-2 border-aegean text-ink bg-sand
-           hover:bg-aegean/5
+           hover:bg-aegean/10
            focus:outline-none focus:ring-2 focus:ring-aegean/30;
   }
 
-  /* Sunset-outline */
   .btn-outline-sunset {
     @apply btn border-2 border-sunset text-sunset bg-white
            hover:bg-sunset/5
@@ -97,5 +105,13 @@ body {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
+  }
+
+  .bleed-small {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 1200px;
   }
 }

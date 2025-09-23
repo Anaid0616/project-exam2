@@ -48,10 +48,16 @@ export default function VenueCard({
 
       {showManage && (
         <div className="mt-3 flex items-center justify-end gap-2">
-          <Link href={`/venues/${v.id}/edit`} className="btn btn-ghost">
+          <Link
+            href={`/venues/${v.id}/edit`}
+            className="btn btn-outline btn-sm"
+          >
             Edit
           </Link>
-          <button className="btn btn-danger" onClick={() => onDelete?.(v.id)}>
+          <button
+            className="btn btn-outline-sunset btn-sm"
+            onClick={() => onDelete?.(v.id)}
+          >
             Delete
           </button>
         </div>

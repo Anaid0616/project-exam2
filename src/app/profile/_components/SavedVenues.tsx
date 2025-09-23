@@ -1,4 +1,3 @@
-// src/app/profile/_components/SavedVenues.tsx
 'use client';
 
 import * as React from 'react';

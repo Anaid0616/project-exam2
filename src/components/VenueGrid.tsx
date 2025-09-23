@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import ImgSkeleton from '@/components/ui/ImgSkeleton';
+
 import Pagination from './Pagination';
 import { api, API } from '@/lib/api';
 import type { VenueListResponse, Venue } from '@/types/venue';
@@ -125,12 +127,13 @@ export default async function VenueGrid({
               key={v.id}
               className="rounded-app bg-shell p-3 shadow-elev border"
             >
-              <Image
+              <ImgSkeleton
                 src={img}
-                alt={v.media?.[0]?.alt ?? v.name}
-                width={1200}
-                height={700}
-                className="mb-3 aspect-[16/9] w-full rounded-app object-cover"
+                alt={v.media?.[0]?.alt ?? v.name ?? 'Venue'}
+                fill
+                containerClassName="mb-3 aspect-[16/9] w-full"
+                roundedClassName="rounded-app"
+                sizes="(min-width:1280px) 25vw, (min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
                 unoptimized
               />
 

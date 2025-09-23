@@ -23,6 +23,28 @@ export async function getProfile(name: string): Promise<Profile> {
   return unwrap(res);
 }
 
+// Update profile
+export type UpdateProfilePayload = {
+  name?: string;
+  bio?: string;
+  avatar?: { url: string; alt?: string | null } | null;
+  banner?: { url: string; alt?: string | null } | null;
+};
+
+export async function updateProfile(
+  profileName: string,
+  input: UpdateProfilePayload
+): Promise<Profile> {
+  const res = await authApi<MaybeEnvelope<Profile>>(
+    `${API.profiles}/${encodeURIComponent(profileName)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    }
+  );
+  return unwrap(res);
+}
+
 // Create venue
 export async function createVenue(input: Partial<Venue>): Promise<Venue> {
   const res = await authApi<MaybeEnvelope<Venue>>(API.venues, {
