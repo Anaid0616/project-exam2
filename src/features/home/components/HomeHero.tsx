@@ -1,6 +1,7 @@
 // features/home/components/HomeHero.tsx
 'use client';
 import Image from 'next/image';
+import VenueSearchForm from '@/features/search/VenueSearchForm';
 
 export default function HomeHero() {
   return (
@@ -13,16 +14,8 @@ export default function HomeHero() {
         priority
         unoptimized
       />
-
       <div className="absolute inset-x-0 -bottom-8 z-[5] flex justify-center px-4">
-        <form className="card grid w-[min(100%,900px)] grid-cols-1 gap-3 rounded-app p-4 md:grid-cols-[1.5fr,1fr,1fr,1fr,auto]">
-          <h3 className="col-span-full text-xl font-semibold">Find stays</h3>
-          <input className="input" placeholder="Where" />
-          <input className="input" placeholder="Check-in" />
-          <input className="input" placeholder="Check-out" />
-          <input className="input" placeholder="Guests" />
-          <button className="btn btn-primary">Search</button>
-        </form>
+        <VenueSearchForm />
       </div>
     </section>
   );

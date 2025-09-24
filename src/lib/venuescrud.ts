@@ -155,3 +155,16 @@ export async function getVenueWithBookings(
   );
   return unwrap(res);
 }
+
+export async function listVenuesWithBookings(
+  limit = 120
+): Promise<VenueWithBookings[]> {
+  // _bookings=true
+  const res = await authApi<{ data: VenueWithBookings[] }>(
+    `${API.venues}?_bookings=true&limit=${limit}`
+  ).catch(() =>
+    authApi<VenueWithBookings[]>(`${API.venues}?_bookings=true&limit=${limit}`)
+  );
+
+  return Array.isArray(res) ? (res as VenueWithBookings[]) : res?.data ?? [];
+}

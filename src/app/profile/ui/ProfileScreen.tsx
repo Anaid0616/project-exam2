@@ -156,7 +156,7 @@ export default function ProfileScreen() {
         setLoadingBookings(false);
         setLoadingVenues(false);
       } finally {
-        if (alive) setLoadingProfile(false); // ⬅️ alltid
+        if (alive) setLoadingProfile(false);
       }
     })();
 
@@ -211,7 +211,7 @@ export default function ProfileScreen() {
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-6 pt-0">
-      {/* ==== InfoCard (header) ==== */}
+      {/* ==== InfoCard ==== */}
       {loadingProfile ? (
         <InfoCardSkeleton />
       ) : (

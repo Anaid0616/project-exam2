@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Pencil } from 'lucide-react';
 import type { JwtPayload, Profile } from '@/types/venue';
+import { isVenueManager } from '@/lib/isVenueManager';
 
 type Role = 'customer' | 'manager';
 
@@ -27,12 +28,7 @@ export default function InfoCard({
   childrenClassName?: string;
 }) {
   const role: Role =
-    roleProp ??
-    (profile?.venueManager
-      ? 'manager'
-      : payload?.venueManager
-      ? 'manager'
-      : 'customer');
+    roleProp ?? (isVenueManager(profile, payload) ? 'manager' : 'customer');
 
   const email = profile?.email ?? payload?.email ?? '—';
   const nameFromEmail =
@@ -46,7 +42,6 @@ export default function InfoCard({
   const bio = profile?.bio ?? '—';
 
   return (
-    // YTTRE SEKTION med dold rubrik (bra för a11y)
     <section aria-labelledby="profile-header" className="relative z-0">
       <h2 id="profile-header" className="sr-only">
         Profile
@@ -67,7 +62,6 @@ export default function InfoCard({
         </div>
       </div>
 
-      {/* KORTET: använd ARTICLE istället för nested section */}
       <article className="panel relative z-[10] mx-auto -mt-10 md:-mt-14 p-3 md:p-4">
         {/* Avatar + text + buttons */}
         <div className="flex items-start gap-4 md:items-start">

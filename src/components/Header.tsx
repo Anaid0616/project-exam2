@@ -5,7 +5,10 @@ import Image from 'next/image';
 import * as React from 'react';
 import { Heart } from 'lucide-react';
 import { decodeJwt } from '@/components/utils';
-import type { JwtPayload } from '@/types/venue';
+import type { JwtPayload, Profile } from '@/types/venue';
+import { isVenueManager } from '@/lib/isVenueManager';
+import { getProfile } from '@/lib/venuescrud';
+import { usePathname } from 'next/navigation';
 
 /* ==== helpers ==== */
 function isExpired(p?: JwtPayload | null): boolean {
@@ -20,6 +23,29 @@ function logout() {
   }
 }
 
+function NavButtonLikeLink({
+  href,
+  children,
+  className = '',
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const pathname = usePathname();
+  const active = pathname === href || pathname.startsWith(href + '/');
+
+  return (
+    <Link
+      href={href}
+      data-active={active ? 'true' : undefined}
+      className={`nav-link-underline ${className}`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 /* Länk med lagoon-underline */
 function NavLink({
   href,
@@ -30,15 +56,14 @@ function NavLink({
   children: React.ReactNode;
   className?: string;
 }) {
+  const pathname = usePathname();
+  const active = pathname === href || pathname.startsWith(href + '/');
+
   return (
     <Link
       href={href}
-      className={[
-        'relative px-2 py-1 text-sm md:text-base text-ink/80 hover:text-ink',
-        'after:absolute after:left-0 after:-bottom-0.5 after:h-[3px] after:bg-lagoon after:w-0',
-        'hover:after:w-full after:transition-all after:duration-200',
-        className,
-      ].join(' ')}
+      data-active={active ? 'true' : undefined}
+      className={`nav-link-underline nav-link-underline--sm ${className}`}
     >
       {children}
     </Link>
@@ -51,11 +76,13 @@ function NavButtonLike({
   onClick,
   ariaExpanded,
   ariaHaspopup,
+  isActive = false,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   ariaExpanded?: boolean;
   ariaHaspopup?: 'menu' | 'listbox' | 'dialog' | 'grid' | 'tree';
+  isActive?: boolean;
 }) {
   return (
     <button
@@ -63,11 +90,8 @@ function NavButtonLike({
       onClick={onClick}
       aria-expanded={ariaExpanded}
       aria-haspopup={ariaHaspopup}
-      className={[
-        'relative px-2 py-1 text-base text-ink/80 hover:text-black',
-        'after:absolute after:left-0 after:-bottom-0.5 after:h-[3px] after:bg-lagoon after:w-0',
-        'hover:after:w-full after:transition-all after:duration-200',
-      ].join(' ')}
+      data-active={isActive ? 'true' : undefined}
+      className={['nav-link-underline', 'text-base'].join(' ')}
     >
       {children}
     </button>
@@ -77,6 +101,8 @@ function NavButtonLike({
 /* Dropdownen */
 function ProfileMenu() {
   const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
+  const active = pathname.startsWith('/profile');
   const btnRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -103,6 +129,7 @@ function ProfileMenu() {
         onClick={() => setOpen((o) => !o)}
         ariaExpanded={open}
         ariaHaspopup="menu"
+        isActive={active || open}
       >
         My Profile
       </NavButtonLike>
@@ -145,6 +172,7 @@ function ProfileMenu() {
 /* ==== Header ==== */
 export default function Header() {
   const [payload, setPayload] = React.useState<JwtPayload | null>(null);
+  const [profile, setProfile] = React.useState<Profile | null>(null);
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
@@ -155,10 +183,20 @@ export default function Header() {
       return;
     }
     setPayload(p ?? null);
+
+    (async () => {
+      if (!p?.name) return;
+      try {
+        const prof = await getProfile(p.name);
+        setProfile(prof);
+      } catch {
+        // ignorera — vi kan fortfarande använda payload om den har flaggan
+      }
+    })();
   }, []);
 
   const isAuthed = !!payload;
-  const isManager = !!payload?.venueManager;
+  const isManager = isVenueManager(profile, payload);
 
   return (
     <div className="sticky top-0 z-[200] w-full bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
@@ -181,8 +219,15 @@ export default function Header() {
           </nav>
         ) : (
           <nav className="flex items-center gap-3 md:gap-4">
-            {/* Manager: Create venue före hjärtat, som länk */}
-            {isManager && <NavLink href="/venues/create">Create venue</NavLink>}
+            {isManager && (
+              <NavButtonLikeLink
+                href="/venues/create"
+                className="flex items-center gap-1"
+              >
+                <span className="text-lg leading-none">+</span>
+                <span>Create venue</span>
+              </NavButtonLikeLink>
+            )}
 
             {/* Saved (ikon) */}
             <Link
@@ -194,7 +239,7 @@ export default function Header() {
               <Heart className="h-5 w-5" />
             </Link>
 
-            {/* Profilmeny (knapp som ser ut som länk) */}
+            {/* profile menu */}
             <ProfileMenu />
           </nav>
         )}
