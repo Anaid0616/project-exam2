@@ -156,6 +156,21 @@ export async function getVenueWithBookings(
   return unwrap(res);
 }
 
+/** Textsök på namn/beskrivning via Noroff endpointen */
+export async function searchVenues(
+  q: string,
+  opts?: { bookings?: boolean; limit?: number }
+): Promise<Venue[] | VenueWithBookings[]> {
+  const withBookings = opts?.bookings ? '&_bookings=true' : '';
+  const limit = opts?.limit ? `&limit=${opts.limit}` : '';
+  const url = `${API.venues}/search?q=${encodeURIComponent(
+    q
+  )}${withBookings}${limit}`;
+
+  const res = await authApi<MaybeEnvelope<Venue[] | VenueWithBookings[]>>(url);
+  return unwrap(res) ?? [];
+}
+
 export async function listVenuesWithBookings(
   limit = 120
 ): Promise<VenueWithBookings[]> {

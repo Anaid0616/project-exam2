@@ -24,6 +24,14 @@ export default function VenueSearchForm({
     if (from) q.set('from', from);
     if (to) q.set('to', to);
     if (guests) q.set('guests', String(guests));
+
+    console.log('[SEARCH SUBMIT]', {
+      where,
+      from,
+      to,
+      guests,
+      url: `/search?${q.toString()}`,
+    });
     router.push(`/search?${q.toString()}`);
   }
 
