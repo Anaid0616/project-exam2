@@ -68,8 +68,8 @@ export default async function VenueDetailsPage({
         />
       </div>
 
-      <main className="relative z-10 -mt-10 md:-mt-14 mx-auto max-w-6xl px-6">
-        <section className="grid gap-6 md:grid-cols-[2fr,1fr] items-start">
+      <main className="relative z-0 -mt-10 md:-mt-14 mx-auto max-w-6xl px-6">
+        <section className="grid gap-6 lg:grid-cols-[1fr,360px] items-start">
           <div className="card p-5 space-y-5">
             <div>
               <div className="flex flex-wrap items-center gap-2">

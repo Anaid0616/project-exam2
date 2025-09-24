@@ -31,7 +31,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
       <body className="font-sans bg-sand text-ink">
         <Header />
-        <main>
+        <main className="relative z-0">
           {' '}
           <UserProvider>{children}</UserProvider>
         </main>

@@ -2,7 +2,7 @@
 
 export default function InfoCardSkeleton() {
   return (
-    <header className="relative">
+    <section className="relative">
       {/* Banner placeholder – samma layout som InfoCard */}
       <div className="mx-auto w-full px-4">
         <div className="relative mx-auto h-56 md:h-72 bleed-small overflow-hidden rounded-app">
@@ -11,7 +11,7 @@ export default function InfoCardSkeleton() {
       </div>
 
       {/* Card placeholder – samma spacing som InfoCard */}
-      <section className="panel relative mx-auto -mt-10 md:-mt-14 p-3 md:p-4">
+      <article className="panel relative mx-auto -mt-10 md:-mt-14 p-3 md:p-4">
         {/* Header rad: avatar + text + knappar */}
         <div className="flex items-start gap-4 md:items-start">
           {/* Oval avatar (vertikal), uppdragen lika mycket */}
@@ -48,7 +48,7 @@ export default function InfoCardSkeleton() {
             <div className="h-8 w-28 rounded bg-ink/10 animate-pulse" />
           </div>
         </div>
-      </section>
-    </header>
+      </article>
+    </section>
   );
 }

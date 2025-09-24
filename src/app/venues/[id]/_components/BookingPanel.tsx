@@ -102,66 +102,69 @@ export default function BookingPanel({
   }
 
   return (
-    <aside className="panel md:sticky md:top-8 space-y-3 p-4">
-      {/* Price */}
-      <div className="flex items-end justify-between">
+    <aside className="md:sticky md:top-24 self-start">
+      {/* själva kortet */}
+      <div className="panel space-y-3 p-4">
+        {/* Price */}
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-sm text-ink/60">Price</p>
+            <p className="text-xl font-semibold">
+              {price ? `${money(price)} / night` : '—'}
+            </p>
+          </div>
+        </div>
+
+        {/* Datum – återanvändbar komponent */}
+        <DateRangeField
+          value={range}
+          onChange={setRange}
+          blocked={blockedRanges}
+          className="grid gap-3 relative"
+        />
+
+        {/* Guests */}
         <div>
-          <p className="text-sm text-ink/60">Price</p>
-          <p className="text-xl font-semibold">
-            {price ? `${money(price)} / night` : '—'}
+          <label className="label">Guests (max {maxGuests})</label>
+          <div className="flex items-center gap-2">
+            <IconBtn
+              src={ICONS.minus}
+              label="Decrease guests"
+              onClick={() => setGuests((g) => Math.max(1, g - 1))}
+              disabled={guests <= 1}
+            />
+            <span
+              aria-live="polite"
+              className="inline-block w-6 text-center select-none"
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+            >
+              {guests}
+            </span>
+            <IconBtn
+              src={ICONS.plus}
+              label="Increase guests"
+              onClick={() => setGuests((g) => Math.min(maxGuests, g + 1))}
+              disabled={guests >= maxGuests}
+            />
+          </div>
+        </div>
+
+        {/* Sum */}
+        <div className="mt-1 flex items-center justify-between">
+          <p className="text-sm text-ink/60">
+            {nights ? `Total for ${nights} night${nights > 1 ? 's' : ''}` : '—'}
           </p>
+          <p className="font-semibold">{total ? money(total) : '—'}</p>
         </div>
+
+        <button
+          className="btn btn-primary w-full"
+          disabled={!canBook}
+          onClick={onBook}
+        >
+          Book now
+        </button>
       </div>
-
-      {/* Datum – återanvändbar komponent */}
-      <DateRangeField
-        value={range}
-        onChange={setRange}
-        blocked={blockedRanges}
-        className="grid gap-3 relative"
-      />
-
-      {/* Guests */}
-      <div>
-        <label className="label">Guests (max {maxGuests})</label>
-        <div className="flex items-center gap-2">
-          <IconBtn
-            src={ICONS.minus}
-            label="Decrease guests"
-            onClick={() => setGuests((g) => Math.max(1, g - 1))}
-            disabled={guests <= 1}
-          />
-          <span
-            aria-live="polite"
-            className="inline-block w-6 text-center select-none"
-            style={{ fontVariantNumeric: 'tabular-nums' }}
-          >
-            {guests}
-          </span>
-          <IconBtn
-            src={ICONS.plus}
-            label="Increase guests"
-            onClick={() => setGuests((g) => Math.min(maxGuests, g + 1))}
-            disabled={guests >= maxGuests}
-          />
-        </div>
-      </div>
-
-      {/* Sum */}
-      <div className="mt-1 flex items-center justify-between">
-        <p className="text-sm text-ink/60">
-          {nights ? `Total for ${nights} night${nights > 1 ? 's' : ''}` : '—'}
-        </p>
-        <p className="font-semibold">{total ? money(total) : '—'}</p>
-      </div>
-
-      <button
-        className="btn btn-primary w-full"
-        disabled={!canBook}
-        onClick={onBook}
-      >
-        Book now
-      </button>
     </aside>
   );
 }

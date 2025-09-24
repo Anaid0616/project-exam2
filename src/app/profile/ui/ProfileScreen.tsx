@@ -83,13 +83,15 @@ export default function ProfileScreen() {
     initialCustTab
   );
   const [mgrTab, setMgrTab] = React.useState<
-    'bookings' | 'myVenues' | 'venueBookings'
+    'bookings' | 'myVenues' | 'venueBookings' | 'saved'
   >('myVenues');
 
   //
   React.useEffect(() => {
     if (role === 'customer') {
       setCustTab(params.get('saved') ? 'saved' : 'bookings');
+    } else if (role === 'manager') {
+      if (params.get('saved')) setMgrTab('saved');
     }
   }, [params, role]);
 
@@ -98,18 +100,28 @@ export default function ProfileScreen() {
     let alive = true;
 
     (async () => {
+      if (!alive) return;
       setLoadingProfile(true);
       try {
         const t =
           typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         const p = t ? decodeJwt(t) : null;
         if (!alive) return;
+
         setPayload(p);
-
         const name = p?.name;
-        if (!t || !name) return;
 
-        // profile + role
+        // ⬇️ Viktigt: släck alla loaders även vid tidig exit
+        if (!t || !name) {
+          if (!alive) return;
+          setRole('customer');
+          setLoadingBookings(false);
+          setLoadingVenues(false);
+          setLoadingProfile(false);
+          return;
+        }
+
+        // profil + roll
         const pData = await getProfile(name);
         if (!alive) return;
         setProfile(pData);
@@ -117,7 +129,7 @@ export default function ProfileScreen() {
         const r: Role = pData.venueManager ? 'manager' : 'customer';
         setRole(r);
 
-        // bookings (both)
+        // bookings (båda roller)
         setLoadingBookings(true);
         try {
           const apiBookings = await getMyBookings(name);
@@ -127,7 +139,7 @@ export default function ProfileScreen() {
           if (alive) setLoadingBookings(false);
         }
 
-        // manager → venues list
+        // venues (manager)
         if (r === 'manager') {
           setLoadingVenues(true);
           try {
@@ -144,7 +156,7 @@ export default function ProfileScreen() {
         setLoadingBookings(false);
         setLoadingVenues(false);
       } finally {
-        if (alive) setLoadingProfile(false);
+        if (alive) setLoadingProfile(false); // ⬅️ alltid
       }
     })();
 

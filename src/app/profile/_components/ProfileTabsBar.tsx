@@ -4,7 +4,7 @@ import * as React from 'react';
 
 type Role = 'customer' | 'manager';
 
-// Stabil höjd: alltid 4px border-bottom, aktiv = lagoon, inaktiv = transparent
+// tabclass
 export function tabClass(active: boolean) {
   return `px-2.5 py-1.5 -mb-px leading-tight border-b-[4px]
           ${
@@ -25,7 +25,7 @@ export default function ProfileTabsBar({
   role: Role;
   custTab?: 'bookings' | 'saved';
   setCustTab?: (t: 'bookings' | 'saved') => void;
-  // ✅ fix: korrekta unioner
+
   mgrTab?: 'bookings' | 'myVenues' | 'venueBookings' | 'saved';
   setMgrTab?: (t: 'bookings' | 'myVenues' | 'venueBookings' | 'saved') => void;
   className?: string;

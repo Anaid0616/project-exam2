@@ -73,7 +73,7 @@ export default function RegisterPage() {
 
   return (
     <main className="mx-auto max-w-6xl p-6">
-      <div className="grid gap-2 md:grid-cols-2 items-stretch">
+      <div className="grid md:grid-cols-2 items-stretch">
         {/* Left: Card with the form */}
         <section className="panel flex flex-col justify-between">
           <div>
@@ -132,8 +132,8 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
-              {/* Account type (radio) */}
 
+              {/* Account type (radio) */}
               <fieldset className="mt-2">
                 <legend
                   id="legend-account-type"
