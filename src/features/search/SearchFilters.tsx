@@ -70,14 +70,21 @@ export default function SearchFilters() {
       <div>
         <label className="block text-sm font-medium mb-2">Guests</label>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => setParam('guests', String(Math.max(1, guests - 1)))}
             className="p-2 text-aegean hover:opacity-80 focus-visible:outline-none"
             aria-label="Minus one guest"
           >
-            <Image src="/minus.svg" alt="minus" width={20} height={20} />
+            <Image
+              src="/minus.svg"
+              alt="minus"
+              width={20}
+              height={20}
+              className="w-6 h-6"
+              aria-hidden
+            />
           </button>
 
           <span className="w-8 text-center font-semibold select-none">
@@ -90,7 +97,14 @@ export default function SearchFilters() {
             className="p-2 text-aegean hover:opacity-80 focus-visible:outline-none"
             aria-label="Plus one guest"
           >
-            <Image src="/plus.svg" alt="plus" width={20} height={20} />
+            <Image
+              src="/plus.svg"
+              alt="plus"
+              width={20}
+              height={20}
+              className="w-6 h-6"
+              aria-hidden
+            />
           </button>
         </div>
       </div>
