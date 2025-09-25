@@ -23,7 +23,7 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
   const rating = typeof v.rating === 'number' ? v.rating : 0;
   const maxGuests = v.maxGuests ?? 1;
 
-  // Amenities ligger under v.meta i din typ
+  // Amenities
   const amen = {
     wifi: Boolean(v.meta?.wifi),
     parking: Boolean(v.meta?.parking),

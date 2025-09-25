@@ -49,7 +49,7 @@ export default async function SearchPage({
 
   const sort = sp.sort ?? 'reco';
 
-  // ----- Hämta venues -----
+  // ----- get venues -----
   let venues: VenueWithBookings[];
   if (whereLc) {
     venues = (await searchVenues(whereLc, {
