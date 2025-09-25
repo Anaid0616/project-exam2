@@ -10,7 +10,7 @@ type Props = {
   max?: number;
   suggest?: number;
   className?: string;
-  inputId?: string; // ✅ här finns inputId
+  inputId?: string;
 };
 
 export default function GuestsPicker(props: Props) {
@@ -21,7 +21,7 @@ export default function GuestsPicker(props: Props) {
     max = 10,
     suggest = 2,
     className = '',
-    inputId, // ✅ nu kommer inputId in korrekt
+    inputId,
   } = props;
 
   const [open, setOpen] = React.useState(false);
@@ -48,9 +48,8 @@ export default function GuestsPicker(props: Props) {
 
   return (
     <div ref={ref} className={`relative ${className}`}>
-      {/* Trigger som labeln ska peka på */}
       <button
-        id={inputId} // ✅ viktigt för labelkoppling
+        id={inputId}
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}

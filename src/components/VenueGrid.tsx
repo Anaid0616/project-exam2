@@ -113,7 +113,7 @@ export default async function VenueGrid({
 
   return (
     <>
-      <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xxl:grid-cols-4">
         {items.map((v) => {
           const img =
             v.media?.[0]?.url ??

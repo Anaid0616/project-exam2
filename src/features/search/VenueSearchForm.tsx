@@ -14,7 +14,7 @@ function Field({
       <label
         htmlFor={id}
         className="pointer-events-none absolute -top-4 left-3 z-10 px-1
-                     text-xs font-medium text-ink/70"
+                     text-xs font-medium text-ink/80"
       >
         {label}
       </label>
@@ -75,6 +75,7 @@ export default function VenueSearchForm({
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (from && to && new Date(from) > new Date(to)) {
       alert('Check-out must be after check-in');
       return;
@@ -83,10 +84,12 @@ export default function VenueSearchForm({
     if (where.trim()) q.set('where', where.trim());
     if (from) q.set('from', from);
     if (to) q.set('to', to);
-    if (guests) q.set('guests', String(guests));
 
     if (guests === null) q.set('guests', '2');
     else q.set('guests', String(guests));
+
+    setOpen(false);
+
     router.push(`/search?${q.toString()}`);
   }
 
@@ -171,7 +174,7 @@ export default function VenueSearchForm({
             onChange={(e) => setFrom(e.target.value)}
           />
           {!from && (
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/50">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/60">
               Add date
             </span>
           )}
@@ -188,14 +191,14 @@ export default function VenueSearchForm({
             onChange={(e) => setTo(e.target.value)}
           />
           {!to && (
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/50">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/60">
               Add date
             </span>
           )}
         </div>
       </Field>
       <Field id="guests" label="Guests">
-        <GuestsPicker value={guests} onChange={setGuests} />
+        <GuestsPicker inputId="guests" value={guests} onChange={setGuests} />
       </Field>
 
       <button
