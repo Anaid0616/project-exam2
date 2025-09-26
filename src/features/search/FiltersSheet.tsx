@@ -5,7 +5,7 @@ import React from 'react';
 type Props = {
   open: boolean;
   onClose: () => void;
-  children: React.ReactNode; // your existing <SearchFilters />
+  children: React.ReactNode; // my <SearchFilters />
 };
 
 /**

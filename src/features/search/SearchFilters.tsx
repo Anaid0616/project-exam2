@@ -1,13 +1,47 @@
 'use client';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import Image from 'next/image';
 
+/**
+ * SearchFilters
+ *
+ * Sidebar (or mobile sheet content) that reads/writes its state from the URL query string.
+ * All controls are controlled by the current URL; updates are performed by pushing a new URL
+ * via Next.js navigation, which re-renders the page with filtered results.
+ *
+ * UX notes
+ * - Range slider uses a filled track to visualize the selected max price.
+ * - Guests stepper clamps values to [1, 10].
+ * - Ratings list uses your brand icon (logo) as a star replacement.
+ * - Amenity toggles are boolean flags that map to "1" (on) or removal (off) in the URL.
+ *
+ * Accessibility
+ * - Interactive elements have labels and use standard input controls (range, radio, checkbox).
+ * - Icon images used as “stars” are decorative (`alt=""`) and therefore not announced.
+ */
 export default function SearchFilters() {
   const router = useRouter();
   const sp = useSearchParams();
 
+  /**
+   * Cached copy of the current query string.
+   * Using URLSearchParams makes add/remove of keys predictable.
+   */
   const q = React.useMemo(() => new URLSearchParams(sp.toString()), [sp]);
+
+  /**
+   * setParam
+   *
+   * Updates (or removes) a single query parameter, then navigates to /search?…
+   *
+   * Removal rules:
+   * - empty string, '0', `undefined` → remove the key entirely
+   *
+   * @param key - Query string key to write (e.g., "guests", "priceMax")
+   * @param val - Value to set; falsy values remove the key
+   */
   const setParam = React.useCallback(
     (key: string, val?: string) => {
       const next = new URLSearchParams(q);
@@ -18,11 +52,12 @@ export default function SearchFilters() {
     [q, router]
   );
 
-  // ----- current values from URL -----
+  /** Price slider bounds (kept local for readability, adjust as needed). */
   const PRICE_MIN = 20;
   const PRICE_MAX = 500;
 
-  const priceMax = Number(sp.get('priceMax') ?? '0') || 212; // default t.ex. 212
+  /** Current values parsed from the URL (with sensible defaults). */
+  const priceMax = Number(sp.get('priceMax') ?? '0') || 212;
   const guests = Number(sp.get('guests') ?? '0') || 2;
   const ratingMin = Number(sp.get('ratingMin') ?? '0') || 0;
 
@@ -31,22 +66,29 @@ export default function SearchFilters() {
   const breakfast = sp.get('breakfast') === '1';
   const pets = sp.get('pets') === '1';
 
-  //
+  /**
+   * Percentage of the slider track to color (for the filled track bg).
+   * Clamped implicitly by slider min/max.
+   */
   const pct = Math.round(
     ((priceMax - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100
   );
 
-  //
+  /** Brand icon used for the “rating stars”. */
   const logoSrc = '/icon.png';
 
   return (
-    <aside className="panel space-y-5 lg:sticky top-24 h-fit">
+    <aside className="panel space-y-5">
       <h3 className="text-lg font-semibold">Filter</h3>
 
       {/* ---- Price (aegean) ---- */}
       <div>
         <label className="block text-sm font-medium mb-2">Price</label>
 
+        {/* 
+          Range slider with a custom filled track using inline style.
+          Note: the inline style uses CSS variables where available and falls back to hex.
+        */}
         <input
           type="range"
           min={PRICE_MIN}
@@ -62,6 +104,7 @@ export default function SearchFilters() {
               appearance: 'none',
             } as React.CSSProperties
           }
+          aria-label="Maximum price per night"
         />
         <div className="text-sm text-ink/70 mt-1">Up to €{priceMax}</div>
       </div>
@@ -70,6 +113,7 @@ export default function SearchFilters() {
       <div>
         <label className="block text-sm font-medium mb-2">Guests</label>
 
+        {/* Simple stepper, clamped to [1, 10] */}
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -87,7 +131,10 @@ export default function SearchFilters() {
             />
           </button>
 
-          <span className="w-8 text-center font-semibold select-none">
+          <span
+            className="w-8 text-center font-semibold select-none"
+            aria-live="polite"
+          >
             {guests}
           </span>
 
@@ -109,10 +156,11 @@ export default function SearchFilters() {
         </div>
       </div>
 
+      {/* ---- Ratings ---- */}
       <div>
         <label className="block text-sm font-medium mb-2">Ratings</label>
 
-        {/* vertikal lista */}
+        {/* Vertical list of radio options (5 → 1). Each row shows N brand icons. */}
         <div className="flex flex-col gap-2">
           {[5, 4, 3, 2, 1].map((r) => (
             <label key={r} className="block cursor-pointer">
@@ -122,6 +170,7 @@ export default function SearchFilters() {
                 checked={ratingMin === r}
                 onChange={() => setParam('ratingMin', String(r))}
                 className="sr-only"
+                aria-label={`Minimum rating ${r}`}
               />
               <span
                 className={[
@@ -202,11 +251,14 @@ export default function SearchFilters() {
           </li>
         </ul>
       </div>
+
+      {/* ---- Clear all ---- */}
       <div className="pt-2">
         <button
           type="button"
           className="btn btn-outline w-full"
           onClick={() => router.push('/search')}
+          aria-label="Clear all filters"
         >
           Clear filter
         </button>

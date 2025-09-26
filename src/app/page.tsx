@@ -1,7 +1,8 @@
-// app/page.tsx
+import { Suspense } from 'react';
 import ChipsBar from '@/features/home/components/ChipsBar';
 import VenueGrid from '@/components/VenueGrid';
 import HomeHero from '@/features/home/components/HomeHero';
+import VenueGridSkeleton from '@/components/skeletons/VenueGridSkeleton';
 
 export const revalidate = 0;
 
@@ -24,7 +25,6 @@ export default async function HomePage({
 
   const page = Number(pageStr ?? '1') || 1;
   const locOne = locRaw ? locRaw.toLowerCase() : null;
-
   return (
     <main className="mx-auto max-w-6xl space-y-6">
       <HomeHero />
@@ -36,14 +36,18 @@ export default async function HomePage({
           <ChipsBar />
         </div>
 
-        <VenueGrid
-          page={page}
-          pageSize={12}
-          tag={tag ?? undefined}
-          q={q ?? undefined}
-          loc={locOne}
-          path="/"
-        />
+        <div className="mt-6">
+          <Suspense fallback={<VenueGridSkeleton count={12} />}>
+            <VenueGrid
+              page={page}
+              pageSize={12}
+              tag={tag ?? undefined}
+              q={q ?? undefined}
+              loc={locOne}
+              path="/"
+            />
+          </Suspense>
+        </div>
       </section>
     </main>
   );

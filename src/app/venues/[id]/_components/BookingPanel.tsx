@@ -1,4 +1,3 @@
-// src/app/venues/[id]/_components/BookingPanel.tsx
 'use client';
 
 import * as React from 'react';
@@ -7,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 
-import DateRangeField, { type BlockedRange } from '@/components/DateRangeField';
+import DateRangeCalendar, {
+  type BlockedRange,
+} from '@/components/DateRangeCalendar';
 import { createBooking } from '@/lib/venuescrud';
 import { toast } from '@/lib/toast';
 
@@ -47,13 +48,11 @@ export default function BookingPanel({
 }) {
   const router = useRouter();
 
-  // Range från DateRangeField
   const [range, setRange] = React.useState<DateRange | undefined>(undefined);
 
   // Guests
   const [guests, setGuests] = React.useState(1);
 
-  // Blockerade datum för kalendern (bokningar)
   const blockedRanges: BlockedRange[] = React.useMemo(
     () =>
       (booked ?? []).map((b) => ({
@@ -115,13 +114,17 @@ export default function BookingPanel({
           </div>
         </div>
 
-        {/* Datum – återanvändbar komponent */}
-        <DateRangeField
-          value={range}
-          onChange={setRange}
-          blocked={blockedRanges}
-          className="grid gap-3 relative"
-        />
+        {/* OInline calendar*/}
+        <div>
+          <label className="label mb-1 block">Select dates</label>
+          <DateRangeCalendar
+            value={range}
+            onChange={setRange}
+            blocked={blockedRanges}
+            className="rounded-app border border-ink/10 p-2"
+            minDate={new Date()}
+          />
+        </div>
 
         {/* Guests */}
         <div>

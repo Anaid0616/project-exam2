@@ -6,6 +6,7 @@ import SaveButton from '@/components/SaveButton';
 
 type Media = { url: string; alt?: string | null };
 
+/** Lightweight hero carousel focused on fast LCP. */
 export default function HeroCarousel({
   images,
   fallback,
@@ -20,7 +21,6 @@ export default function HeroCarousel({
   fullBleed?: boolean;
   showFavorite?: boolean;
   venueId: string;
-  onToggleFavorite?: (next: boolean) => void;
 }) {
   const slides = images && images.length ? images : [fallback];
   const [i, setI] = React.useState(0);
@@ -29,6 +29,7 @@ export default function HeroCarousel({
   const prev = () => setI((n) => (n - 1 + len) % len);
   const next = () => setI((n) => (n + 1) % len);
 
+  // simple swipe
   const touch = React.useRef<{ x: number | null }>({ x: null });
   const onTouchStart = (e: React.TouchEvent) =>
     (touch.current.x = e.touches[0].clientX);
@@ -44,9 +45,18 @@ export default function HeroCarousel({
     ? 'relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen'
     : 'relative w-full rounded-app shadow-elev overflow-hidden';
 
-  const sizesAttr = fullBleed
-    ? '100vw'
-    : '(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1152px';
+  // Matcha din containerbredd (max ~1152px på desktop)
+  const sizesAttr = fullBleed ? '100vw' : '(min-width:1280px) 1152px, 100vw';
+
+  // Liten hjälpare: generera blurDataURL för Unsplash
+  const blurFor = (url: string) =>
+    url.includes('images.unsplash.com')
+      ? `${url}&w=32&q=10&auto=format`
+      : undefined;
+
+  // För LCP: bara första bilden får priority/eager
+  const isFirstSlide = i === 0;
+  const slide = slides[i];
 
   return (
     <div
@@ -56,13 +66,17 @@ export default function HeroCarousel({
       onTouchEnd={onTouchEnd}
     >
       <Image
-        key={slides[i].url}
-        src={slides[i].url}
-        alt={slides[i].alt ?? ''}
+        key={slide.url}
+        src={slide.url}
+        alt={slide.alt ?? ''}
         fill
-        sizes={sizesAttr}
         className="object-cover"
-        priority
+        sizes={sizesAttr}
+        priority={isFirstSlide}
+        fetchPriority={isFirstSlide ? 'high' : 'auto'}
+        loading={isFirstSlide ? 'eager' : 'lazy'}
+        placeholder={blurFor(slide.url) ? 'blur' : undefined}
+        blurDataURL={blurFor(slide.url)}
       />
 
       {showFavorite && (
@@ -75,6 +89,7 @@ export default function HeroCarousel({
         <>
           <Arrow onClick={prev} position="left" />
           <Arrow onClick={next} position="right" />
+          {/* lyft prickarna på desktop så de inte krockar med kortet */}
           <Dots count={len} active={i} />
         </>
       )}
@@ -98,11 +113,9 @@ function Arrow({
       aria-label={position === 'left' ? 'Previous image' : 'Next image'}
       onClick={onClick}
       className={`absolute top-1/2 -translate-y-1/2 ${side}
-        z-20 grid place-items-center
-        h-10 w-10 rounded-full        /* <- helt rund */
-        bg-sand/90 text-aegean shadow-elev
-        hover:bg-sand focus-visible:outline-none
-        focus-visible:ring-2 focus-visible:ring-aegean/30
+        z-20 grid place-items-center h-10 w-10 rounded-full
+        bg-sand/90 text-aegean shadow-elev hover:bg-sand
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aegean/30
       `}
     >
       <svg viewBox="0 0 24 24" className={`h-5 w-5 ${flip}`}>
@@ -121,7 +134,7 @@ function Arrow({
 
 function Dots({ count, active }: { count: number; active: number }) {
   return (
-    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+    <div className="absolute inset-x-0 bottom-12 md:bottom-16 lg:bottom-19 flex justify-center gap-2 z-10">
       {Array.from({ length: count }).map((_, idx) => (
         <span
           key={idx}
