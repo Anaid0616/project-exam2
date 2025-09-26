@@ -27,7 +27,6 @@ export default function MobileNav({
 
   return (
     <div
-      aria-hidden={!open}
       className={[
         'fixed inset-0 z-[999]',
         open ? 'pointer-events-auto' : 'pointer-events-none',
@@ -51,6 +50,7 @@ export default function MobileNav({
           open ? 'translate-x-0' : 'translate-x-full',
         ].join(' ')}
         role="dialog"
+        aria-modal="true"
         aria-label="Menu"
       >
         <div className="h-20 flex items-center justify-between px-4 py-5 border-b bg-white">
