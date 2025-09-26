@@ -121,7 +121,31 @@ export default async function VenueDetailsPage({
               <div>
                 <h3 className="text-base font-semibold">Location</h3>
                 <p className="mt-1 text-sm text-ink/70">{loc}</p>
-                <div className="mt-3 h-40 w-full rounded-app bg-ink/5" />
+
+                <div className="mt-3 overflow-hidden rounded-app border border-ink/10">
+                  <iframe
+                    title={`Map of ${loc}`}
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(
+                      loc
+                    )}&output=embed`}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="h-56 w-full md:h-64"
+                  />
+                </div>
+
+                <p className="mt-2 text-sm">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      loc
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-aegean hover:underline"
+                  >
+                    Open in Google Maps
+                  </a>
+                </p>
               </div>
             )}
           </div>
