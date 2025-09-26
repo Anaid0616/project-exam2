@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import MobileNav from '@/components/MobileNav';
 import Image from 'next/image';
 import * as React from 'react';
 import { Heart } from 'lucide-react';
@@ -9,6 +10,7 @@ import type { JwtPayload, Profile } from '@/types/venue';
 import { isVenueManager } from '@/lib/isVenueManager';
 import { getProfile } from '@/lib/venuescrud';
 import { usePathname } from 'next/navigation';
+import Portal from '@/components/Portal';
 
 /* ==== helpers ==== */
 function isExpired(p?: JwtPayload | null): boolean {
@@ -173,6 +175,7 @@ function ProfileMenu() {
 export default function Header() {
   const [payload, setPayload] = React.useState<JwtPayload | null>(null);
   const [profile, setProfile] = React.useState<Profile | null>(null);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
@@ -209,16 +212,16 @@ export default function Header() {
           <span className="sr-only">Holidaze</span>
         </Link>
 
-        {/* Right side */}
+        {/* Desktop nav */}
         {!isAuthed ? (
-          <nav className="flex items-center gap-6">
+          <nav className="hidden items-center gap-6 md:flex">
             <NavLink href="/auth/register">Register</NavLink>
             <Link href="/auth/login" className="btn btn-outline">
               Login
             </Link>
           </nav>
         ) : (
-          <nav className="flex items-center gap-3 md:gap-4">
+          <nav className="hidden items-center gap-3 md:flex md:gap-4">
             {isManager && (
               <NavButtonLikeLink
                 href="/venues/create"
@@ -243,6 +246,47 @@ export default function Header() {
             <ProfileMenu />
           </nav>
         )}
+
+        {/* Mobile hamburger (visible on mobile) */}
+        <div className="flex items-center gap-4 md:hidden">
+          {isAuthed && (
+            <Link
+              href="/profile?saved=1"
+              aria-label="Saved venues"
+              title="Saved venues"
+              className="inline-flex items-center justify-center p-2 -m-2 text-ink/80 hover:text-ink"
+            >
+              <Heart className="h-6 w-6" />
+            </Link>
+          )}
+
+          <button
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(true)}
+            className="p-2 -m-2 rounded-full hover:bg-ink/10"
+          >
+            <svg
+              viewBox="0 0 20 20"
+              className="h-6 w-6"
+              fill="currentColor"
+              aria-hidden
+            >
+              <path d="M3 6.5h14a1 1 0 1 0 0-2H3a1 1 0 1 0 0 2Zm14 3H3a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2Zm0 5H3a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2Z" />
+            </svg>
+          </button>
+        </div>
+
+        <Portal>
+          <MobileNav
+            open={mobileOpen}
+            onClose={() => setMobileOpen(false)}
+            isAuthed={isAuthed}
+            isManager={isManager}
+            onLogout={logout}
+          />
+        </Portal>
       </div>
     </div>
   );

@@ -1,8 +1,20 @@
-// components/GuestsPicker.tsx
 'use client';
 import * as React from 'react';
 import Image from 'next/image';
 
+/**
+ * Props for GuestsPicker.
+ *
+ * @property value     Current guests value. Use `null` to indicate "no choice yet"
+ *                     so the component shows a soft placeholder (from `suggest`).
+ * @property onChange  Called with a new value (or `null` when Reset is pressed).
+ * @property min       Minimum allowed guests when a value is present. Default: 1.
+ * @property max       Maximum allowed guests. Default: 10.
+ * @property suggest   Placeholder count shown when value is `null`. Default: 2.
+ * @property className Extra classes merged into the root container.
+ * @property inputId   Optional id applied to the trigger <button>, so a
+ *                     <label htmlFor={inputId}> associates correctly.
+ */
 type Props = {
   value: number | null;
   onChange: (v: number | null) => void;
@@ -13,20 +25,33 @@ type Props = {
   inputId?: string;
 };
 
-export default function GuestsPicker(props: Props) {
-  const {
-    value,
-    onChange,
-    min = 1,
-    max = 10,
-    suggest = 2,
-    className = '',
-    inputId,
-  } = props;
-
+/**
+ * GuestsPicker
+ *
+ * A small “stepper-in-a-popover” that behaves like a select:
+ * - The trigger looks like an input.
+ * - Clicking opens a small dialog with – / + controls and a live-updating count.
+ * - When `value` is `null`, the trigger shows a softer placeholder using `suggest`.
+ *
+ * Accessibility:
+ * - Trigger has `aria-haspopup="dialog"` and `aria-expanded`.
+ * - Popover uses `role="dialog"` + `aria-label`.
+ * - The count uses `aria-live="polite"` so screen readers hear updates.
+ * - Provide `inputId` and pair it with a <label htmlFor={inputId}> outside.
+ */
+export default function GuestsPicker({
+  value,
+  onChange,
+  min = 1,
+  max = 10,
+  suggest = 2,
+  className = '',
+  inputId,
+}: Props) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
+  // Close the popover on outside click or Escape
   React.useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
@@ -43,12 +68,15 @@ export default function GuestsPicker(props: Props) {
     };
   }, []);
 
+  // Shown value = actual value or placeholder suggestion
   const shown = value ?? suggest;
   const isPh = value === null;
 
   return (
     <div ref={ref} className={`relative ${className}`}>
+      {/* Trigger that looks like an input; label outside should use htmlFor={inputId} */}
       <button
+        name="guests"
         id={inputId}
         type="button"
         aria-haspopup="dialog"
@@ -77,6 +105,8 @@ export default function GuestsPicker(props: Props) {
         >
           <div className="flex items-center justify-between gap-3">
             <div className="font-medium">Guests</div>
+
+            {/* Stepper controls */}
             <div className="flex items-center gap-0">
               <button
                 type="button"
@@ -87,6 +117,7 @@ export default function GuestsPicker(props: Props) {
                 disabled={value === null || value <= min}
                 className="size-9 flex items-center justify-center disabled:opacity-40 hover:bg-ink/5"
               >
+                {/* Fixed width/height prevents layout shift and silences Next/Image warnings */}
                 <Image
                   src="/minus.svg"
                   alt="minus"
@@ -128,7 +159,7 @@ export default function GuestsPicker(props: Props) {
             <button
               type="button"
               className="text-sm text-ink/70 hover:underline"
-              onClick={() => onChange(null)}
+              onClick={() => onChange(null)} // back to placeholder state
             >
               Reset
             </button>
