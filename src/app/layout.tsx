@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
-import Header from '@/components/Header';
+import Header from '@/components/header/Header';
 import Footer from '@/components/Footer';
 import ToastProvider from '@/components/ToastProvider';
 import { UserProvider } from '@/providers/UserProvider';
@@ -31,7 +31,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
       <body className="font-sans bg-sand text-ink">
         <Header />
-        <main className="relative z-0">
+        <main className="overflow-x-clip">
           {' '}
           <UserProvider>{children}</UserProvider>
         </main>

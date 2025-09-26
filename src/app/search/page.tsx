@@ -5,6 +5,8 @@ import SortMenu from '@/features/search/SortMenu';
 import { listVenuesWithBookings, searchVenues } from '@/lib/venuescrud';
 import type { VenueWithBookings } from '@/types/venue';
 
+import HeaderActionsMobile from '@/features/search/HeaderActionsMobile';
+
 function overlaps(aFrom: Date, aTo: Date, bFrom: Date, bTo: Date) {
   return aFrom < bTo && aTo > bFrom;
 }
@@ -107,26 +109,42 @@ export default async function SearchPage({
   // ----- UI -----
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 space-y-4">
-      <div className="panel flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold">
-            {whereRaw
-              ? `Stays in ${whereRaw[0].toUpperCase()}${whereRaw.slice(1)}`
-              : 'Stays'}
-          </h2>
-          <p className="text-ink/70 text-sm">
-            {fromStr && toStr ? `${fromStr} – ${toStr}` : 'Any dates'}
-            {guests
-              ? ` · ${guests} guest${guests > 1 ? 's' : ''}`
-              : ' · Any guests'}
-            {' · '} {results.length} result{results.length === 1 ? '' : 's'}
-          </p>
+      {/* HEADER-KORTET */}
+      <div className="panel">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">
+              {whereRaw
+                ? `Stays in ${whereRaw[0].toUpperCase()}${whereRaw.slice(1)}`
+                : 'Stays'}
+            </h2>
+            <p className="text-ink/70 text-sm">
+              {fromStr && toStr ? `${fromStr} – ${toStr}` : 'Any dates'}
+              {guests
+                ? ` · ${guests} guest${guests > 1 ? 's' : ''}`
+                : ' · Any guests'}
+              {' · '} {results.length} result{results.length === 1 ? '' : 's'}
+            </p>
+          </div>
+
+          {/* Desktop: sort uppe till höger (mobil döljs här) */}
+          <div className="hidden lg:block">
+            <SortMenu />
+          </div>
         </div>
-        <SortMenu />
+
+        {/* Mobil: rad under texterna inne i panelen */}
+        <HeaderActionsMobile>
+          <SearchFilters />
+        </HeaderActionsMobile>
       </div>
 
+      {/* DESKTOP: oförändrad grid med sticky sidebar */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[300px,1fr]">
-        <SearchFilters />
+        <aside className="hidden lg:sticky lg:top-24 lg:block">
+          <SearchFilters />
+        </aside>
+
         <section className="space-y-4">
           {results.length === 0 ? (
             <p className="text-ink/70">No venues match your filters.</p>

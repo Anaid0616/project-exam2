@@ -40,7 +40,7 @@ export default function SearchFilters() {
   const logoSrc = '/icon.png';
 
   return (
-    <aside className="panel space-y-5 sticky top-24 h-fit">
+    <aside className="panel space-y-5 lg:sticky top-24 h-fit">
       <h3 className="text-lg font-semibold">Filter</h3>
 
       {/* ---- Price (aegean) ---- */}
