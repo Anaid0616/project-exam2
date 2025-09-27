@@ -1,14 +1,24 @@
 import Link from 'next/link';
+import { MapPin } from 'lucide-react';
+
 import { getVenueWithBookings } from '@/lib/venuescrud';
 import type { VenueWithBookings, BookedLite } from '@/types/venue';
-import BookingPanel from './_components/BookingPanel';
+
 import HeroCarousel from './_components/HeroCarousel';
-import Rating from './_components/Rating';
+import BookingPanel from './_components/BookingPanel';
 import OwnerActions from './_components/OwnerActions';
+
+import Rating from '@/components/Rating';
+import AmenitiesRow from '@/components/AmenitiesRow';
 
 export const revalidate = 0;
 
-function money(n: number) {
+/**
+ * Format a number as EUR without decimals (e.g. "€240").
+ * @param n - Nightly price in EUR
+ * @returns Money string in EUR
+ */
+function money(n: number): string {
   return new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'EUR',
@@ -16,9 +26,24 @@ function money(n: number) {
   }).format(n);
 }
 
+/**
+ * Venue details page.
+ *
+ * Server-rendered page that fetches a venue (including bookings and owner)
+ * and renders:
+ *  - Hero carousel
+ *  - Title + rating + location + quick facts
+ *  - Description, amenities (shared icon row), policies, map
+ *  - Booking panel (client component) with inline calendar
+ *
+ * Layout:
+ *  - On large screens: two-column grid where the booking panel is sticky.
+ *  - On small screens: booking panel spans full width below content.
+ */
 export default async function VenueDetailsPage({
   params,
 }: {
+  /** Dynamic segment from /venues/[id] (kept as a Promise per your setup). */
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
@@ -39,7 +64,8 @@ export default async function VenueDetailsPage({
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-2 md:px-6">
+        {/* Breadcrumbs  */}
         <nav className="mb-2 pt-3 text-xs text-ink/70">
           <ol className="flex gap-2">
             <li>
@@ -49,7 +75,7 @@ export default async function VenueDetailsPage({
             </li>
             <li>/</li>
             <li>
-              <Link href="/venues" className="hover:underline">
+              <Link href="/#venues" className="hover:underline">
                 Venues
               </Link>
             </li>
@@ -68,18 +94,30 @@ export default async function VenueDetailsPage({
         />
       </div>
 
-      <main className="relative z-0 -mt-10 md:-mt-14 mx-auto max-w-6xl px-6">
-        <section className="grid gap-6 lg:grid-cols-[1fr,360px] items-start">
+      <main className="relative z-0 -mt-10 md:-mt-14 mx-auto max-w-6xl px-2 md:px-6">
+        <section className="grid gap-6 min-[900px]:grid-cols-[1fr,360px] items-start">
+          {/* Content */}
           <div className="card p-5 space-y-5">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-baseline gap-3">
                 <h1 className="text-3xl font-extrabold tracking-tight">
                   {v.name}
                 </h1>
-                <Rating value={v.rating ?? 0} />
+
+                {/* Rating */}
+                <Rating
+                  value={v.rating ?? 0}
+                  size="lg"
+                  className="translate-y-[1px]"
+                />
               </div>
-              {loc && <p className="mt-1 text-sm text-ink/70">{loc}</p>}
-              <p className="mt-2 text-sm text-ink/70">
+
+              <div className="mt-1 flex items-center gap-1">
+                <MapPin className="h-4 w-4 text-sunset" aria-hidden />
+                {loc && <p className="mt-1 text-ink/70">{loc}</p>}
+              </div>
+
+              <p className="mt-2 text-ink/70">
                 Guests: up to {v.maxGuests}
                 {typeof v.price === 'number' && (
                   <> &nbsp;•&nbsp; {money(v.price)} / night</>
@@ -98,14 +136,12 @@ export default async function VenueDetailsPage({
               </p>
             </div>
 
+            {/* Amenities */}
             <div>
               <h3 className="text-base font-semibold">Amenities</h3>
-              <ul className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <Amenity label="Free Wi-Fi" active={!!v.meta?.wifi} />
-                <Amenity label="On-site parking" active={!!v.meta?.parking} />
-                <Amenity label="Breakfast" active={!!v.meta?.breakfast} />
-                <Amenity label="Pets allowed" active={!!v.meta?.pets} />
-              </ul>
+              <div className="mt-2">
+                <AmenitiesRow meta={v.meta ?? {}} size="md" gapClass="gap-6" />
+              </div>
             </div>
 
             <div>
@@ -150,6 +186,7 @@ export default async function VenueDetailsPage({
             )}
           </div>
 
+          {/* Booking panel */}
           <BookingPanel
             venueId={v.id}
             price={v.price}
@@ -161,18 +198,5 @@ export default async function VenueDetailsPage({
         </section>
       </main>
     </>
-  );
-}
-
-function Amenity({ label, active }: { label: string; active: boolean }) {
-  return (
-    <li className={`flex items-center gap-2 ${active ? '' : 'opacity-40'}`}>
-      <span
-        className={`inline-block h-2.5 w-2.5 rounded-app ${
-          active ? 'bg-aegean' : 'bg-ink/30'
-        }`}
-      />
-      <span>{label}</span>
-    </li>
   );
 }

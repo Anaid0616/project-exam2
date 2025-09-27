@@ -5,6 +5,7 @@ import Header from '@/components/header/Header';
 import Footer from '@/components/Footer';
 import ToastProvider from '@/components/ToastProvider';
 import { UserProvider } from '@/providers/UserProvider';
+import 'react-day-picker/dist/style.css';
 
 const inter = Inter({
   subsets: ['latin'],

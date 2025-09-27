@@ -31,6 +31,23 @@ function nightsBetween(a: Date, b: Date) {
 }
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
 
+// ── helper ────────────────────────────────
+function asLocalDate(input: string) {
+  const d = new Date(input);
+  if (!Number.isNaN(d.getTime())) {
+    return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  }
+  const [y, m, dd] = input.split('-').map(Number);
+  return new Date(y, (m ?? 1) - 1, dd ?? 1);
+}
+function addDays(d: Date, n: number) {
+  const c = new Date(d);
+  c.setDate(c.getDate() + n);
+  return c;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+
 export default function BookingPanel({
   venueId,
   price,
@@ -49,16 +66,16 @@ export default function BookingPanel({
   const router = useRouter();
 
   const [range, setRange] = React.useState<DateRange | undefined>(undefined);
-
-  // Guests
   const [guests, setGuests] = React.useState(1);
 
+  // ── block dates days before ──────
   const blockedRanges: BlockedRange[] = React.useMemo(
     () =>
-      (booked ?? []).map((b) => ({
-        from: new Date(b.dateFrom),
-        to: new Date(b.dateTo),
-      })),
+      (booked ?? []).map((b) => {
+        const from = asLocalDate(b.dateFrom);
+        const to = addDays(asLocalDate(b.dateTo), -1);
+        return { from, to };
+      }),
     [booked]
   );
 
@@ -92,7 +109,8 @@ export default function BookingPanel({
         ...(venueName ? { venueName } : {}),
         ...(location ? { location } : {}),
       });
-      router.push(`/book?${q.toString()}`);
+
+      router.push(`/book/confirmation?${q.toString()}`);
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : 'Could not create booking';
@@ -101,7 +119,7 @@ export default function BookingPanel({
   }
 
   return (
-    <aside className="md:sticky md:top-24 self-start">
+    <aside className="min-w-0 w-full min-[900px]:sticky min-[900px]:top-24 self-start">
       {/* själva kortet */}
       <div className="panel space-y-3 p-4">
         {/* Price */}
@@ -114,15 +132,20 @@ export default function BookingPanel({
           </div>
         </div>
 
-        {/* OInline calendar*/}
+        {/* Inline calendar */}
         <div>
           <label className="label mb-1 block">Select dates</label>
           <DateRangeCalendar
             value={range}
             onChange={setRange}
             blocked={blockedRanges}
-            className="rounded-app border border-ink/10 p-2"
-            minDate={new Date()}
+            className="
+    booking-calendar rounded-app border border-ink/10 p-2
+    w-full max-w-[360px] md:max-w-[400px] mx-auto
+    [&_.rdp]:inline-block origin-top overflow-visible
+
+    max-[338px]:scale-[0.80] max-[338px]:-mb-20
+  "
           />
         </div>
 

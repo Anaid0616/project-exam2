@@ -1,4 +1,3 @@
-// src/validation/auth.ts
 import * as yup from 'yup';
 import { InferType } from 'yup';
 
@@ -32,7 +31,7 @@ export const registerSchema = yup.object({
     .string()
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
-  // viktig: omvandlar radio value "true"/"false" -> boolean
+  // Important radio value "true"/"false" -> boolean
   venueManager: yup
     .boolean()
     .transform((value, originalValue) => {

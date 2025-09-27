@@ -150,3 +150,14 @@ input[type='date'].dateph[value='']::-webkit-datetime-edit {
 input[type='date'].dateph:not([value=''])::-webkit-datetime-edit {
   color: inherit;
 }
+
+/* ---- Booking calendar ---- */
+.booking-calendar .rdp {
+  margin: 0;
+}
+
+/* unlock default sizes */
+.booking-calendar .rdp-months {
+  max-width: none;
+  justify-content: center;
+}

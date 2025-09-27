@@ -2,110 +2,37 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  MapPin,
-  CalendarRange,
-  Wifi,
-  Car,
-  UtensilsCrossed,
-  PawPrint,
-  type LucideIcon,
-} from 'lucide-react';
+import { MapPin, CalendarRange } from 'lucide-react';
 import SaveButton from '@/components/SaveButton';
+import Rating from '@/components/Rating';
+import AmenitiesRow from '@/components/AmenitiesRow';
 import type { VenueWithBookings } from '@/types/venue';
-
-/**
- * Displays the rating using your brand icon instead of stars.
- * Filled vs. “empty” state is determined by rounding the numeric value.
- *
- * Accessibility: exposes the precise rating via `aria-label` while the icons
- * themselves are decorative and `aria-hidden`.
- *
- * @param props.value - Numeric rating in the range 0–5 (rounded for fill)
- */
-function LogoRating({ value }: { value: number }) {
-  const full = Math.round(value);
-  return (
-    <div
-      className="inline-flex items-center gap-1"
-      aria-label={`${value.toFixed(1)} out of 5`}
-    >
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} className={i < full ? 'opacity-100' : 'opacity-30'}>
-          <Image
-            src="/logofooter.svg"
-            alt="" // decorative
-            width={16}
-            height={16}
-            className="inline-block align-[-2px]"
-            aria-hidden
-          />
-        </span>
-      ))}
-      <span className="ml-1 text-[13px] text-ink/60">{value.toFixed(1)}</span>
-    </div>
-  );
-}
-
-/**
- * Single amenity line (icon + label). Renders nothing when `show` is false.
- *
- * @param props.show - Whether to render this amenity
- * @param props.icon - Lucide icon component for the amenity
- * @param props.label - Text label for the amenity
- */
-function Amenity({
-  show,
-  icon: Icon,
-  label,
-}: {
-  show: boolean;
-  icon: LucideIcon;
-  label: string;
-}) {
-  if (!show) return null;
-  return (
-    <li className="inline-flex items-center gap-1.5 text-sm text-ink/70">
-      <Icon className="h-4 w-4 text-ink/50" aria-hidden />
-      <span className="truncate">{label}</span>
-    </li>
-  );
-}
 
 /**
  * SearchResultCard
  *
- * Responsive card used on the search results page.
+ * Responsive card used in the search results grid to preview a single venue.
+ * Shows image, name, rating, location, a brief date row, amenities and a CTA.
  *
- * Layout (md+):
- * - Two-column grid: [image | info].
- * - The image spans two rows (`md:row-span-2`).
- * - A footer row lives in column 2, row 2 (so it sits under the info column only).
- *
- * Interactions:
- * - SaveButton (heart) appears:
- *   - On mobile: white icon, positioned on top-right of the image.
- *   - On md+: sunset-colored icon, positioned in the card’s top-right corner.
+ * Layout:
+ * - On small screens: single-column stacked layout.
+ * - On md+ screens: two-column grid ([image | info]); image spans two rows.
  *
  * Accessibility:
- * - Rating announces the exact numeric rating via `aria-label`.
- * - Decorative icons are `aria-hidden`.
+ * - Decorative icons have `aria-hidden`.
+ * - `Rating` component includes an ARIA label with the numeric value.
  *
- * @param props.v - Venue with optional bookings, typed from your shared `VenueWithBookings`
+ * @param param0 - Component props
+ * @param param0.v - Venue data (incl. media, meta, price) to render in the card
  */
 export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
+  /** Primary image URL (falls back to a generic icon if none exists). */
   const img = v.media[0]?.url || '/icon.png';
+  /** City and country labels with safe fallbacks. */
   const city = v.location?.city ?? '—';
   const country = v.location?.country ?? '—';
+  /** Normalized numeric rating (defaults to 0 if missing). */
   const rating = typeof v.rating === 'number' ? v.rating : 0;
-
-  // Normalize amenity booleans for simple rendering logic
-  const amen = {
-    wifi: !!v.meta.wifi,
-    parking: !!v.meta.parking,
-    breakfast: !!v.meta.breakfast,
-    pets: !!v.meta.pets,
-  } as const;
 
   return (
     <article className="relative isolate overflow-hidden rounded-2xl border border-ink/10 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
@@ -118,8 +45,7 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
         className="absolute right-3 top-3 hidden md:block"
       />
 
-      {/* Main grid:
-         md+: two columns [image | info], image spans two rows. */}
+      {/* Main grid: md+ two columns [image | info], image spans two rows */}
       <div className="grid grid-cols-1 gap-4 md:auto-rows-auto md:grid-cols-[270px,1fr] lg:grid-cols-[310px,1fr]">
         {/* Image (row 1–2 on md+) */}
         <div
@@ -162,7 +88,7 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
 
           {/* Rating just below the name */}
           <div className="mt-1">
-            <LogoRating value={rating} />
+            <Rating value={rating} size="sm" />
           </div>
 
           {/* Location below rating */}
@@ -173,23 +99,16 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
             </span>
           </div>
 
-          {/* Date row (placeholder copy) */}
+          {/* Date row */}
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink/70">
             <CalendarRange className="h-4 w-4" aria-hidden />
             <span>Date from – Date to, 2 nights</span>
           </div>
 
-          {/* Amenities */}
-          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
-            <Amenity show={amen.wifi} icon={Wifi} label="Wi-Fi" />
-            <Amenity
-              show={amen.breakfast}
-              icon={UtensilsCrossed}
-              label="Breakfast"
-            />
-            <Amenity show={amen.parking} icon={Car} label="Parking" />
-            <Amenity show={amen.pets} icon={PawPrint} label="Pets" />
-          </ul>
+          {/* Amenities  */}
+          <div className="mt-3">
+            <AmenitiesRow meta={v.meta ?? {}} size="sm" gapClass="gap-4" />
+          </div>
         </div>
 
         {/* Footer (column 2, row 2): price/total on the left, CTA on the right */}
