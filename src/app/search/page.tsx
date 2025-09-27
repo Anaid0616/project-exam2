@@ -1,95 +1,96 @@
 // app/search/page.tsx
-
 import SearchFilters from '@/features/search/SearchFilters';
 import SearchResultCard from '@/features/search/SearchResultCard';
 import SortMenu from '@/features/search/SortMenu';
-import { listVenuesWithBookings, searchVenues } from '@/lib/venuescrud';
-import type { VenueWithBookings } from '@/types/venue';
 import HeaderActionsMobile from '@/features/search/HeaderActionsMobile';
 
-/**
- * Query string accepted by the Search page. Matches your existing URL schema.
- */
-type SearchQueryParams = {
-  where?: string;
-  from?: string;
-  to?: string;
-  guests?: string;
-  priceMax?: string;
-  ratingMin?: string;
-  wifi?: string;
-  parking?: string;
-  breakfast?: string;
-  pets?: string;
-  sort?: 'reco' | 'price_asc' | 'price_desc' | 'rating_desc';
-};
+import { listVenuesWithBookings, searchVenues } from '@/lib/venuescrud';
+import type { VenueWithBookings } from '@/types/venue';
+
+import { one, int, type Sp } from '@/lib/url-params';
 
 /**
  * Returns `true` when two date ranges overlap.
- * Inclusive on touching ranges is avoided (A.to > B.from) to prevent
- * booking that ends the same day another starts from being considered a clash.
+ * We avoid inclusive-on-touch (A.to > B.from) so a booking that ends on a day
+ * does not clash with one that starts the same day.
  *
  * @param aFrom - Range A start
  * @param aTo   - Range A end
  * @param bFrom - Range B start
  * @param bTo   - Range B end
  */
-function overlaps(aFrom: Date, aTo: Date, bFrom: Date, bTo: Date) {
+function overlaps(aFrom: Date, aTo: Date, bFrom: Date, bTo: Date): boolean {
   return aFrom < bTo && aTo > bFrom;
 }
 
 /**
  * SearchPage (Server Component)
  *
- * Server-rendered page that:
- * 1) Reads search params
- * 2) Fetches venues (either by keyword search or listing)
- * 3) Filters in-memory according to params
- * 4) Sorts the result list
- * 5) Renders the UI with a desktop sidebar and a mobile “Filters” sheet
+ * Responsibilities
+ * 1) Read URL params (where/from/to/guests/priceMax/ratingMin/amenities/sort)
+ * 2) Fetch venues (keyword search or plain list)
+ * 3) Filter in-memory according to params (guests, price, rating, amenities, date clash)
+ * 4) Sort the results
+ * 5) Render desktop sidebar + mobile filters
  *
  * Data flow
- * - All filtering & sorting happens server-side for a single render pass.
- * - Controls (SearchFilters + SortMenu) update the URL, which re-renders this page.
+ * - All filtering/sorting is server-side for a single render pass.
+ * - Controls (SearchFilters, SortMenu) update the URL → this page re-renders.
  *
  * Accessibility
- * - Counts and date strings are rendered as plain text; the filter UI handles ARIA.
+ * - Counts and dates are plain text; interactive ARIA lives in the filter components.
+ *
+ * Accepted URL params (string values unless stated)
+ * - where, from(yyyy-mm-dd), to(yyyy-mm-dd)
+ * - guests(number), priceMax(number), ratingMin(number)
+ * - wifi('1'), parking('1'), breakfast('1'), pets('1')
+ * - sort: 'reco' | 'price_asc' | 'price_desc' | 'rating_desc'
  */
 export default async function SearchPage({
   searchParams,
 }: {
-  /** Query string provided by Next.js as a promise in app router */
-  searchParams: Promise<SearchQueryParams>;
+  /** Next.js provides search params as a Promise in app router */
+  searchParams: Promise<Sp>;
 }) {
   /** Resolve URL params */
   const sp = await searchParams;
 
-  // ----- Parse input -----
-  const whereRaw = (sp.where ?? '').trim();
+  // ----- Parse input (same semantics as before) -----
+  const whereRaw = (one(sp.where) ?? '').trim();
   const whereLc = whereRaw.toLowerCase();
 
-  const fromStr = sp.from ?? '';
-  const toStr = sp.to ?? '';
+  const fromStr = one(sp.from) ?? '';
+  const toStr = one(sp.to) ?? '';
   const from = fromStr ? new Date(fromStr) : null;
   const to = toStr ? new Date(toStr) : null;
 
-  const guests = sp.guests ? Number(sp.guests) : null;
-  const priceMax = sp.priceMax ? Number(sp.priceMax) : null;
-  const ratingMin = sp.ratingMin ? Number(sp.ratingMin) : null;
+  const guestsStr = one(sp.guests);
+  const priceMaxStr = one(sp.priceMax);
+  const ratingStr = one(sp.ratingMin);
+
+  const guests = guestsStr ? int(guestsStr, 0) : null;
+  const priceMax = priceMaxStr ? int(priceMaxStr, 0) : null;
+  const ratingMin = ratingStr ? int(ratingStr, 0) : null;
 
   const want = {
-    wifi: sp.wifi === '1',
-    parking: sp.parking === '1',
-    breakfast: sp.breakfast === '1',
-    pets: sp.pets === '1',
+    wifi: one(sp.wifi) === '1',
+    parking: one(sp.parking) === '1',
+    breakfast: one(sp.breakfast) === '1',
+    pets: one(sp.pets) === '1',
   } as const;
 
-  const sort = sp.sort ?? 'reco';
+  const sort =
+    (one(sp.sort) as
+      | 'reco'
+      | 'price_asc'
+      | 'price_desc'
+      | 'rating_desc'
+      | undefined) ?? 'reco';
 
   // ----- Fetch venues -----
   let venues: VenueWithBookings[];
   if (whereLc) {
-    // Keyword search (server-side), includes bookings for clash detection
+    // Keyword search (server-side), include bookings for clash detection
     venues = (await searchVenues(whereLc, {
       bookings: true,
       limit: 100,
@@ -149,7 +150,7 @@ export default async function SearchPage({
       case 'rating_desc':
         return (b.rating ?? 0) - (a.rating ?? 0);
       default:
-        return 0; // 'reco' or unknown → leave as-is
+        return 0;
     }
   });
 
@@ -174,7 +175,7 @@ export default async function SearchPage({
             </p>
           </div>
 
-          {/* Desktop and mobile version is below) */}
+          {/* Desktop sort (mobile version below) */}
           <div className="hidden lg:block">
             <SortMenu />
           </div>
@@ -188,10 +189,7 @@ export default async function SearchPage({
 
       {/* Desktop layout: sticky sidebar + results */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[300px,1fr]">
-        <aside
-          className="hidden lg:block lg:sticky lg:top-24 lg:self-start
-+                   lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto"
-        >
+        <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
           <SearchFilters />
         </aside>
 

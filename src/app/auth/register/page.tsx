@@ -7,11 +7,13 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { api, API } from '@/lib/api';
 import { registerSchema, type RegisterForm } from '@/validation/auth';
+import { toast } from '@/lib/toast';
+import { ApiError } from '@/lib/api';
 
 const HERO =
   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=70&auto=format&fit=crop';
 
-/** Expected shape coming back from your register endpoint. Adjust if needed. */
+/** API response shape returned by the register endpoint. Adjust if your backend differs. */
 type RegisterResponse = {
   data: {
     name: string;
@@ -24,20 +26,22 @@ type RegisterResponse = {
   meta?: unknown;
 };
 
-/** Turns an unknown error into a human-friendly message. */
-function getErrorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : 'Registration failed';
-}
-
+/**
+ * Registration page
+ *
+ * - Uses React Hook Form + Yup resolver for client validation.
+ * - Submits to `API.register` via the `api` helper.
+ * - On success, navigates to `/auth/login`.
+ * - Field errors are shown under each input; API error is shown under the submit button.
+ */
 export default function RegisterPage() {
   const [apiError, setApiError] = React.useState<string | null>(null);
   const [result, setResult] = React.useState<RegisterResponse | null>(null);
 
-  // RHF with Yup
+  // React Hook Form with Yup schema
   const {
     register,
     handleSubmit,
-
     formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
     resolver: yupResolver(registerSchema),
@@ -51,10 +55,9 @@ export default function RegisterPage() {
   });
 
   /**
-   * Submits validated values to the register endpoint.
-   * Shows the response; optionally redirect to login.
+   * Submit validated values to the register endpoint.
+   * Shows the API response and redirects to login on success.
    */
-  // --- onSubmit: skicka som det är (boolean) ---
   async function onSubmit(values: RegisterForm) {
     setApiError(null);
     setResult(null);
@@ -64,10 +67,23 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
       });
+
       setResult(data);
-      if (data?.data?.email) window.location.href = '/auth/login';
+      toast.success({ title: 'Account created' });
+
+      if (data?.data?.email) {
+        window.location.href = '/auth/login';
+      }
     } catch (err) {
-      setApiError(getErrorMessage(err));
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+          ? err.message
+          : 'Registration failed';
+
+      setApiError(msg);
+      toast.error({ title: 'Register failed', description: msg });
     }
   }
 
@@ -98,6 +114,7 @@ export default function RegisterPage() {
                   <p className="text-red-600 text-sm">{errors.name.message}</p>
                 )}
               </div>
+
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
@@ -113,6 +130,7 @@ export default function RegisterPage() {
                   <p className="text-red-600 text-sm">{errors.email.message}</p>
                 )}
               </div>
+
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -142,9 +160,9 @@ export default function RegisterPage() {
                   Account type
                 </legend>
 
+                {/* fieldset+legend gives the group semantics; keep labels clickable */}
                 <div
                   className="flex gap-6"
-                  role="radiogroup"
                   aria-labelledby="legend-account-type"
                 >
                   <label
@@ -158,7 +176,11 @@ export default function RegisterPage() {
                       {...register('venueManager', {
                         setValueAs: (v) => v === 'true',
                       })}
-                      className="h-4 w-4"
+                      className="
+                        h-4 w-4 accent-aegean
+                        outline-none focus:outline-none focus:ring-0
+                        focus-visible:outline-none focus-visible:ring-0
+                      "
                     />
                     Customer
                   </label>
@@ -174,12 +196,17 @@ export default function RegisterPage() {
                       {...register('venueManager', {
                         setValueAs: (v) => v === 'true',
                       })}
-                      className="h-4 w-4"
+                      className="
+                        h-4 w-4 accent-aegean
+                        outline-none focus:outline-none focus:ring-0
+                        focus-visible:outline-none focus-visible:ring-0
+                      "
                     />
                     Venue Manager
                   </label>
                 </div>
               </fieldset>
+
               <button
                 type="submit"
                 className="btn btn-primary w-full"
@@ -187,6 +214,7 @@ export default function RegisterPage() {
               >
                 {isSubmitting ? 'Registering…' : 'Register'}
               </button>
+
               {apiError && (
                 <p className="text-red-600 text-sm mt-2">{apiError}</p>
               )}

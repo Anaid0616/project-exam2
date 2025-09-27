@@ -91,7 +91,7 @@ export async function GET(req: Request) {
   starts.sort((a, b) => a.length - b.length || a.localeCompare(b));
   inc.sort((a, b) => a.length - b.length || a.localeCompare(b));
 
-  // Skicka t.ex. max 10 för dropdown (snabbt)
+  // Max 10 for dropdown
   const results = [...starts, ...inc].slice(0, 10);
 
   return NextResponse.json(results, {

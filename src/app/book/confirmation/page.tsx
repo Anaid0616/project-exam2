@@ -1,20 +1,69 @@
 'use client';
 
+import * as React from 'react';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import { one, int, type Sp } from '@/lib/url-params';
 
+/** ConfirmParams
+ * Expected query parameters for the booking confirmation page.
+ * All fields are optional; validation is done in `parseConfirmParams()`.
+ */
+type ConfirmParams = {
+  id?: string;
+  venueName?: string;
+  from?: string;
+  to?: string;
+  guests?: number;
+  total?: number;
+  location?: string;
+};
+
+/**
+ * parseConfirmParams
+ *
+ * - Parses and validates the expected query parameters from the URL.
+ * - Returns an object with the parsed values or undefined if missing/invalid.
+ */
+function parseConfirmParams(sp: Sp): ConfirmParams {
+  return {
+    id: one(sp.id),
+    venueName: one(sp.venueName),
+    from: one(sp.from),
+    to: one(sp.to),
+    guests: (() => {
+      const v = one(sp.guests);
+      return v ? int(v, 0) : undefined;
+    })(),
+    total: (() => {
+      const v = one(sp.total);
+      return v ? int(v, 0) : undefined;
+    })(),
+    location: one(sp.location),
+  };
+}
+
+/**
+ * BookContent (Client)
+ * Renders the booking confirmation details using URL parameters.
+ * Uses `useSearchParams()` to access query parameters.
+ */
 function BookContent() {
   const sp = useSearchParams();
 
-  const venueName = sp.get('venueName') ?? '—';
-  const venueId = sp.get('id') ?? undefined;
-  const from = sp.get('from') ?? '—';
-  const to = sp.get('to') ?? '—';
-  const guests = sp.get('guests') ?? '—';
-  const total = sp.get('total');
-  const location = sp.get('location') ?? '—';
+  // Memoize raw params object from URLSearchParams
+  const raw = React.useMemo<Sp>(() => Object.fromEntries(sp.entries()), [sp]);
+  const params = React.useMemo(() => parseConfirmParams(raw), [raw]);
+
+  const venueName = params.venueName ?? '—';
+  const venueId = params.id;
+  const from = params.from ?? '—';
+  const to = params.to ?? '—';
+  const guests = params.guests?.toString() ?? '—';
+  const total = params.total != null ? params.total.toString() : undefined;
+  const location = params.location ?? '—';
 
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-4">
@@ -82,6 +131,10 @@ function BookContent() {
   );
 }
 
+/**
+ * BookConfirmationPage
+ * Wrapper med Suspense så `useSearchParams()`
+ */
 export default function BookConfirmationPage() {
   return (
     <Suspense fallback={<main className="p-6">Loading…</main>}>

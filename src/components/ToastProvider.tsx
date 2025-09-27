@@ -11,12 +11,12 @@ export default function ToastProvider() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timers = useRef<Record<string, number>>({}); // id -> timeoutId
 
-  // 1) Markera att vi kör i klienten (för SSR)
+  // mark client
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // 2) Skapa/demountera portal-elementet när vi är monterade
+  // create/destroy portal node
   useEffect(() => {
     if (!mounted) return;
 
@@ -26,16 +26,14 @@ export default function ToastProvider() {
     portalEl.current = el;
 
     return () => {
-      // städa alla timrar vid unmount
       Object.values(timers.current).forEach(clearTimeout);
       timers.current = {};
-
       document.body.removeChild(el);
       portalEl.current = null;
     };
   }, [mounted]);
 
-  // Stable dismiss-funktion (används i effekten nedan)
+  // stable dismiss
   const dismiss = useCallback((id: string) => {
     const t = timers.current[id];
     if (t) {
@@ -45,15 +43,12 @@ export default function ToastProvider() {
     setToasts((s) => s.filter((x) => x.id !== id));
   }, []);
 
-  // 3) Prenumerera på nya toasts
+  // subscribe to new toasts
   useEffect(() => {
     if (!mounted) return;
 
     const unsubscribe = subscribe((t) => {
-      // lägg till toasten
       setToasts((s) => [...s, t]);
-
-      // auto-dismiss efter duration (default 3500ms)
       const timeoutId = window.setTimeout(
         () => dismiss(t.id),
         t.duration ?? 3500
@@ -61,43 +56,56 @@ export default function ToastProvider() {
       timers.current[t.id] = timeoutId;
     });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [mounted, dismiss]); // inga eslint-disable behövs
+    return () => unsubscribe();
+  }, [mounted, dismiss]);
 
-  // Ingen portal före mount
   if (!mounted || !portalEl.current) return null;
 
+  // Top-center container so it’s visible immediately
   return createPortal(
-    <div className="fixed bottom-4 right-4 z-[100] flex w-80 max-w-[92vw] flex-col gap-2">
-      {toasts.map((t) => (
-        <ToastItem key={t.id} toast={t} onClose={() => dismiss(t.id)} />
-      ))}
+    <div className="fixed inset-x-0 top-4 z-[1000] flex justify-center px-2 pointer-events-none">
+      <div className="flex w-full max-w-md flex-col gap-2">
+        {toasts.map((t) => (
+          <ToastItem key={t.id} toast={t} onClose={() => dismiss(t.id)} />
+        ))}
+      </div>
     </div>,
     portalEl.current
   );
 }
 
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
-  const { title, description, variant = 'info' } = toast;
+  const { title, description, variant = 'info', duration = 3500 } = toast;
   const role = variant === 'error' ? 'alert' : 'status';
   const live = variant === 'error' ? 'assertive' : 'polite';
-  const border =
-    variant === 'success'
-      ? 'border-emerald-400'
-      : variant === 'error'
-      ? 'border-rose-400'
-      : 'border-ink/20';
+
+  // matchar din palett
+  const styles = {
+    info: { bar: 'bg-aegean', border: 'border-aegean/30', icon: 'text-aegean' },
+    success: {
+      bar: 'bg-lagoon',
+      border: 'border-lagoon/40',
+      icon: 'text-lagoon',
+    },
+    error: {
+      bar: 'bg-sunset',
+      border: 'border-sunset/40',
+      icon: 'text-sunset',
+    },
+  } as const;
+  const s = styles[variant];
 
   return (
     <div
       role={role}
       aria-live={live}
-      className={`pointer-events-auto rounded-app border ${border} bg-sand text-ink shadow-elev`}
+      className={`pointer-events-auto relative overflow-hidden rounded-app border ${s.border} bg-shell text-ink shadow-elev animate-[toast-in_150ms_ease-out]`}
     >
-      <div className="flex items-start gap-3 p-3">
-        <Icon variant={variant} />
+      {/* accentbar till vänster */}
+      <div className={`absolute inset-y-0 left-0 w-1 ${s.bar}`} />
+
+      <div className="flex items-start gap-3 p-3 pl-4">
+        <Icon variant={variant} className={s.icon} />
         <div className="flex-1">
           {title && <p className="font-semibold">{title}</p>}
           {description && (
@@ -119,14 +127,54 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
           </svg>
         </button>
       </div>
+
+      {/* progress bar */}
+      <div className="absolute bottom-0 left-0 h-0.5 w-full bg-ink/10">
+        <div
+          className={`${s.bar} h-full`}
+          style={{
+            width: '100%',
+            animation: `toastProgress ${duration}ms linear forwards`,
+          }}
+        />
+      </div>
+
+      {/* keyframes lokalt så du slipper röra config nu */}
+      <style jsx>{`
+        @keyframes toast-in {
+          0% {
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes toastProgress {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-100%);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
-function Icon({ variant }: { variant: 'success' | 'error' | 'info' }) {
+function Icon({
+  variant,
+  className,
+}: {
+  variant: 'success' | 'error' | 'info';
+  className?: string;
+}) {
+  const cls = `mt-0.5 h-5 w-5 ${className ?? ''}`;
   if (variant === 'success')
     return (
-      <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 text-emerald-600">
+      <svg viewBox="0 0 24 24" className={cls}>
         <path
           d="M5 13l4 4L19 7"
           fill="none"
@@ -137,7 +185,7 @@ function Icon({ variant }: { variant: 'success' | 'error' | 'info' }) {
     );
   if (variant === 'error')
     return (
-      <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 text-rose-600">
+      <svg viewBox="0 0 24 24" className={cls}>
         <path
           d="M12 9v4m0 4h.01M10 2l10 18H0L10 2z"
           fill="none"
@@ -147,7 +195,7 @@ function Icon({ variant }: { variant: 'success' | 'error' | 'info' }) {
       </svg>
     );
   return (
-    <svg viewBox="0 0 24 24" className="mt-0.5 h-5 w-5 text-aegean">
+    <svg viewBox="0 0 24 24" className={cls}>
       <circle
         cx="12"
         cy="12"

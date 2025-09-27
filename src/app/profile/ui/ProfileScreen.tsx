@@ -111,7 +111,7 @@ export default function ProfileScreen() {
         setPayload(p);
         const name = p?.name;
 
-        // ⬇️ Viktigt: släck alla loaders även vid tidig exit
+        //
         if (!t || !name) {
           if (!alive) return;
           setRole('customer');

@@ -14,9 +14,9 @@ import AmenitiesRow from '@/components/AmenitiesRow';
 export const revalidate = 0;
 
 /**
- * Format a number as EUR without decimals (e.g. "€240").
- * @param n - Nightly price in EUR
- * @returns Money string in EUR
+ * Format a number as EUR with no decimals (e.g. "€240").
+ * @param n Nightly price in EUR.
+ * @returns Formatted currency string.
  */
 function money(n: number): string {
   return new Intl.NumberFormat('en-GB', {
@@ -29,16 +29,16 @@ function money(n: number): string {
 /**
  * Venue details page.
  *
- * Server-rendered page that fetches a venue (including bookings and owner)
- * and renders:
- *  - Hero carousel
- *  - Title + rating + location + quick facts
- *  - Description, amenities (shared icon row), policies, map
- *  - Booking panel (client component) with inline calendar
+ * Server-rendered page that:
+ *  - Fetches a venue (incl. bookings and owner).
+ *  - Renders hero images, title, rating, location, description, amenities,
+ *    policies, map, and the booking panel (client side).
  *
  * Layout:
- *  - On large screens: two-column grid where the booking panel is sticky.
- *  - On small screens: booking panel spans full width below content.
+ *  - ≥900px: 2-column grid with a sticky booking panel (360px).
+ *  - <900px: single column; booking panel sits under the content.
+ *
+ * @param params Dynamic route params for /venues/[id].
  */
 export default async function VenueDetailsPage({
   params,
@@ -65,7 +65,7 @@ export default async function VenueDetailsPage({
   return (
     <>
       <div className="mx-auto max-w-7xl px-2 md:px-6">
-        {/* Breadcrumbs  */}
+        {/* Breadcrumbs */}
         <nav className="mb-2 pt-3 text-xs text-ink/70">
           <ol className="flex gap-2">
             <li>
@@ -103,8 +103,6 @@ export default async function VenueDetailsPage({
                 <h1 className="text-3xl font-extrabold tracking-tight">
                   {v.name}
                 </h1>
-
-                {/* Rating */}
                 <Rating
                   value={v.rating ?? 0}
                   size="lg"
@@ -136,7 +134,6 @@ export default async function VenueDetailsPage({
               </p>
             </div>
 
-            {/* Amenities */}
             <div>
               <h3 className="text-base font-semibold">Amenities</h3>
               <div className="mt-2">
