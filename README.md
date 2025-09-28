@@ -61,7 +61,7 @@ Overview
 
 ## Features
 
-- 🔎 Search & Filters: “Where” input with typeahead, date range (check-in/out), guests.
+- 🔎 Search & Filters: “Where” input, date range (check-in/out), guests.
 
 - 🏨 Venue Pages: Media gallery, details/amenities, price, availability calendar, booking CTA.
 
@@ -75,7 +75,7 @@ Overview
 
 - 🍞 Toasts & Modals: Global toasts (success/error/info); confirm modal for destructive actions.
 
-- 📱 Responsive 
+- 📱 Responsive: Cross browsers
 
 ---
 
