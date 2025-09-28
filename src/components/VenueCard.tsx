@@ -3,15 +3,20 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { money } from '@/components/utils';
 import type { Venue } from '@/types/venue';
+import SaveButton from '@/components/SaveButton';
 
 export default function VenueCard({
   v,
   showManage,
   onDelete,
+  showSave = false,
+  priority = false,
 }: {
   v: Venue;
   showManage?: boolean;
   onDelete?: (id: string) => void;
+  showSave?: boolean;
+  priority?: boolean;
 }) {
   const img =
     v.media?.[0]?.url ??
@@ -23,26 +28,73 @@ export default function VenueCard({
 
   return (
     <article className="card p-3">
-      <Image
-        src={img}
-        alt={v.media?.[0]?.alt ?? v.name}
-        width={800}
-        height={450}
-        className="mb-2 aspect-[16/9] w-full rounded-app object-cover"
-        unoptimized
-      />
+      <div className="relative">
+        <Image
+          src={img}
+          alt={v.media?.[0]?.alt ?? v.name}
+          width={800}
+          height={450}
+          className="mb-2 aspect-[16/9] w-full rounded-app object-cover"
+          priority={priority}
+        />
+
+        {/* heart overlay only i saved */}
+        {showSave && (
+          <div className="absolute right-2 top-2">
+            <SaveButton
+              venueId={String(v.id)}
+              variant="overlay"
+              tone="ink"
+              size="md"
+            />
+          </div>
+        )}
+      </div>
+
       <h4 className="font-semibold leading-tight">{v.name}</h4>
-      <p className="text-sm text-ink/70">{loc}</p>
+
+      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/70">
+        <p className="text-sm text-ink/70">{loc}</p>
+        <span className="hidden sm:inline text-ink/30">|</span>
+        <span>{v.maxGuests ?? 1} guests</span>
+        <span className="hidden sm:inline text-ink/30">|</span>
+        <span className="inline-flex items-center gap-1">
+          <Image
+            src="/logofooter.svg"
+            alt=""
+            width={14}
+            height={14}
+            className="opacity-80"
+            unoptimized
+          />
+          {(typeof v.rating === 'number' ? v.rating : 0).toFixed(1)}
+        </span>
+      </div>
 
       <div className="mt-2 flex items-center justify-between">
         <p className="font-medium">
           {typeof v.price === 'number' ? `${money(v.price)} / night` : '—'}
         </p>
+
         <Link
           href={`/venues/${v.id}`}
-          className="text-aegean text-sm hover:underline"
+          className="group inline-flex items-center gap-1 text-aegean text-sm font-medium hover:underline"
         >
-          View
+          <span className="leading-none">View venue</span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            className="h-4 w-4 flex-none transition-transform group-hover:translate-x-0.5"
+            aria-hidden="true"
+          >
+            <path
+              d="M8 5l8 7-8 7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </Link>
       </div>
 

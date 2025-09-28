@@ -106,6 +106,7 @@ export default async function VenueDetailsPage({
                 <Rating
                   value={v.rating ?? 0}
                   size="lg"
+                  variant="five"
                   className="translate-y-[1px]"
                 />
               </div>

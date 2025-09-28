@@ -94,7 +94,9 @@ export default function BookingDetailsPage() {
           unoptimized
         />
         <div className="min-w-0">
-          <h1 className="text-lg font-semibold truncate">{vName}</h1>
+          <Link href={`/venues/${venue.id}`} className="hover:underline">
+            <h1 className="text-lg font-semibold truncate">{vName}</h1>
+          </Link>
           {loc && <p className="text-sm text-ink/70">{loc}</p>}
           <p className="text-sm text-ink/70">
             Booking ref: <strong> {data.id}</strong>

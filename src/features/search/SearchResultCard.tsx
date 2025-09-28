@@ -88,7 +88,7 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
 
           {/* Rating just below the name */}
           <div className="mt-1">
-            <Rating value={rating} size="sm" />
+            <Rating value={rating} size="sm" variant="five" />
           </div>
 
           {/* Location below rating */}

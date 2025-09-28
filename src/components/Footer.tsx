@@ -7,15 +7,42 @@ import {
   SiKlarna,
 } from 'react-icons/si';
 
+/**
+ * Footer
+ *
+ * A responsive site footer with:
+ * - Left: quick links (Profile, Contact)
+ * - Center: circular brand mark
+ * - Right: accepted payment icons
+ *
+ * Responsiveness & alignment:
+ * - On small screens, all sections are centered and stacked in a single column.
+ * - From `md:` upwards, the layout switches to a 3-column grid:
+ *   left-aligned links, centered logo, right-aligned payment icons.
+ *
+ * Accessibility:
+ * - Uses semantic <footer>.
+ * - Payment icons include `aria-label` for screen readers.
+ *
+ * Styling notes:
+ * - Thin top divider uses the brand color `bg-aegean`.
+ * - Bottom bar shows the current year and brand name.
+ */
 export default function Footer() {
   return (
     <footer className="mt-12">
-      {/* thin top divider in your teal */}
+      {/* Thin top divider in brand color */}
       <div className="h-4 bg-aegean" />
 
-      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 py-8 md:grid-cols-3">
-        {/* Left: links */}
-        <div className="space-y-2">
+      <div
+        className="
+          mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8
+          items-center text-center
+          md:grid-cols-3 md:text-left
+        "
+      >
+        {/* Left: links (center on mobile, left on md+) */}
+        <div className="space-y-2 justify-self-center md:justify-self-start">
           <h3 className="font-semibold">Holidaze</h3>
           <ul className="space-y-1 text-sm text-ink/70">
             <li>
@@ -31,21 +58,27 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Center: circular logo (your SVG in /public) */}
-        <div className="flex justify-center">
+        {/* Center: circular logo */}
+        <div className="flex justify-center md:justify-center">
           <Image
             src="/logofooter.svg"
             alt="Holidaze mark"
             width={56}
             height={56}
-            className="rounded-app w-14 h-14"
+            className="h-14 w-14 rounded-app"
+            priority
           />
         </div>
 
-        {/* Right: payment icons */}
-        <div className="md:justify-self-end">
-          <h3 className="mb-2 font-semibold">Payments</h3>
-          <div className="flex items-center gap-4 text-ink/70">
+        {/* Right: payment icons (center on mobile, right on md+) */}
+        <div className="justify-self-center md:justify-self-end">
+          <h3 className="mb-2 font-semibold md:text-right">Payments</h3>
+          <div
+            className="
+              flex flex-wrap items-center justify-center gap-4 text-ink/70
+              md:justify-end
+            "
+          >
             <SiKlarna aria-label="Klarna" className="h-8 w-10 text-ink" />
             <SiVisa aria-label="Visa" className="h-8 w-10 text-ink" />
             <SiMastercard
@@ -60,7 +93,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* bottom bar */}
+      {/* Bottom bar */}
       <div className="bg-aegean py-3 text-center text-xs text-white">
         © {new Date().getFullYear()} HOLIDAZE
       </div>

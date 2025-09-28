@@ -6,12 +6,17 @@ type Role = 'customer' | 'manager';
 
 // tabclass
 export function tabClass(active: boolean) {
-  return `px-2.5 py-1.5 -mb-px leading-tight border-b-[4px]
-          ${
-            active
-              ? 'border-lagoon text-ink'
-              : 'border-transparent text-ink/70 hover:text-ink'
-          }`;
+  return `
+    inline-flex items-center shrink-0 snap-start
+    h-9 px-3 text-sm
+    -mb-px leading-tight border-b-[4px]
+    ${
+      active
+        ? 'border-coral text-ink'
+        : 'border-transparent text-ink/70 hover:text-ink'
+    }
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-[2px]
+  `;
 }
 
 export default function ProfileTabsBar({
@@ -32,7 +37,22 @@ export default function ProfileTabsBar({
 }) {
   return (
     <div className={`mt-2 ${className}`}>
-      <div className="flex items-center justify-between">
+      {/* SCROLL-CONTAINER */}
+      <div
+        role="tablist"
+        aria-label="Profile sections"
+        className="
+    -mx-3 px-3
+    overflow-x-auto no-scrollbar whitespace-nowrap
+    snap-x snap-mandatory
+    
+    md:mx-0 md:px-0
+
+    [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-16px),transparent)]
+    [-webkit-mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-16px),transparent)]
+    md:[mask-image:none] md:[-webkit-mask-image:none]
+  "
+      >
         <div className="flex gap-1">
           {role === 'customer' && setCustTab && custTab && (
             <>

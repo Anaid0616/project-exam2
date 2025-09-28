@@ -23,10 +23,15 @@ export default async function HomePage({
   const locOne = (locRaw ? locRaw.toLowerCase() : null) as string | null;
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6">
+    <main className="mx-auto max-w-6xl space-y-6 px-2 sm:p-x6">
       <HomeHero />
       <section>
-        <h2 className="text-2xl font-semibold pt-12 md:pt-17">
+        <h2
+          className="text-2xl font-semibold
+               pt-28
+               min-[421px]:pt-20
+               min-[845px]:pt-14"
+        >
           Popular right now
         </h2>
         <div className="mt-3">

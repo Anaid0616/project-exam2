@@ -38,7 +38,7 @@ export default function ManagerTabContent({
 }) {
   return (
     <section className="mt-1 space-y-4">
-      {tab === 'saved' && <SavedVenues />}
+      {tab === 'saved' && <SavedVenues showSaveOverlay />}
 
       {tab === 'bookings' &&
         (loadingBookings ? (

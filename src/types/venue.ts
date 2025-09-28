@@ -76,7 +76,7 @@ export type VenueBooking = {
 };
 
 export type BookedLite = {
-  dateFrom: string; // ISO YYYY-MM-DD eller ISO-stamp från API
+  dateFrom: string; // ISO YYYY-MM-DD or ISO-stamp from API
   dateTo: string; // ISO
 };
 

@@ -4,8 +4,8 @@ import { money } from './utils';
 
 function StatusPill({ value }: { value: VenueBooking['status'] }) {
   const map: Record<VenueBooking['status'], string> = {
-    Upcoming: 'bg-lagoon/10 text-aegean',
-    Pending: 'bg-coral/60 text-black/70',
+    Upcoming: 'bg-lagoon/20 text-aegean',
+    Pending: 'bg-coral/50 text-black/70',
     Completed: 'bg-green-100 text-green-700',
     Canceled: 'bg-sunset-100 text-sunset-600',
   };
@@ -18,12 +18,18 @@ function StatusPill({ value }: { value: VenueBooking['status'] }) {
   );
 }
 
+/**
+ * Tabellvy för bokningar (desktop). Mobilvy hanteras i Panel-komponenten.
+ */
 export default function VenueBookingsTable({
   rows,
   viewBasePath = '/profile/bookings',
 }: {
+  /** Rader att rendera i tabellen. */
   rows: VenueBooking[];
+  /** Baspath för "View"-länken. */
   viewBasePath?: string;
+  /** (Reserv: ej använd här) */
   onDelete?: (id: string) => void;
 }) {
   return (
@@ -59,10 +65,10 @@ export default function VenueBookingsTable({
               <td className="p-3">
                 <StatusPill value={b.status} />
               </td>
-              <td className="p-3 flex items-center gap-3">
+              <td className="p-3">
                 <a
                   href={`${viewBasePath}/${b.id}`}
-                  className="text-aegean hover:underline"
+                  className="inline-flex items-center rounded-app border border-aegean bg-aegean px-3 py-1 text-xs font-medium text-white shadow-sm hover:bg-aegean/90 focus:outline-none focus:ring-2 focus:ring-aegean/40"
                 >
                   View
                 </a>

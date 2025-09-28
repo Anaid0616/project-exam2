@@ -21,7 +21,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-4">
+    <main className="mx-auto max-w-3xl p-2 sm:p-6 space-y-4">
       <div className="card p-5">
         <h1 className="text-xl font-semibold my-4 text-center">Contact us</h1>
         <ContactForm onSubmit={handleSubmit} submitLabel="Send" />

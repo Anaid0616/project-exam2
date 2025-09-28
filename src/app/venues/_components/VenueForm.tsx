@@ -101,7 +101,7 @@ export default function VenueForm({
 
       {/* Gallery */}
       <GalleryFields
-        control={control as Control<VenueFormValues>} // ✅ säker typ
+        control={control as Control<VenueFormValues>}
         register={register}
         watch={watch}
         errors={errors}

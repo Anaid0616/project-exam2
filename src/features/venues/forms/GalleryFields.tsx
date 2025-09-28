@@ -53,7 +53,9 @@ export default function GalleryFields({
         return (
           <div
             key={f.id}
-            className="grid grid-cols-[8rem,1fr,auto] items-center gap-3 rounded-app border border-ink/10 p-3"
+            className="grid gap-3 items-start rounded-app border border-ink/10 p-3
+    grid-cols-1 
+    min-[500px]:grid-cols-[8rem,1fr,auto]"
           >
             <div className="relative w-32 h-24 rounded-xl overflow-hidden bg-ink/5">
               {isValid ? (
@@ -74,7 +76,7 @@ export default function GalleryFields({
 
             <div className="grid gap-3 md:grid-cols-2">
               <input
-                type="text" // <— undvik webbläsarens url-krav
+                type="text"
                 className="input h-11 font-mono"
                 placeholder="Image URL"
                 {...register(`media.${i}.url` as const, {

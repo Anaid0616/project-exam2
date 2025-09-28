@@ -25,7 +25,7 @@ export default function NewVenuePage() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-4">
+    <main className="mx-auto max-w-3xl p-2 sm:p-6 space-y-4">
       <div className="card p-5">
         <h1 className="my-4 text-center text-xl font-semibold">Create venue</h1>
         <VenueForm onSubmit={handleSubmit} submitLabel="Create venue" />

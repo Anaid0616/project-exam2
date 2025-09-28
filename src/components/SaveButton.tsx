@@ -5,7 +5,7 @@ import { useUser } from '@/providers/UserProvider';
 
 type Variant = 'overlay' | 'chip';
 type Size = 'sm' | 'md' | 'lg';
-type Tone = 'white' | 'sunset' | 'ink'; // NEW
+type Tone = 'white' | 'sunset' | 'ink';
 
 export default function SaveButton({
   venueId,
@@ -13,22 +13,22 @@ export default function SaveButton({
   variant = 'overlay',
   size = 'lg',
   withText = false,
-  tone = 'white', // NEW: styr färgen på hjärtat
-  iconClassName, // NEW: låter kortet justera ikonstorlek om man vill
+  tone = 'white',
+  iconClassName,
 }: {
   venueId: string;
   className?: string;
   variant?: Variant;
   size?: Size;
   withText?: boolean;
-  tone?: Tone; // NEW
-  iconClassName?: string; // NEW
+  tone?: Tone;
+  iconClassName?: string;
 }) {
   const { email, ready: userReady } = useUser();
   const { has, toggle, ready } = useFavorites(email);
   const saved = has(venueId);
 
-  // färger för overlay
+  // colors overlay
   const overlayBase =
     tone === 'sunset'
       ? 'text-sunset'
@@ -58,7 +58,7 @@ export default function SaveButton({
         <Heart
           strokeWidth={1.8}
           className={`${iconSize} ${saved ? overlaySaved : overlayBase}
-            drop-shadow-[0_1px_4px_rgba(0,0,0,0.35)]
+            
             transition-transform duration-150 hover:scale-105`}
         />
       </button>

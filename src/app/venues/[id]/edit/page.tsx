@@ -56,7 +56,7 @@ export default function EditVenuePage() {
   if (!venue) return <main className="p-6">Not found</main>;
 
   return (
-    <main className="mx-auto max-w-3xl p-6 space-y-4">
+    <main className="mx-auto max-w-3xl p-2 sm:p-6 space-y-4">
       <div className="card p-5">
         <h1 className="my-4 text-center text-xl font-semibold">Edit venue</h1>
         <VenueForm

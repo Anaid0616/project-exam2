@@ -1,3 +1,4 @@
+// src/app/(home)/_components/HomeHero.tsx
 'use client';
 
 import Image from 'next/image';
@@ -18,18 +19,28 @@ export default function HomeHero() {
       </div>
 
       {/* Panel */}
-      <div className="absolute inset-x-0 -bottom-14 z-10 flex justify-center px-4">
+      <div
+        className="
+    absolute inset-x-0
+    -bottom-28               /* <= 420px */
+    min-[421px]:-bottom-20     /* 421px–844px */
+    min-[845px]:-bottom-14     /* >= 845px */
+    z-10 flex justify-center px-4"
+      >
         <div className="pointer-events-auto w-[min(100%,1150px)]">
           <div
             className="
-              rounded-app border shadow-elev p-4 md:p-5
-              bg-white/70 supports-[backdrop-filter]:bg-white/60
-              backdrop-blur-md border-white/50
-            "
+            rounded-app border shadow-elev p-4 md:p-5
+            bg-white/70 supports-[backdrop-filter]:bg-white/60
+            backdrop-blur-md border-white/50
+          "
           >
             <VenueSearchForm
               className="!p-0 !shadow-none !border-0
-              grid grid-cols-1 gap-3 md:grid-cols-[1.4fr,1fr,1fr,1fr,auto]"
+                       grid gap-3
+                       grid-cols-1
+                       min-[420px]:grid-cols-2
+                       min-[845px]:grid-cols-[1.4fr,1fr,1fr,1fr,auto]"
             />
           </div>
         </div>

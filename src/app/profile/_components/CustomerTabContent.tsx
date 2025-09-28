@@ -12,6 +12,9 @@ export type UiBooking = {
   when: string;
   total: number;
   image?: string;
+  location?: string;
+  guests?: number;
+  nights: number;
 };
 
 export default function CustomerTabContent({
@@ -23,7 +26,7 @@ export default function CustomerTabContent({
   bookings: UiBooking[];
   loading: boolean;
 }) {
-  if (tab === 'saved') return <SavedVenues />;
+  if (tab === 'saved') return <SavedVenues showSaveOverlay />;
 
   return (
     <section className="mt-2 space-y-4">

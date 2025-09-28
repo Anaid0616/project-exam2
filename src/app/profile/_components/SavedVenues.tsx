@@ -7,7 +7,11 @@ import { getVenue } from '@/lib/venuescrud';
 import type { Venue } from '@/types/venue';
 import VenueCard from '@/components/VenueCard';
 
-export default function SavedVenues() {
+export default function SavedVenues({
+  showSaveOverlay = false,
+}: {
+  showSaveOverlay?: boolean;
+}) {
   const { email } = useUser();
   const { ids } = useFavorites(email);
 
@@ -16,10 +20,9 @@ export default function SavedVenues() {
 
   React.useEffect(() => {
     let active = true;
-
     (async () => {
       if (!ids.length) {
-        setVenues([]);
+        if (active) setVenues([]);
         return;
       }
       setLoading(true);
@@ -30,7 +33,6 @@ export default function SavedVenues() {
         if (active) setLoading(false);
       }
     })();
-
     return () => {
       active = false;
     };
@@ -49,7 +51,7 @@ export default function SavedVenues() {
   return (
     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
       {venues.map((v) => (
-        <VenueCard key={v.id} v={v} />
+        <VenueCard key={v.id} v={v} showSave={showSaveOverlay} />
       ))}
     </div>
   );

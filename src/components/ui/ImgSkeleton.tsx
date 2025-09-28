@@ -1,10 +1,9 @@
-// src/components/ui/ImgSkeleton.tsx
 'use client';
 
 import Image, { type ImageProps } from 'next/image';
 import { useState } from 'react';
 
-type Props = Omit<ImageProps, 'alt' | 'onLoad'> & {
+type Props = Omit<ImageProps, 'alt' | 'onLoad' | 'onLoadingComplete'> & {
   alt?: string;
   containerClassName?: string;
   roundedClassName?: string;
@@ -35,12 +34,13 @@ export default function ImgSkeleton({
       <Image
         {...img}
         alt={alt}
-        className={`object-cover ${roundedClassName} transition-opacity duration-300 ${
+        className={`object-cover transition-opacity duration-300 ${
           loaded ? 'opacity-100' : 'opacity-0'
         } ${className ?? ''}`}
+        // Fires after the image is decoded and painted — smoother than onLoad
+        onLoadingComplete={() => setLoaded(true)}
+        // Keep onLoad if you need it for other callers
         onLoad={(e) => {
-          //
-          setLoaded(true);
           onLoad?.(e);
         }}
       />

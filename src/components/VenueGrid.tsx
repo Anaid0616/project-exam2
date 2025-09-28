@@ -1,22 +1,42 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import ImgSkeleton from '@/components/ui/ImgSkeleton';
-
+// src/components/VenueGrid.tsx
+import VenueCard from '@/components/VenueCard';
 import Pagination from './Pagination';
 import { api, API } from '@/lib/api';
 import type { VenueListResponse, Venue } from '@/types/venue';
 
 type Props = {
+  /** Current (1-based) page index. */
   page: number;
+  /** Number of venues per page (default: 12). */
   pageSize?: number;
+  /** Optional tag filter passed to the API. */
   tag?: string | null;
+  /** Optional free-text query passed to the API. */
   q?: string | null;
+  /** Optional location filter (city/country string or array of strings). */
   loc?: string | string[] | null;
+  /** Base path used by the Pagination component (default: '/'). */
   path?: string;
+  /** Hide venues starting with “Z…” (default: true). */
   hideZzz?: boolean;
+  /** Keep only venues that have at least one image (default: true). */
   onlyWithImage?: boolean;
 };
 
+/**
+ * VenueGrid
+ *
+ * Server component that:
+ * 1) Fetches venues in batches until we have enough to fill the requested page.
+ * 2) Applies lightweight client-side filters (hide “zzz”, has image, location match).
+ * 3) Renders a responsive grid of `VenueCard`s (without save-heart or manage actions).
+ * 4) Improves LCP by marking the *first* card on page 1 as `priority`.
+ *
+ * Notes:
+ * - This component intentionally keeps the network loop minimal: it loads enough
+ *   results to fill the current page and one extra item to detect `hasNext`.
+ * - Location filtering is substring-based on “city country”.
+ */
 export default async function VenueGrid({
   page,
   pageSize = 12,
@@ -27,9 +47,10 @@ export default async function VenueGrid({
   hideZzz = true,
   onlyWithImage = true,
 }: Props) {
+  // We want enough to fill the current page plus one extra to know if there is a next page
   const wantCount = page * pageSize + 1;
 
-  const batch = 100;
+  const batch = 100; // API batch size
   let apiPage = 1;
   let more = true;
 
@@ -43,6 +64,7 @@ export default async function VenueGrid({
     ? [norm(loc)]
     : [];
 
+  // Local filter predicate
   const keep = (v: Venue) => {
     if (hideZzz && /^z+/i.test(v.name ?? '')) return false;
     if (onlyWithImage && !v.media?.[0]?.url) return false;
@@ -57,6 +79,7 @@ export default async function VenueGrid({
     return true;
   };
 
+  // Guard to avoid excessive API paging
   const MAX_PAGES = 200;
 
   for (
@@ -105,6 +128,7 @@ export default async function VenueGrid({
     }
   }
 
+  // Slice current page
   const start = (page - 1) * pageSize;
   const items = filtered.slice(start, start + pageSize);
   const hasNext = filtered.length > start + pageSize;
@@ -114,86 +138,15 @@ export default async function VenueGrid({
   return (
     <>
       <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xxl:grid-cols-4">
-        {items.map((v) => {
-          const img =
-            v.media?.[0]?.url ??
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=60&auto=format&fit=crop';
-          const locText = [v.location?.city, v.location?.country]
-            .filter(Boolean)
-            .join(', ');
-
-          return (
-            <article
-              key={v.id}
-              className="rounded-app bg-shell p-3 shadow-elev border"
-            >
-              <ImgSkeleton
-                src={img}
-                alt={v.media?.[0]?.alt ?? v.name ?? 'Venue'}
-                fill
-                containerClassName="mb-3 aspect-[16/9] w-full"
-                roundedClassName="rounded-app"
-                sizes="(min-width:1280px) 25vw, (min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
-                unoptimized
-              />
-
-              <div className="min-w-0">
-                <h3
-                  className="font-semibold leading-tight truncate"
-                  title={v.name}
-                >
-                  {v.name}
-                </h3>
-              </div>
-
-              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/70">
-                {locText && <span>{locText}</span>}
-                <span className="hidden sm:inline text-ink/30">|</span>
-                <span>{v.maxGuests ?? 1} guests</span>
-                <span className="hidden sm:inline text-ink/30">|</span>
-                <span className="inline-flex items-center gap-1">
-                  <Image
-                    src="/logofooter.svg"
-                    alt=""
-                    width={14}
-                    height={14}
-                    className="opacity-80"
-                    unoptimized
-                  />
-                  {(typeof v.rating === 'number' ? v.rating : 0).toFixed(1)}
-                </span>
-              </div>
-
-              <div className="mt-2 flex items-center justify-between">
-                {typeof v.price === 'number' && (
-                  <p className="font-medium">€{v.price} / night</p>
-                )}
-                <Link
-                  href={`/venues/${v.id}`}
-                  className="text-aegean text-sm font-medium hover:underline group"
-                >
-                  <span className="inline-flex items-center gap-1">
-                    View venue
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      className="h-4 w-4 -mt-px transition-transform group-hover:translate-x-0.5"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M8 5l8 7-8 7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </Link>
-              </div>
-            </article>
-          );
-        })}
+        {items.map((v, i) => (
+          <VenueCard
+            key={v.id}
+            v={v}
+            showSave={false} // no heart in the grid
+            showManage={false} // no edit/delete in the grid
+            priority={page === 1 && i === 0} // improve LCP on the first visible card
+          />
+        ))}
       </section>
 
       <Pagination
