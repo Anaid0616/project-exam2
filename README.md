@@ -1,36 +1,172 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project exam 2 - Holidaze
 
-## Getting Started
+**Diana Bergelin**
 
-First, run the development server:
+![Holidaze Banner](https://github.com/user-attachments/assets/11645164-5ede-4605-8218-30038b0e1c31)
+
+
+## 🎯 Assignment Goal
+
+A modern, responsive front-end for Holidaze, where customers can discover and book stays while venue managers create and manage venues and bookings. API-integration with Noroffs Holidaze API.
+
+Overview
+
+- Visitors can browse venues, search, and open a venue page.
+  
+- Customers can log in, book dates, view upcoming bookings, and update their profile/avatar.
+
+- Venue Managers can log in, create/edit/delete venues, and see bookings for the venues they manage.
+
+- Mobile-first UI with accessible forms, responsive tables → cards on small screens, skeleton loading, and toast notifications.
+
+[🔗 Live Demo](https://holidazetravels.netlify.app/)
+
+---
+
+## 🛍️ Project Brief
+
+**All Users**
+
+- View a list of venues
+
+- Search for venues
+
+- View a single venue by ID
+
+- Register as Customer or Venue Manager (stud.noroff.no email)
+
+- See a calendar with available/booked dates
+
+**Customers**
+
+- Log in / Log out
+
+- Create a booking
+
+- View upcoming bookings
+
+- Update avatar/profile picture
+
+**Venue Managers**
+
+- Log in / Log out
+
+- Create, edit, delete a venue
+
+- View upcoming bookings for owned venues
+
+- Update avatar/profile picture
+
+---
+
+## Features
+
+- 🔎 Search & Filters: “Where” input, date range (check-in/out), guests.
+
+- 🏨 Venue Pages: Media gallery, details/amenities, price, availability calendar, booking CTA.
+
+- 📅 Bookings: Date validation, nights × price calculation, upcoming bookings view.
+
+- 👤 Profiles: Avatar & banner update; role-aware tabs (Customer vs Manager).
+
+- 🧰 Manager Tools: Create/Edit/Delete venues, see bookings per venue.
+
+- 💖 Saved Venues: Favorite/unfavorite venues; skeletons while loading.
+
+- 🍞 Toasts & Modals: Global toasts (success/error/info); confirm modal for destructive actions.
+
+- 📱 Responsive: Cross browsers
+
+---
+
+## Technologies Used
+
+### 🔧 Tech
+
+
+### Frontend
+![Next.js](https://img.shields.io/badge/-Next.js-000000?logo=nextdotjs&logoColor=white&style=for-the-badge)
+![React](https://img.shields.io/badge/-React-61DAFB?logo=react&logoColor=black&style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white&style=for-the-badge)
+![Tailwind CSS](https://img.shields.io/badge/-Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge)
+
+### State & Data
+![JWT](https://img.shields.io/badge/-JWT-000000?logo=jsonwebtokens&logoColor=white&style=for-the-badge)
+
+### Tooling
+![ESLint](https://img.shields.io/badge/-ESLint-4B32C3?logo=eslint&logoColor=white&style=for-the-badge)
+![Prettier](https://img.shields.io/badge/-Prettier-F7B93E?logo=prettier&logoColor=black&style=for-the-badge)
+![Node.js](https://img.shields.io/badge/-Node.js-339933?logo=nodedotjs&logoColor=white&style=for-the-badge)
+
+### Deployment
+![Netlify](https://img.shields.io/badge/-Netlify-00C7B7?logo=netlify&logoColor=white&style=for-the-badge)
+
+---
+
+## Installation
+
+Make sure you have **Node.js** installed on your machine.
+
+### 1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # create and edit env file
+npm run dev    
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+# .env.local
+NEXT_PUBLIC_API_BASE=https://api.noroff.dev/api/v1/holidaze
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Core Flows
 
-## Learn More
+- Home / Search: “Where” + date range + guests. On small screens, date fields align side-by-side from ~420px; desktop uses a 5-column layout.
 
-To learn more about Next.js, take a look at the following resources:
+- Venue Detail: Images, description, amenities, location, availability calendar, total price calculation, booking.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Profile:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Customer tabs: Bookings, Saved
 
-## Deploy on Vercel
+Manager tabs: My Venues, Venue Bookings, Bookings, Saved
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Edit Profile modal (avatar, banner, name, bio)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Manager CRUD: Create/Edit/Delete venues with confirm modal + toasts.
+
+Saved Venues: Grid of favorites; shows skeletons while fetching details.
+
+---
+
+## Credits
+
+Design & Code: Diana Bergelin
+
+Images: Unsplash, Noroff API
+
+Icons: React Icons, iconify figma
+
+Inspiration: Pinterest, Ving, Solresor, Tui
+
+Learning Support: Next homepage, ChatGPT, Youtube tutorials, Noroff resources
+
+---
+
+## License
+
+This project was built for educational purposes at Noroff and is not licensed for commercial use.
+
+---
+
+## Contact
+
+📧 diana.bergelin@live.se
+
+🔗 [LinkedIn](https://www.linkedin.com/in/diana-b-4209a72ba/)
+
+[Back to Top](#project-exam-2---holidaze)
+
