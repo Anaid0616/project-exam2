@@ -1,4 +1,3 @@
-// src/app/(home)/_components/HomeHero.tsx
 'use client';
 
 import Image from 'next/image';

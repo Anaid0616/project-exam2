@@ -1,10 +1,9 @@
-// src/features/search/VenueSearchForm.tsx
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import GuestsPicker from '@/components/GuestsPicker';
 
-/** Floating label wrapper (oförändrat, men med valfri className för grid-span) */
+/** Floating label wrapper  */
 function Field({
   id,
   label,
@@ -31,7 +30,7 @@ function Field({
  * - Guests (custom picker)
  * - Search (push till /search)
  *
- * Endast layouten är justerad för små skärmar. Styling är i övrigt orörd.
+ * Responsiv grid:
  */
 export default function VenueSearchForm({
   className = '',
@@ -83,7 +82,7 @@ export default function VenueSearchForm({
     };
   }, [where]);
 
-  // Submit: validera datum, bygg query och navigera
+  // Submit
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (from && to && new Date(from) > new Date(to)) {
@@ -118,7 +117,7 @@ export default function VenueSearchForm({
         Find stays
       </h3>
 
-      {/* WHERE — span 2 kolumner från 420px, tillbaka till 1 på ≥845px */}
+      {/* WHERE */}
       <Field
         id="where"
         label="Where"
