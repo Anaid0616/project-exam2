@@ -23,20 +23,6 @@ Overview
 
 ---
 
-## Table of Contents
-
-- [Description](#description)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
-- [File Structure](#file-structure)
-- [Future Improvements](#future-improvements)
-- [Credits](#credits)
-- [License](#license)
-
----
-
 ## 🛍️ Project Brief
 
 **All Users**
