@@ -4,7 +4,7 @@ import Link from 'next/link';
 import MobileNav from '@/components/MobileNav';
 import Image from 'next/image';
 import * as React from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
 import { decodeJwt } from '@/components/utils';
 import type { JwtPayload, Profile } from '@/types/venue';
 import { isVenueManager } from '@/lib/isVenueManager';
@@ -12,7 +12,6 @@ import { getProfile } from '@/lib/venuescrud';
 import Portal from '@/components/Portal';
 import NavLink from '@/components/header/NavLink';
 import ProfileMenu from '@/components/header/ProfileMenu';
-import { Plus } from 'lucide-react';
 
 /**
  * Returns true if a decoded JWT payload is expired.
@@ -27,7 +26,7 @@ function isExpired(p?: JwtPayload | null): boolean {
 }
 
 /**
- * Clears auth token from localStorage and performs a hard navigation
+ * Clears the auth token from localStorage and performs a hard navigation
  * to the homepage. A hard reload ensures any in-memory state or caches
  * depending on the token are reset.
  */
@@ -42,37 +41,62 @@ function logout() {
 /**
  * Top application header.
  *
- * Responsibilities:
- * - Reads JWT from localStorage on mount, decodes & validates it.
- * - Optionally fetches the user profile (to decide venue manager role).
- * - Renders desktop navigation (register/login or manager actions + saved + profile menu).
- * - Renders mobile actions (saved + hamburger), and the mobile sheet via a Portal.
- * - Applies a translucent background with backdrop blur while sticky on top.
+ * Behavior:
+ * - Synchronously initializes auth state from localStorage on the client to reduce "flash".
+ * - Verifies token on mount (logout if expired) and optionally fetches the user profile.
+ * - Renders desktop navigation (register/login OR manager actions + saved + profile menu).
+ * - Renders mobile actions (saved + hamburger) and the mobile sheet via a Portal.
+ *
+ * UX:
+ * - While auth status is unknown, renders a neutral skeleton to avoid flashing unauthenticated UI.
  *
  * Accessibility:
  * - Desktop profile dropdown is an ARIA menu triggered by a button.
- * - MobileNav is rendered in a Portal to avoid clipping/stacking issues and
- *   covers the whole viewport.
+ * - MobileNav is rendered in a Portal to avoid clipping/stacking issues and covers the viewport.
  */
 export default function Header() {
-  /** Decoded JWT payload (null when not authenticated). */
-  const [payload, setPayload] = React.useState<JwtPayload | null>(null);
+  /**
+   * Decoded JWT payload (null when not authenticated).
+   * Initialized synchronously from localStorage on the client to minimize "loading" time.
+   */
+  const [payload, setPayload] = React.useState<JwtPayload | null>(() => {
+    if (typeof window === 'undefined') return null; // SSR-safe
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    const p = decodeJwt(token);
+    if (isExpired(p)) return null; // no side effects here
+    return p ?? null;
+  });
+
   /** Profile object for additional role checks (may be null if not fetched or unauthenticated). */
   const [profile, setProfile] = React.useState<Profile | null>(null);
+
   /** Controls visibility of the mobile sheet menu. */
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  // Read token, validate expiry, decode payload, and try to fetch profile.
+  /**
+   * Indicates that the initial auth check has completed (so we can render
+   * the correct UI or a skeleton until then).
+   */
+  const [authReady, setAuthReady] = React.useState(false);
+
+  // Verify token (logout if expired) and fetch profile once on mount.
   React.useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      setAuthReady(true);
+      return;
+    }
 
     const p = decodeJwt(token);
     if (isExpired(p)) {
-      logout();
+      logout(); // redirects; no further render needed
       return;
     }
-    setPayload(p ?? null);
+
+    // If the sync initializer didn't set payload (edge cases), correct it.
+    if (!payload && p) setPayload(p);
+    setAuthReady(true);
 
     (async () => {
       if (!p?.name) return;
@@ -80,10 +104,11 @@ export default function Header() {
         const prof = await getProfile(p.name);
         setProfile(prof);
       } catch {
-        // If profile fetch fails, we can still rely on JWT flags.
+        // It's fine to continue without a profile; JWT flags may be enough.
       }
     })();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once
 
   /** Whether the user is authenticated. */
   const isAuthed = !!payload;
@@ -102,7 +127,13 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav */}
-        {!isAuthed ? (
+        {!authReady ? (
+          // Neutral skeleton to avoid flash and layout shift
+          <div className="hidden md:flex items-center gap-6">
+            <div className="h-9 w-28 rounded-md bg-black/5" aria-hidden />
+            <div className="h-9 w-24 rounded-md bg-black/5" aria-hidden />
+          </div>
+        ) : !isAuthed ? (
           <nav className="hidden items-center gap-6 md:flex">
             <NavLink href="/auth/register" size="sm">
               Register
@@ -124,7 +155,6 @@ export default function Header() {
                 </div>
               </NavLink>
             )}
-
             {/* Saved (desktop) */}
             <Link
               href="/profile?saved=1"
@@ -134,7 +164,6 @@ export default function Header() {
             >
               <Heart className="h-5 w-5" />
             </Link>
-
             {/* Profile dropdown */}
             <ProfileMenu onLogout={logout} />
           </nav>
@@ -142,7 +171,7 @@ export default function Header() {
 
         {/* Mobile actions: saved + hamburger */}
         <div className="flex items-center gap-4 md:hidden">
-          {isAuthed && (
+          {authReady && isAuthed && (
             <Link
               href="/profile?saved=1"
               aria-label="Saved venues"
@@ -176,8 +205,8 @@ export default function Header() {
           <MobileNav
             open={mobileOpen}
             onClose={() => setMobileOpen(false)}
-            isAuthed={isAuthed}
-            isManager={isManager}
+            isAuthed={authReady && isAuthed}
+            isManager={authReady && isManager}
             onLogout={logout}
           />
         </Portal>
