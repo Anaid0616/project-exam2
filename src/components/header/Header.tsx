@@ -135,6 +135,7 @@ export default function Header() {
           </div>
         ) : !isAuthed ? (
           <nav className="hidden items-center gap-6 md:flex">
+            <NavLink href="/venues">Venues</NavLink>
             <NavLink href="/auth/register" size="sm">
               Register
             </NavLink>
@@ -144,6 +145,7 @@ export default function Header() {
           </nav>
         ) : (
           <nav className="hidden items-center gap-3 md:flex md:gap-4">
+            <NavLink href="/venues">Venues</NavLink>
             {isManager && (
               <NavLink
                 href="/venues/create"

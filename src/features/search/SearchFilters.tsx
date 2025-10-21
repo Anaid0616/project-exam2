@@ -47,7 +47,7 @@ export default function SearchFilters() {
       const next = new URLSearchParams(q);
       if (!val || val === '0' || val === '') next.delete(key);
       else next.set(key, val);
-      router.push(`/search?${next.toString()}`);
+      router.push(`/venues?${next.toString()}`);
     },
     [q, router]
   );
@@ -83,7 +83,7 @@ export default function SearchFilters() {
 
       {/* ---- Price (aegean) ---- */}
       <div>
-        <label className="block text-sm font-medium mb-2">Price</label>
+        <label className="block font-medium mb-2">Price</label>
 
         {/* 
           Range slider with a custom filled track using inline style.
@@ -106,12 +106,12 @@ export default function SearchFilters() {
           }
           aria-label="Maximum price per night"
         />
-        <div className="text-sm text-ink/70 mt-1">Up to €{priceMax}</div>
+        <div className="text-ink/80 mt-1">Up to €{priceMax}</div>
       </div>
 
       {/* ---- Guests stepper +/- ---- */}
       <div>
-        <label className="block text-sm font-medium mb-2">Guests</label>
+        <label className="block font-medium mb-2">Guests</label>
 
         {/* Simple stepper, clamped to [1, 10] */}
         <div className="flex items-center gap-1">
@@ -158,7 +158,7 @@ export default function SearchFilters() {
 
       {/* ---- Ratings ---- */}
       <div>
-        <label className="block text-sm font-medium mb-2">Ratings</label>
+        <label className="block font-medium mb-2">Ratings</label>
 
         {/* Vertical list of radio options (5 → 1). Each row shows N brand icons. */}
         <div className="flex flex-col gap-2">
@@ -181,7 +181,7 @@ export default function SearchFilters() {
                 ].join(' ')}
               >
                 {Array.from({ length: r }).map((_, i) => (
-                  <Image key={i} src={logoSrc} alt="" width={16} height={16} />
+                  <Image key={i} src={logoSrc} alt="" width={18} height={18} />
                 ))}
               </span>
             </label>
@@ -199,8 +199,8 @@ export default function SearchFilters() {
 
       {/* ---- Amenities ---- */}
       <div>
-        <label className="block text-sm font-medium mb-2">Amenities</label>
-        <ul className="space-y-2 text-sm">
+        <label className="block font-medium mb-2">Amenities</label>
+        <ul className="space-y-2">
           <li className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -256,8 +256,8 @@ export default function SearchFilters() {
       <div className="pt-2">
         <button
           type="button"
-          className="btn btn-outline w-full"
-          onClick={() => router.push('/search')}
+          className="btn btn-white w-full"
+          onClick={() => router.push('/venues')}
           aria-label="Clear all filters"
         >
           Clear filter

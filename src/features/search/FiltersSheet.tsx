@@ -5,15 +5,9 @@ import React from 'react';
 type Props = {
   open: boolean;
   onClose: () => void;
-  children: React.ReactNode; // my <SearchFilters />
+  children: React.ReactNode;
 };
 
-/**
- * Small, scrollable bottom sheet for mobile filters.
- * - Backdrop click + Esc to close
- * - Locks page scroll while open
- * - Max height ~70% of viewport; internal scroll area
- */
 export default function FiltersSheet({ open, onClose, children }: Props) {
   React.useEffect(() => {
     if (!open) return;
@@ -30,43 +24,42 @@ export default function FiltersSheet({ open, onClose, children }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 lg:hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       {/* backdrop */}
       <button
         aria-label="Close filters"
         onClick={onClose}
         className="absolute inset-0 bg-black/40"
       />
+
       {/* panel */}
       <div
         role="dialog"
         aria-modal="true"
-        className="absolute inset-x-0 bottom-0 max-h-[70vh] rounded-t-2xl bg-white shadow-xl"
+        className="
+          absolute inset-x-4 bottom-8 rounded-2xl bg-white shadow-xl 
+          max-h-[75vh] sm:inset-x-6 md:inset-x-12
+          lg:relative lg:inset-auto lg:w-[60rem] lg:max-w-[90vw] lg:rounded-2xl lg:p-8
+        "
       >
-        {/* drag handle */}
+        {/* drag handle (hidden on desktop) */}
         <div
-          className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-ink/10"
+          className="mx-auto mt-2 h-1.5 w-10 rounded-full bg-ink/10 lg:hidden"
           aria-hidden
         />
+
         {/* scroll area */}
-        <div className="mt-3 max-h-[calc(70vh-3rem)] overflow-y-auto px-4 pb-4">
+        <div className="mt-3 max-h-[calc(75vh-3rem)] overflow-y-auto px-4 pb-4 lg:max-h-none lg:overflow-visible lg:px-0">
           {children}
         </div>
-        {/* sticky footer */}
-        <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-ink/10 bg-white px-4 py-3">
-          <button
-            className="rounded-xl border border-ink/10 px-4 py-2 text-sm"
-            onClick={onClose}
-          >
-            Close
-          </button>
-          <button
-            className="rounded-xl bg-aegean px-4 py-2 text-sm font-medium text-white"
-            onClick={onClose}
-          >
-            Show results
-          </button>
-        </div>
+
+        {/* close btn (desktop only) */}
+        <button
+          onClick={onClose}
+          className="lg:block absolute top-4 right-5 text-ink/60 hover:text-ink"
+        >
+          ✕
+        </button>
       </div>
     </div>
   );

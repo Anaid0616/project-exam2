@@ -59,12 +59,12 @@ export default function BookingCard({
       </div>
 
       {/* Title */}
-      <h4 className="truncate text-[17px] font-semibold leading-tight text-ink">
+      <h4 className="truncate text-lg font-semibold leading-tight">
         {b.venueName}
       </h4>
 
       {/* Details */}
-      <ul className="mt-1 space-y-1 text-sm text-ink/70">
+      <ul className="mt-1 space-y-1">
         {b.location && (
           <li className="flex items-start gap-2">
             <MapPin className="mt-[2px] h-4 w-4 text-sunset" aria-hidden />
@@ -95,14 +95,10 @@ export default function BookingCard({
       {/* Footer: push right with ml-auto, keep together; wraps neatly on tiny screens */}
       <div className="mt-3 flex">
         <div className="ml-auto flex flex-wrap items-center justify-end gap-3">
-          <p className="text-[15px] font-semibold text-ink">
-            {money(b.total)}{' '}
-            <span className="font-normal text-ink/70">total</span>
+          <p className="font-semibold">
+            {money(b.total)} <span className="font-normal">total</span>
           </p>
-          <Link
-            href={`/profile/bookings/${b.id}`}
-            className="btn btn-primary btn-sm"
-          >
+          <Link href={`/profile/bookings/${b.id}`} className="btn btn-primary">
             View booking
           </Link>
         </div>

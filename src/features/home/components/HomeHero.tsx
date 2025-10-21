@@ -24,9 +24,9 @@ export default function HomeHero() {
     -bottom-28               /* <= 420px */
     min-[421px]:-bottom-20     /* 421px–844px */
     min-[845px]:-bottom-14     /* >= 845px */
-    z-10 flex justify-center px-4"
+    z-10 flex justify-center px-2 xl:px-4"
       >
-        <div className="pointer-events-auto w-[min(100%,1150px)]">
+        <div className="pointer-events-auto w-[min(100%,1135px)]">
           <div
             className="
             rounded-app border shadow-elev p-4 md:p-5

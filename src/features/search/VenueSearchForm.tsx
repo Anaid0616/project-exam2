@@ -34,8 +34,10 @@ function Field({
  */
 export default function VenueSearchForm({
   className = '',
+  onSearchEnd,
 }: {
   className?: string;
+  onSearchEnd?: () => void;
 }) {
   const router = useRouter();
 
@@ -95,7 +97,9 @@ export default function VenueSearchForm({
     if (to) q.set('to', to);
     q.set('guests', guests === null ? '2' : String(guests));
     setOpen(false);
-    router.push(`/search?${q.toString()}`);
+    router.push(`/venues?${q.toString()}`);
+
+    if (onSearchEnd) onSearchEnd();
   }
 
   return (

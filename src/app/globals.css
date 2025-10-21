@@ -18,10 +18,10 @@
     @apply font-display text-2xl sm:text-3xl font-bold leading-snug;
   }
   h3 {
-    @apply font-display text-xl sm:text-2xl font-semibold leading-snug;
+    @apply font-display text-lg sm:text-lg font-semibold leading-snug;
   }
   p {
-    @apply text-[16px] leading-7 text-ink/80;
+    @apply text-[16px] leading-7 text-ink/90;
   }
   a {
     @apply text-ink no-underline hover:no-underline;
@@ -60,23 +60,31 @@
   }
 
   .btn-sm {
-    @apply px-3 py-1.5 min-h-[32px];
+    @apply px-3 py-1.5 min-h-[34px];
   }
 
+  /* 🌊 Primary (Lagoon) */
   .btn-primary {
-    @apply bg-aegean text-white hover:bg-aegean/90 focus:outline-none focus:ring-2 focus:ring-aegean/90;
+    @apply bg-lagoon text-black hover:bg-lagoon/90
+         focus:ring-2 focus:ring-lagoon/90;
   }
 
-  .btn-outline {
-    @apply btn border-2 border-aegean text-ink bg-sand
-           hover:bg-aegean/10
-           focus:outline-none focus:ring-2 focus:ring-aegean/30;
+  /* 🌺 Secondary (Coral) */
+  .btn-secondary {
+    @apply bg-coral text-white hover:bg-coral/90
+         focus:ring-2 focus:ring-coral/90;
+  }
+
+  /* ⚪ White / Neutral (used for Change search, Cancel, etc.) */
+  .btn-white {
+    @apply bg-white text-ink border border-ink/20
+         hover:bg-ink/5 hover:border-ink/20
+         focus:ring-2 focus:ring-ink/20;
   }
 
   .btn-outline-sunset {
-    @apply btn border-2 border-sunset text-sunset bg-white
-           hover:bg-sunset/5
-           focus:outline-none focus:ring-2 focus:ring-sunset/30;
+    @apply bg-sunset border border-sunset text-white hover:bg-sunset/90
+         focus:ring-2 focus:ring-sunset/90;
   }
 
   .grid-cards {

@@ -126,7 +126,7 @@ export default function EditProfileModal({
           </label>
 
           <div className="mt-2 flex justify-end gap-2">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>
+            <button type="button" className="btn btn-white" onClick={onClose}>
               Cancel
             </button>
             <button

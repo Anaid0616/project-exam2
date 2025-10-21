@@ -34,36 +34,30 @@ export default function VenueCard({
           alt={v.media?.[0]?.alt ?? v.name}
           width={800}
           height={450}
-          className="mb-2 aspect-[16/9] w-full rounded-app object-cover"
+          className="mb-2 w-full h-[220px] rounded-app object-cover"
           priority={priority}
         />
 
         {/* heart overlay only i saved */}
         {showSave && (
-          <div className="absolute right-2 top-2">
-            <SaveButton
-              venueId={String(v.id)}
-              variant="overlay"
-              tone="ink"
-              size="md"
-            />
-          </div>
+          <SaveButton
+            venueId={String(v.id)}
+            variant="overlay"
+            tone="white"
+            size="md"
+            className="absolute right-2 top-2"
+          />
         )}
       </div>
 
-      <h4 className="font-semibold leading-tight">{v.name}</h4>
-
-      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/70">
-        <p className="text-sm text-ink/70">{loc}</p>
-        <span className="hidden sm:inline text-ink/30">|</span>
-        <span>{v.maxGuests ?? 1} guests</span>
-        <span className="hidden sm:inline text-ink/30">|</span>
-        <span className="inline-flex items-center gap-1">
+      <div className="flex gap-x-2">
+        <h3 className="font-semibold leading-tight">{v.name}</h3>
+        <span className="inline-flex items-center gap-1 px-1">
           <Image
             src="/logofooter.svg"
             alt=""
-            width={14}
-            height={14}
+            width={17}
+            height={17}
             className="opacity-80"
             unoptimized
           />
@@ -71,39 +65,26 @@ export default function VenueCard({
         </span>
       </div>
 
+      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-regular">
+        <p className="text-ink/90">{loc}</p>
+
+        <span className="hidden sm:inline ">|</span>
+        <span className="text-ink/90">{v.maxGuests ?? 1} guests</span>
+      </div>
+
       <div className="mt-2 flex items-center justify-between">
         <p className="font-medium">
           {typeof v.price === 'number' ? `${money(v.price)} / night` : '—'}
         </p>
 
-        <Link
-          href={`/venues/${v.id}`}
-          className="group inline-flex items-center gap-1 text-aegean text-sm font-medium hover:underline"
-        >
-          <span className="leading-none">View venue</span>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            className="h-4 w-4 flex-none transition-transform group-hover:translate-x-0.5"
-            aria-hidden="true"
-          >
-            <path
-              d="M8 5l8 7-8 7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <Link href={`/venues/${v.id}`} className="btn btn-primary">
+          View venue
         </Link>
       </div>
 
       {showManage && (
-        <div className="mt-3 flex items-center justify-end gap-2">
-          <Link
-            href={`/venues/${v.id}/edit`}
-            className="btn btn-outline btn-sm"
-          >
+        <div className="mt-3 flex items-center justify-start gap-2">
+          <Link href={`/venues/${v.id}/edit`} className="btn btn-white btn-sm">
             Edit
           </Link>
           <button

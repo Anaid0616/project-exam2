@@ -21,15 +21,21 @@ export default function Pagination({
   path = '/',
   query,
   className = '',
+  total,
+  pageSize = 12,
 }: {
   page: number;
   hasNext: boolean;
   path?: string;
   query?: Qs;
   className?: string;
+  total?: number;
+  pageSize?: number;
 }) {
   const prevPage = Math.max(1, page - 1);
   const nextPage = page + 1;
+
+  const totalPages = total ? Math.ceil(total / pageSize) : undefined;
 
   const prevHref = makeHref(path, prevPage, query);
   const nextHref = makeHref(path, nextPage, query);
@@ -46,7 +52,10 @@ export default function Pagination({
         ‹ Prev
       </Link>
 
-      <span className="px-3 text-sm text-ink/70">Page {page}</span>
+      <span className="px-3 text-sm text-ink/70">
+        Page {page}
+        {totalPages ? ` of ${totalPages}` : ''}
+      </span>
 
       <Link
         href={nextHref}

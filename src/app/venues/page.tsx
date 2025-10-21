@@ -1,13 +1,12 @@
-// app/search/page.tsx
+// app/venues/page.tsx
 import SearchFilters from '@/features/search/SearchFilters';
 import SearchResultCard from '@/features/search/SearchResultCard';
-import SortMenu from '@/features/search/SortMenu';
-import HeaderActionsMobile from '@/features/search/HeaderActionsMobile';
-
 import { listVenuesWithBookings, searchVenues } from '@/lib/venuescrud';
 import type { VenueWithBookings } from '@/types/venue';
-
-import { one, int, type Sp } from '@/lib/url-params';
+import { one, int, last, type Sp } from '@/lib/url-params';
+import Pagination from '@/components/Pagination';
+import SearchHeaderCard from '@/features/search/SearchHeaderCard';
+import { normalizeCountry } from '@/lib/normalizeCountry';
 
 /**
  * Returns `true` when two date ranges overlap.
@@ -29,16 +28,13 @@ function overlaps(aFrom: Date, aTo: Date, bFrom: Date, bTo: Date): boolean {
  * Responsibilities
  * 1) Read URL params (where/from/to/guests/priceMax/ratingMin/amenities/sort)
  * 2) Fetch venues (keyword search or plain list)
- * 3) Filter in-memory according to params (guests, price, rating, amenities, date clash)
+ * 3) Filter (guests, price, rating, amenities)
  * 4) Sort the results
  * 5) Render desktop sidebar + mobile filters
  *
  * Data flow
  * - All filtering/sorting is server-side for a single render pass.
  * - Controls (SearchFilters, SortMenu) update the URL → this page re-renders.
- *
- * Accessibility
- * - Counts and dates are plain text; interactive ARIA lives in the filter components.
  *
  * Accepted URL params (string values unless stated)
  * - where, from(yyyy-mm-dd), to(yyyy-mm-dd)
@@ -72,6 +68,8 @@ export default async function SearchPage({
   const priceMax = priceMaxStr ? int(priceMaxStr, 0) : null;
   const ratingMin = ratingStr ? int(ratingStr, 0) : null;
 
+  const loc = (last(sp.loc)?.toLowerCase() ?? null) as string | null;
+
   const want = {
     wifi: one(sp.wifi) === '1',
     parking: one(sp.parking) === '1',
@@ -85,6 +83,7 @@ export default async function SearchPage({
       | 'price_asc'
       | 'price_desc'
       | 'rating_desc'
+      | 'newest_first'
       | undefined) ?? 'reco';
 
   // ----- Fetch venues -----
@@ -140,7 +139,27 @@ export default async function SearchPage({
     return true;
   });
 
-  // ----- Sort -----
+  // ----- Extra filter: hideZzz & onlyWithImage -----
+  const hideZzz = true;
+  const onlyWithImage = true;
+
+  results = results.filter((v) => {
+    if (hideZzz && /^z+/i.test(v.name ?? '')) return false;
+    if (onlyWithImage && !v.media?.[0]?.url) return false;
+    return true;
+  });
+
+  // ----- Location filter (country or city) -----
+  if (loc) {
+    results = results.filter((v) => {
+      const city = (v.location?.city ?? '').toLowerCase();
+      const country = normalizeCountry(v.location?.country ?? '').toLowerCase();
+      const term = loc.toLowerCase();
+      return city.includes(term) || country.includes(term);
+    });
+  }
+
+  // ----- Sorting -----
   results = results.sort((a, b) => {
     switch (sort) {
       case 'price_asc':
@@ -149,43 +168,43 @@ export default async function SearchPage({
         return (b.price ?? 0) - (a.price ?? 0);
       case 'rating_desc':
         return (b.rating ?? 0) - (a.rating ?? 0);
+      case 'newest_first': {
+        const dateA = new Date(a.created ?? 0).getTime() || 0;
+        const dateB = new Date(b.created ?? 0).getTime() || 0;
+        return dateB - dateA;
+      }
       default:
         return 0;
     }
   });
 
+  // Pagination logic
+  const PAGE_SIZE = 12;
+  const pageStr = one(sp.page);
+  const page = int(pageStr, 1);
+
+  const start = (page - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+
+  const queryObj = Object.fromEntries(
+    Object.entries(sp || {}).map(([k, v]) => [
+      k,
+      Array.isArray(v) ? v[0] : String(v ?? ''),
+    ])
+  );
+
   // ----- UI -----
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 space-y-4">
-      {/* Header card */}
-      <div className="panel">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold">
-              {whereRaw
-                ? `Stays in ${whereRaw[0].toUpperCase()}${whereRaw.slice(1)}`
-                : 'Stays'}
-            </h2>
-            <p className="text-ink/70 text-sm">
-              {fromStr && toStr ? `${fromStr} – ${toStr}` : 'Any dates'}
-              {guests
-                ? ` · ${guests} guest${guests > 1 ? 's' : ''}`
-                : ' · Any guests'}
-              {' · '} {results.length} result{results.length === 1 ? '' : 's'}
-            </p>
-          </div>
-
-          {/* Desktop sort (mobile version below) */}
-          <div className="hidden lg:block">
-            <SortMenu />
-          </div>
-        </div>
-
-        {/* Mobile: Filters inside the header card */}
-        <HeaderActionsMobile>
-          <SearchFilters />
-        </HeaderActionsMobile>
-      </div>
+      {/* Header card with toggle */}
+      <SearchHeaderCard
+        whereRaw={whereRaw}
+        fromStr={fromStr}
+        toStr={toStr}
+        guests={guests ?? undefined}
+        resultCount={results.length}
+        loc={loc}
+      />
 
       {/* Desktop layout: sticky sidebar + results */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[300px,1fr]">
@@ -197,8 +216,20 @@ export default async function SearchPage({
           {results.length === 0 ? (
             <p className="text-ink/70">No venues match your filters.</p>
           ) : (
-            results.map((v) => <SearchResultCard key={v.id} v={v} />)
+            results
+              .slice(start, end)
+              .map((v) => <SearchResultCard key={v.id} v={v} />)
           )}
+
+          {/* Pagination */}
+          <Pagination
+            page={page}
+            hasNext={end < results.length}
+            path="/venues"
+            query={queryObj}
+            total={results.length}
+            pageSize={PAGE_SIZE}
+          />
         </section>
       </div>
     </main>

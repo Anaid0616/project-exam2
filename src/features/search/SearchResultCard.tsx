@@ -70,11 +70,11 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
           />
 
           {/* Small chips over the image */}
-          <div className="pointer-events-none absolute left-2 top-2 inline-flex gap-1">
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs font-medium text-ink/80 backdrop-blur">
+          <div className="pointer-events-none absolute left-2 top-2 inline-flex gap-1 text-sm">
+            <span className="rounded-full bg-white/80 px-2 py-0.5 font-medium text-ink/90 backdrop-blur">
               {v.maxGuests} guests
             </span>
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs font-medium text-ink/80 backdrop-blur">
+            <span className="rounded-full bg-white/80 px-2 py-0.5 font-medium text-ink/90 backdrop-blur">
               {country}
             </span>
           </div>
@@ -82,17 +82,17 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
 
         {/* Info (column 2, row 1) */}
         <div className="min-w-0">
-          <h4 className="truncate text-[17px] font-semibold leading-tight text-ink">
+          <h4 className="truncate text-lg font-semibold leading-tight text-ink">
             {v.name}
           </h4>
 
           {/* Rating just below the name */}
           <div className="mt-1">
-            <Rating value={rating} size="sm" variant="five" />
+            <Rating value={rating} size="md" variant="five" />
           </div>
 
           {/* Location below rating */}
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-[13px] text-ink/70">
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-ink/90">
             <MapPin className="h-4 w-4 text-sunset" aria-hidden />
             <span className="truncate">
               {city}, {country}
@@ -100,13 +100,13 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
           </div>
 
           {/* Date row */}
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink/70">
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-ink/90">
             <CalendarRange className="h-4 w-4" aria-hidden />
             <span>Date from – Date to, 2 nights</span>
           </div>
 
           {/* Amenities  */}
-          <div className="mt-3">
+          <div className="mt-2">
             <AmenitiesRow meta={v.meta ?? {}} size="sm" gapClass="gap-4" />
           </div>
         </div>
@@ -115,17 +115,15 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
         <div className="border-t border-ink/10 pt-3 md:col-start-2 md:row-start-2">
           <div className="flex items-center justify-between gap-3">
             <div className="text-left">
-              <div className="text-[15px] font-semibold text-ink">
-                €{v.price} / night
-              </div>
-              <div className="text-sm text-ink/70">
+              <div className="font-semibold">€{v.price} / night</div>
+              <div className="text-ink/90">
                 €{v.price * v.maxGuests} · {v.maxGuests} guests
               </div>
             </div>
 
             <Link
               href={`/venues/${v.id}`}
-              className="inline-flex items-center justify-center rounded-xl bg-aegean px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110"
+              className="inline-flex items-center justify-center rounded-xl bg-coral px-4 py-2 font-medium text-black shadow-sm transition hover:brightness-110"
             >
               View details
             </Link>

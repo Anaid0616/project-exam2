@@ -33,6 +33,9 @@ export type Venue = {
   location?: Location;
   rating?: number;
   owner?: Owner;
+
+  created?: string;
+  updated?: string;
 };
 
 export type JwtPayload = {

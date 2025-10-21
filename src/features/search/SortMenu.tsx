@@ -4,10 +4,16 @@ import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 
-type SortValue = 'reco' | 'price_asc' | 'price_desc' | 'rating_desc';
+type SortValue =
+  | 'reco'
+  | 'newest_first'
+  | 'price_asc'
+  | 'price_desc'
+  | 'rating_desc';
 
 const OPTIONS: { value: SortValue; label: string }[] = [
   { value: 'reco', label: 'Recommended' },
+  { value: 'newest_first', label: 'Newest first' },
   { value: 'price_asc', label: 'Price: Low to high' },
   { value: 'price_desc', label: 'Price: High to low' },
   { value: 'rating_desc', label: 'Rating: High to low' },
@@ -51,7 +57,7 @@ export default function SortMenu() {
     const q = new URLSearchParams(sp.toString());
     if (v === 'reco') q.delete('sort');
     else q.set('sort', v);
-    router.push(`/search?${q.toString()}`);
+    router.push(`/venues?${q.toString()}`);
   }
 
   const label = OPTIONS.find((o) => o.value === value)?.label ?? 'Recommended';
@@ -64,7 +70,7 @@ export default function SortMenu() {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="inline-flex items-center gap-2 rounded-app border bg-white px-3 py-2 text-sm shadow-elev hover:bg-ink/5"
+        className="inline-flex items-center gap-2 rounded-app border bg-white px-3 py-1.5 shadow-elev hover:bg-ink/5"
       >
         {label}
         <ChevronDown className="h-4 w-4" />
