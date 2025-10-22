@@ -86,8 +86,8 @@ export default function AmenitiesRow({
     }
     children.push(
       <li key={label} className="inline-flex items-center gap-1.5">
-        <Icon className={`${SIZE[size]} text-ink/70`} aria-hidden />
-        <span className="text-ink/80">{label}</span>
+        <Icon className={`${SIZE[size]} text-ink/90`} aria-hidden />
+        <span className="text-ink/90">{label}</span>
       </li>
     );
   });

@@ -26,7 +26,7 @@ export default function ManagerTabContent({
   loadingVenueRows,
   venueRowsError,
 }: {
-  tab: 'bookings' | 'myVenues' | 'venueBookings' | 'saved'; // ⬅️ la till 'saved'
+  tab: 'bookings' | 'myVenues' | 'venueBookings' | 'saved';
   bookings: UiBooking[];
   loadingBookings: boolean;
   venues: Venue[];

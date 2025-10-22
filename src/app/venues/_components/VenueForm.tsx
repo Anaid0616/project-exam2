@@ -173,7 +173,7 @@ export default function VenueForm({
       <div className="flex justify-start">
         <button
           type="submit"
-          className="btn btn-primary"
+          className="btn btn-primary mb-4"
           disabled={isSubmitting}
         >
           {submitLabel}

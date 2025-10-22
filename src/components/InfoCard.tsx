@@ -145,20 +145,23 @@ export default function InfoCard({
                   {role === 'manager' ? 'Venue Manager' : 'Customer'}
                 </span>
               </div>
-              <p className="text-ink/70 text-xs sm:text-sm mt-1">{email}</p>
-              <p className="text-ink/70"> {bio}</p>
+              <p className="text-ink/90 text-sm mt-1">{email}</p>
+              <p className="text-ink/90"> {bio}</p>
             </div>
           </div>
 
           {/* Buttons — below on small screens, right-aligned on md+ */}
           <div className="flex gap-2 justify-end pt-1 md:pt-0 md:ml-auto md:self-start">
             {role === 'manager' && (
-              <Link href="/venues/create" className="btn btn-primary btn-sm">
+              <Link
+                href="/venues/create"
+                className="btn btn-secondary btn-sm text-sm"
+              >
                 Create venue
               </Link>
             )}
             <button
-              className="btn btn-outline h-8 min-h-8 px-2 text-sm gap-1"
+              className="btn btn-white py-1.5 px-2 text-sm gap-1"
               onClick={onEdit}
               type="button"
             >

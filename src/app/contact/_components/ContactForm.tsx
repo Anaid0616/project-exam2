@@ -119,7 +119,7 @@ export default function ContactForm({
       </div>
 
       <div className="flex justify-start">
-        <button className="btn btn-primary" disabled={isSubmitting}>
+        <button className="btn btn-primary px-6" disabled={isSubmitting}>
           {submitLabel}
         </button>
       </div>

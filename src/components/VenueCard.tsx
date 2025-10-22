@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { money } from '@/components/utils';
 import type { Venue } from '@/types/venue';
 import SaveButton from '@/components/SaveButton';
+import { Pencil, Trash } from 'lucide-react';
 
 export default function VenueCard({
   v,
@@ -37,6 +38,27 @@ export default function VenueCard({
           className="mb-2 w-full h-[220px] rounded-app object-cover"
           priority={priority}
         />
+
+        {/* --- Overlay buttons --- */}
+        {showManage && (
+          <div className="absolute top-2 right-2 flex gap-2 z-10">
+            <Link
+              href={`/venues/${v.id}/edit`}
+              aria-label="Edit"
+              className="bg-white/80 hover:bg-white text-ink rounded-full p-1.5 shadow-sm transition"
+            >
+              <Pencil size={16} />
+            </Link>
+
+            <button
+              aria-label="Delete"
+              onClick={() => onDelete?.(v.id)}
+              className="bg-white/80 hover:bg-white text-sunset rounded-full p-1.5 shadow-sm transition"
+            >
+              <Trash size={16} />
+            </button>
+          </div>
+        )}
 
         {/* heart overlay only i saved */}
         {showSave && (
@@ -81,20 +103,6 @@ export default function VenueCard({
           View venue
         </Link>
       </div>
-
-      {showManage && (
-        <div className="mt-3 flex items-center justify-start gap-2">
-          <Link href={`/venues/${v.id}/edit`} className="btn btn-white btn-sm">
-            Edit
-          </Link>
-          <button
-            className="btn btn-outline-sunset btn-sm"
-            onClick={() => onDelete?.(v.id)}
-          >
-            Delete
-          </button>
-        </div>
-      )}
     </article>
   );
 }

@@ -8,7 +8,7 @@ export const revalidate = 0;
 
 export default function HomePage() {
   return (
-    <main className="mx-auto max-w-6xl space-y-10 px-2">
+    <main className="mx-auto max-w-6xl space-y-8 sm:space-y-10 px-2">
       {/* Hero + search */}
       <HomeHero />
 

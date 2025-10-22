@@ -121,10 +121,7 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
               </div>
             </div>
 
-            <Link
-              href={`/venues/${v.id}`}
-              className="inline-flex items-center justify-center rounded-xl bg-coral px-4 py-2 font-medium text-black shadow-sm transition hover:brightness-110"
-            >
+            <Link href={`/venues/${v.id}`} className="btn btn-primary">
               View details
             </Link>
           </div>

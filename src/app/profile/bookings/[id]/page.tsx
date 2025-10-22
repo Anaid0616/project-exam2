@@ -123,7 +123,7 @@ export default function BookingDetailsPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/profile" className="btn btn-outline">
+          <Link href="/profile" className="btn btn-white">
             View my bookings
           </Link>
         </div>

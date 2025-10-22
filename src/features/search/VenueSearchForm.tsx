@@ -117,9 +117,9 @@ export default function VenueSearchForm({
     ${className}
   `}
     >
-      <h3 className="col-span-full text-xl font-semibold -mt-1 mb-3">
+      <h2 className="col-span-full text-xl font-semibold -mt-1 mb-3">
         Find stays
-      </h3>
+      </h2>
 
       {/* WHERE */}
       <Field

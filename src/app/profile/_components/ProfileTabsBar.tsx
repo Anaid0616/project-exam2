@@ -8,12 +8,12 @@ type Role = 'customer' | 'manager';
 export function tabClass(active: boolean) {
   return `
     inline-flex items-center shrink-0 snap-start
-    h-9 px-3 text-sm
+    h-9 px-3
     -mb-px leading-tight border-b-[4px]
     ${
       active
         ? 'border-coral text-ink'
-        : 'border-transparent text-ink/70 hover:text-ink'
+        : 'border-transparent text-ink/90 hover:text-ink'
     }
     focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 rounded-[2px]
   `;

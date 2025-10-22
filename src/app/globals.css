@@ -50,7 +50,7 @@
 
   .btn {
     @apply inline-flex items-center justify-center rounded-app
-         px-4 py-2 text-sm font-semibold shadow-elev transition-colors
+         px-4 py-2 font-semibold shadow-elev transition-colors
          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0
          min-h-[44px] md:min-h-[36px];
   }
@@ -65,13 +65,13 @@
 
   /* 🌊 Primary (Lagoon) */
   .btn-primary {
-    @apply bg-lagoon text-black hover:bg-lagoon/90
+    @apply bg-lagoon text-black shadow-sm hover:bg-lagoon/90
          focus:ring-2 focus:ring-lagoon/90;
   }
 
   /* 🌺 Secondary (Coral) */
   .btn-secondary {
-    @apply bg-coral text-white hover:bg-coral/90
+    @apply bg-coral text-black hover:bg-coral/90
          focus:ring-2 focus:ring-coral/90;
   }
 
@@ -83,7 +83,12 @@
   }
 
   .btn-outline-sunset {
-    @apply bg-sunset border border-sunset text-white hover:bg-sunset/90
+    @apply bg-white border border-sunset text-sunset hover:bg-sunset/90
+         focus:ring-2 focus:ring-sunset/90;
+  }
+
+  .btn-sunset {
+    @apply bg-sunset text-white hover:bg-sunset/90
          focus:ring-2 focus:ring-sunset/90;
   }
 
@@ -91,19 +96,10 @@
     @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-3;
   }
 
-  /* chips homepage*/
-  .chip {
-    @apply rounded-full border-2 border-aegean bg-white px-3 py-1 text-sm text-ink/80 shadow-sm hover:bg-ink/5 transition;
-    @apply no-underline hover:no-underline focus:no-underline active:no-underline visited:no-underline;
-  }
-  .chip-active {
-    @apply bg-aegean text-white border-aegean hover:bg-aegean/85 transition;
-  }
-
-  /* Base chip for profile role (separate from .chip) */
+  /* Base chip for venue role */
   .chip-role {
     @apply inline-flex items-center gap-1 rounded-full
-           px-2 py-0.5 text-xs font-medium
+           px-3 py-1 text-sm font-medium
            whitespace-nowrap align-middle
            bg-lagoon/40 text-ink;
   }

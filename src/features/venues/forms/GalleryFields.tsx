@@ -39,7 +39,7 @@ export default function GalleryFields({
         <label className="label m-0">Gallery</label>
         <button
           type="button"
-          className="btn btn-outline px-3 py-1.5"
+          className="btn btn-white px-3 py-1.5"
           onClick={() => append({ url: '', alt: '' })}
         >
           + Add image
@@ -94,7 +94,7 @@ export default function GalleryFields({
             {i > 0 ? (
               <button
                 type="button"
-                className="btn-outline-sunset px-3 py-1.5 whitespace-nowrap"
+                className="btn btn-outline-sunset px-3 py-1.5 whitespace-nowrap"
                 onClick={() => remove(i)}
               >
                 <span aria-hidden className="mr-1">
