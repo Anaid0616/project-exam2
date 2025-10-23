@@ -121,7 +121,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="relative h-[40px] w-[130px]">
-            <Image src="/logo.svg" alt="Holidaze" fill priority />
+            <Image src="/logo.svg" alt="Holidaze logo" fill priority />
           </div>
           <span className="sr-only">Holidaze</span>
         </Link>
@@ -139,7 +139,7 @@ export default function Header() {
             <NavLink href="/auth/register" size="sm">
               Register
             </NavLink>
-            <Link href="/auth/login" className="btn btn-outline">
+            <Link href="/auth/login" className="btn btn-primary">
               Login
             </Link>
           </nav>

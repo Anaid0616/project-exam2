@@ -29,29 +29,26 @@ export default function HomeHero() {
           unoptimized
         />
 
-        {/* --- Overlay headline and CTA button --- */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-ink text-center px-4 -mt-3">
-          <h1 className="text-3xl md:text-4xl font-semibold drop-shadow-lg">
-            Find your next stay with Holidaze
-          </h1>
-          <p className="hidden md:block mt-2 text-lg md:text-xl font-medium text-black drop-shadow-md">
-            Discover unique venues and hidden gems across the world
-          </p>
+        {/* --- Overlay content --- */}
+        <div className="absolute inset-0 flex items-center justify-center -mb-10">
+          <div className="max-w-6xl mx-auto w-full px-4 md:px-6 text-left">
+            <h1 className="text-3xl md:text-4xl font-semibold text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.7)] capitalize">
+              Escape to your dream destination
+            </h1>
 
-          {/* CTA button linking to venues page */}
-          <Link
-            href="/venues"
-            className="mt-4 sm:mt-6 btn btn-secondary inline-block px-4  shadow-md transition-all"
-          >
-            Explore Venues
-          </Link>
+            <Link
+              href="/venues"
+              className="mt-6 inline-block btn btn-secondary px-4 py-2 shadow-md transition-all"
+            >
+              Explore Venues
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* --- Search panel --- */}
       {/* 
         The negative margin lifts the search panel upward over the hero image. 
-        Smaller screens overlap slightly more for a tighter layout.
       */}
       <div className="flex justify-center px-2 xl:px-4 -mt-16 sm:-mt-18">
         <div className="pointer-events-auto w-[min(100%,1100px)]">

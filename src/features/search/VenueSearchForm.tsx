@@ -3,6 +3,18 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import GuestsPicker from '@/components/GuestsPicker';
 
+/**
+ * Field
+ *
+ * A simple floating-label wrapper that pairs a label with a child input or custom field.
+ * It positions the label above the input using absolute positioning.
+ *
+ * @param {object} props
+ * @param {string} props.id - The unique identifier for the input field.
+ * @param {string} props.label - The label text for the field.
+ * @param {string} [props.className] - Optional additional classes for styling.
+ * @param {React.ReactNode} props.children - Input or custom field content.
+ */
 /** Floating label wrapper  */
 function Field({
   id,
@@ -75,7 +87,7 @@ export default function VenueSearchForm({
         setOpen(filtered.length > 0);
         setHi(-1);
       } catch {
-        /* ignore */
+        /* ignore network errors */
       }
     }, 250);
     return () => {
@@ -84,7 +96,10 @@ export default function VenueSearchForm({
     };
   }, [where]);
 
-  // Submit
+  /**
+   * Handles form submission.
+   * Validates input, builds query params, and navigates to `/venues`.
+   */
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (from && to && new Date(from) > new Date(to)) {
@@ -132,7 +147,7 @@ export default function VenueSearchForm({
             name="where"
             id="where"
             ref={whereRef}
-            className="input h-11 w-full"
+            className="input h-11 w-full placeholder:text-ink/70"
             placeholder="Santorini, Greece"
             value={where}
             onChange={(e) => setWhere(e.target.value)}
@@ -198,7 +213,7 @@ export default function VenueSearchForm({
             onChange={(e) => setFrom(e.target.value)}
           />
           {!from && (
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/60">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/70">
               Add date
             </span>
           )}
@@ -217,7 +232,7 @@ export default function VenueSearchForm({
             onChange={(e) => setTo(e.target.value)}
           />
           {!to && (
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/60">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/70">
               Add date
             </span>
           )}
@@ -229,7 +244,7 @@ export default function VenueSearchForm({
         <GuestsPicker inputId="guests" value={guests} onChange={setGuests} />
       </Field>
 
-      {/* Search — fullbredd på minsta skärmar, auto från 420px */}
+      {/* Search */}
       <button
         type="submit"
         className="btn btn-primary h-11 w-full min-[420px]:w-auto px-6 !py-0 !min-h-0 leading-none"

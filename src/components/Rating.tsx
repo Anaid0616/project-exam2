@@ -60,8 +60,9 @@ export default function Rating({
         {showNumber && (
           <span
             className={clsx(
-              size === 'lg' ? 'text-sm' : 'text-xs',
-              'text-ink/60'
+              size === 'lg' ? 'text-base' : 'text-sm',
+
+              'text-ink/80'
             )}
           >
             {num}
@@ -91,7 +92,7 @@ export default function Rating({
           />
         </span>
       ))}
-      {showNumber && <span className="ml-1 text-xs text-ink/60">{num}</span>}
+      {showNumber && <span className="ml-1 text-ink/80">{num}</span>}
     </span>
   );
 }

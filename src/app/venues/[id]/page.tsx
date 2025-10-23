@@ -113,38 +113,40 @@ export default async function VenueDetailsPage({
 
               <div className="mt-1 flex items-center gap-1">
                 <MapPin className="h-4 w-4 text-sunset" aria-hidden />
-                {loc && <p className="mt-1 text-ink/70">{loc}</p>}
+                {loc && <p className="mt-1 text-ink">{loc}</p>}
               </div>
 
-              <p className="mt-2 text-ink/70">
+              <p className="mt-2 text-ink/90">
                 Guests: up to {v.maxGuests}
                 {typeof v.price === 'number' && (
                   <> &nbsp;•&nbsp; {money(v.price)} / night</>
                 )}
               </p>
-            </div>
 
-            <OwnerActions venueId={v.id} ownerName={v.owner?.name} />
+              <div className="mt-3 flex justify-start">
+                <OwnerActions venueId={v.id} ownerName={v.owner?.name} />
+              </div>
+            </div>
 
             <hr className="border-ink/10" />
 
             <div>
-              <h2 className="text-base font-semibold">Description</h2>
-              <p className="mt-2 text-ink/80">
+              <h2 className="text-lg font-semibold">Description</h2>
+              <p className="mt-2 text-ink/90">
                 {v.description ?? 'No description provided.'}
               </p>
             </div>
 
             <div>
-              <h3 className="text-base font-semibold">Amenities</h3>
+              <h3 className="font-semibold">Amenities</h3>
               <div className="mt-2">
-                <AmenitiesRow meta={v.meta ?? {}} size="md" gapClass="gap-6" />
+                <AmenitiesRow meta={v.meta ?? {}} size="lg" gapClass="gap-6" />
               </div>
             </div>
 
             <div>
-              <h3 className="text-base font-semibold">Policies</h3>
-              <ul className="mt-2 list-disc pl-5 text-sm text-ink/80">
+              <h3 className="font-semibold">Policies</h3>
+              <ul className="mt-2 list-disc pl-5 text-ink/90">
                 <li>Check-in after 15:00</li>
                 <li>Free cancellation up to 48 hours before arrival</li>
                 <li>No smoking indoors</li>
@@ -153,8 +155,8 @@ export default async function VenueDetailsPage({
 
             {loc && (
               <div>
-                <h3 className="text-base font-semibold">Location</h3>
-                <p className="mt-1 text-sm text-ink/70">{loc}</p>
+                <h3 className="font-semibold">Location</h3>
+                <p className="mt-1 text-ink/80">{loc}</p>
 
                 <div className="mt-3 overflow-hidden rounded-app border border-ink/10">
                   <iframe

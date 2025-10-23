@@ -5,29 +5,47 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { api, API, ApiError } from '@/lib/api';
+import { publicApi, API, HttpError } from '@/lib/api';
 import { loginSchema, type LoginForm } from '@/validation/auth';
 import { toast } from '@/lib/toast';
 
 const HERO =
   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=70&auto=format&fit=crop';
 
+/**
+ * LoginResponse
+ * The Noroff API sometimes returns `{ data: { accessToken } }` or `{ accessToken }`.
+ */
 type LoginResponse =
   | { data: { accessToken: string } }
   | { accessToken: string };
 
+/**
+ * Extracts an access token from the API response,
+ * regardless of whether it is wrapped in a `data` object.
+ */
 function extractAccessToken(res: unknown): string | null {
   if (typeof res !== 'object' || res === null) return null;
-  const r = res as Record<string, unknown>;
-  const data = r['data'];
+  const obj = res as Record<string, unknown>;
+  const data = obj['data'];
   if (typeof data === 'object' && data !== null) {
-    const d = data as Record<string, unknown>;
-    if (typeof d['accessToken'] === 'string') return d['accessToken'];
+    const inner = data as Record<string, unknown>;
+    if (typeof inner['accessToken'] === 'string') return inner['accessToken'];
   }
-  if (typeof r['accessToken'] === 'string') return r['accessToken'];
+  if (typeof obj['accessToken'] === 'string') return obj['accessToken'];
   return null;
 }
 
+/**
+ * LoginPage
+ *
+ * Handles user authentication.
+ * - Validates user input with Yup + React Hook Form.
+ * - Calls the Noroff login API via `publicApi`.
+ * - Stores the returned token in `localStorage`.
+ * - Redirects to the home page on success.
+ * - Shows error toast if login fails.
+ */
 export default function LoginPage() {
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -41,10 +59,14 @@ export default function LoginPage() {
     mode: 'onTouched',
   });
 
+  /**
+   * Submits login credentials to the Noroff API.
+   * Saves token locally and redirects to home on success.
+   */
   async function onSubmit(values: LoginForm) {
     setApiError(null);
     try {
-      const res = await api<LoginResponse>(API.login, {
+      const res = await publicApi<LoginResponse>(API.login, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
@@ -53,16 +75,19 @@ export default function LoginPage() {
       const token = extractAccessToken(res);
       if (!token) throw new Error('No access token returned');
 
+      // Store token locally for authenticated routes
       localStorage.setItem('token', token);
-      toast.success({ title: 'Welcome back!' });
+
+      // Redirect to home
       window.location.href = '/';
     } catch (err) {
       const msg =
-        err instanceof ApiError
+        err instanceof HttpError
           ? err.message
           : err instanceof Error
           ? err.message
           : 'Login failed';
+
       setApiError(msg);
       toast.error({ title: 'Login failed', description: msg });
     }
@@ -70,12 +95,12 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-2 md:px-6">
-      {/* Bleed hero */}
+      {/* Hero Image */}
       <section className="bleed relative h-[250px] md:h-[290px] z-0">
         <Image src={HERO} alt="" fill priority className="object-cover" />
       </section>
 
-      {/* Card that overlaps the hero */}
+      {/* Login Card */}
       <div className="card relative mx-auto -mt-24 md:-mt-20 max-w-md z-10">
         <section className="p-6">
           <h1 className="text-2xl font-bold">Login</h1>
@@ -85,6 +110,7 @@ export default function LoginPage() {
             className="mt-6 space-y-4"
             noValidate
           >
+            {/* Email */}
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
@@ -99,6 +125,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
               <input
@@ -116,6 +143,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               className="btn btn-primary w-full"

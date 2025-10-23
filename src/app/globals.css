@@ -104,14 +104,6 @@
            bg-lagoon/40 text-ink;
   }
 
-  /* Little colored dot inside the role chip */
-  .chip-dot {
-    @apply inline-block h-1.5 w-1.5 rounded-full;
-  }
-  .chip-role .chip-dot {
-    @apply bg-ink;
-  }
-
   @layer utilities {
     .bleed {
       width: 100vw;

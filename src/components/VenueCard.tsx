@@ -4,8 +4,22 @@ import Link from 'next/link';
 import { money } from '@/components/utils';
 import type { Venue } from '@/types/venue';
 import SaveButton from '@/components/SaveButton';
+import Rating from '@/components/Rating';
 import { Pencil, Trash } from 'lucide-react';
 
+/**
+ * VenueCard
+ *
+ * Displays a venue preview with image, name, location, and price.
+ * Optionally shows management buttons (edit/delete) for venue managers.
+ *
+ * @param {object} props
+ * @param {Venue} props.v - The venue data object.
+ * @param {boolean} [props.showManage] - If true, shows edit/delete overlay icons.
+ * @param- Callback fired when delete is clicked.
+ * @param {boolean} [props.showSave] - If true, shows a save (favorite) button overlay.
+ * @param {boolean} [props.priority] - If true, prioritizes image loading.
+ */
 export default function VenueCard({
   v,
   showManage,
@@ -44,14 +58,14 @@ export default function VenueCard({
           <div className="absolute top-2 right-2 flex gap-2 z-10">
             <Link
               href={`/venues/${v.id}/edit`}
-              aria-label="Edit"
+              aria-label="Edit venue"
               className="bg-white/80 hover:bg-white text-ink rounded-full p-1.5 shadow-sm transition"
             >
               <Pencil size={16} />
             </Link>
 
             <button
-              aria-label="Delete"
+              aria-label="Delete venue"
               onClick={() => onDelete?.(v.id)}
               className="bg-white/80 hover:bg-white text-sunset rounded-full p-1.5 shadow-sm transition"
             >
@@ -60,7 +74,7 @@ export default function VenueCard({
           </div>
         )}
 
-        {/* heart overlay only i saved */}
+        {/* --- Heart overlay for favorites --- */}
         {showSave && (
           <SaveButton
             venueId={String(v.id)}
@@ -74,23 +88,17 @@ export default function VenueCard({
 
       <div className="flex gap-x-2">
         <h3 className="font-semibold leading-tight">{v.name}</h3>
-        <span className="inline-flex items-center gap-1 px-1">
-          <Image
-            src="/logofooter.svg"
-            alt=""
-            width={17}
-            height={17}
-            className="opacity-80"
-            unoptimized
-          />
-          {(typeof v.rating === 'number' ? v.rating : 0).toFixed(1)}
-        </span>
+        <Rating
+          value={v.rating ?? 0}
+          variant="single"
+          size="md"
+          precision={1}
+        />
       </div>
 
       <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-regular">
         <p className="text-ink/90">{loc}</p>
-
-        <span className="hidden sm:inline ">|</span>
+        <span className="hidden sm:inline">|</span>
         <span className="text-ink/90">{v.maxGuests ?? 1} guests</span>
       </div>
 

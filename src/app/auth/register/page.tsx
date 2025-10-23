@@ -5,15 +5,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { api, API } from '@/lib/api';
+import { publicApi, API, HttpError } from '@/lib/api';
 import { registerSchema, type RegisterForm } from '@/validation/auth';
 import { toast } from '@/lib/toast';
-import { ApiError } from '@/lib/api';
 
 const HERO =
   'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=70&auto=format&fit=crop';
 
-/** API response shape returned by the register endpoint. Adjust if your backend differs. */
+/**
+ * Response returned by the Noroff registration endpoint.
+ */
 type RegisterResponse = {
   data: {
     name: string;
@@ -23,22 +24,19 @@ type RegisterResponse = {
     avatar?: { url: string; alt?: string | null };
     banner?: { url: string; alt?: string | null };
   };
-  meta?: unknown;
 };
 
 /**
- * Registration page
+ * Registration Page
  *
- * - Uses React Hook Form + Yup resolver for client validation.
- * - Submits to `API.register` via the `api` helper.
- * - On success, navigates to `/auth/login`.
- * - Field errors are shown under each input; API error is shown under the submit button.
+ * - Uses React Hook Form + Yup for client-side validation.
+ * - Submits via `publicApi` (safe fetch wrapper).
+ * - Allows toggling "Venue Manager" role only.
+ * - Displays inline validation errors and one toast if registration fails.
  */
 export default function RegisterPage() {
   const [apiError, setApiError] = React.useState<string | null>(null);
-  const [result, setResult] = React.useState<RegisterResponse | null>(null);
 
-  // React Hook Form with Yup schema
   const {
     register,
     handleSubmit,
@@ -55,33 +53,29 @@ export default function RegisterPage() {
   });
 
   /**
-   * Submit validated values to the register endpoint.
-   * Shows the API response and redirects to login on success.
+   * Submits registration details to the API.
+   * Redirects to /auth/login on success.
    */
   async function onSubmit(values: RegisterForm) {
     setApiError(null);
-    setResult(null);
+
     try {
-      const data = await api<RegisterResponse>(API.register, {
+      const res = await publicApi<RegisterResponse>(API.register, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
       });
 
-      setResult(data);
-      toast.success({ title: 'Account created' });
-
-      if (data?.data?.email) {
+      if (res?.data?.email) {
         window.location.href = '/auth/login';
       }
     } catch (err) {
       const msg =
-        err instanceof ApiError
+        err instanceof HttpError
           ? err.message
           : err instanceof Error
           ? err.message
           : 'Registration failed';
-
       setApiError(msg);
       toast.error({ title: 'Register failed', description: msg });
     }
@@ -90,10 +84,10 @@ export default function RegisterPage() {
   return (
     <main className="mx-auto max-w-6xl p-6">
       <div className="grid md:grid-cols-2 items-stretch">
-        {/* Left: Card with the form */}
+        {/* Left: Registration form */}
         <section className="panel flex flex-col justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Register</h1>
+            <h1 className="text-2xl font-bold">Create an account</h1>
 
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -106,9 +100,9 @@ export default function RegisterPage() {
                 <input
                   className="input"
                   type="text"
-                  placeholder="Name"
-                  aria-invalid={!!errors.name || undefined}
+                  placeholder="Your name"
                   {...register('name')}
+                  aria-invalid={!!errors.name || undefined}
                 />
                 {errors.name && (
                   <p className="text-red-600 text-sm">{errors.name.message}</p>
@@ -121,10 +115,10 @@ export default function RegisterPage() {
                 <input
                   className="input"
                   type="email"
-                  placeholder="Email address"
+                  placeholder="you@stud.noroff.no"
                   autoComplete="email"
-                  aria-invalid={!!errors.email || undefined}
                   {...register('email')}
+                  aria-invalid={!!errors.email || undefined}
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm">{errors.email.message}</p>
@@ -139,10 +133,10 @@ export default function RegisterPage() {
                 <input
                   className="input"
                   type="password"
-                  placeholder="Password (min 8 chars)"
+                  placeholder="Password (min 8 characters)"
                   autoComplete="new-password"
-                  aria-invalid={!!errors.password || undefined}
                   {...register('password')}
+                  aria-invalid={!!errors.password || undefined}
                 />
                 {errors.password && (
                   <p className="text-red-600 text-sm">
@@ -151,65 +145,26 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              {/* Account type (radio) */}
-              <fieldset className="mt-2">
-                <legend
-                  id="legend-account-type"
-                  className="text-sm font-medium mb-2"
+              {/* Venue Manager toggle */}
+              <div className="flex items-center gap-2 mt-3">
+                <input
+                  id="venueManager"
+                  type="checkbox"
+                  {...register('venueManager')}
+                  className="h-4 w-4 accent-aegean focus:ring-0"
+                />
+                <label
+                  htmlFor="venueManager"
+                  className="text-sm cursor-pointer select-none"
                 >
-                  Account type
-                </legend>
+                  Venue Manager
+                </label>
+              </div>
 
-                {/* fieldset+legend gives the group semantics; keep labels clickable */}
-                <div
-                  className="flex gap-6"
-                  aria-labelledby="legend-account-type"
-                >
-                  <label
-                    htmlFor="acct-customer"
-                    className="inline-flex items-center gap-2 cursor-pointer select-none"
-                  >
-                    <input
-                      id="acct-customer"
-                      type="radio"
-                      value="false"
-                      {...register('venueManager', {
-                        setValueAs: (v) => v === 'true',
-                      })}
-                      className="
-                        h-4 w-4 accent-aegean
-                        outline-none focus:outline-none focus:ring-0
-                        focus-visible:outline-none focus-visible:ring-0
-                      "
-                    />
-                    Customer
-                  </label>
-
-                  <label
-                    htmlFor="acct-manager"
-                    className="inline-flex items-center gap-2 cursor-pointer select-none"
-                  >
-                    <input
-                      id="acct-manager"
-                      type="radio"
-                      value="true"
-                      {...register('venueManager', {
-                        setValueAs: (v) => v === 'true',
-                      })}
-                      className="
-                        h-4 w-4 accent-aegean
-                        outline-none focus:outline-none focus:ring-0
-                        focus-visible:outline-none focus-visible:ring-0
-                      "
-                    />
-                    Venue Manager
-                  </label>
-                </div>
-              </fieldset>
-
+              {/* Submit button */}
               <button
                 type="submit"
-                className="btn btn-primary w-full"
+                className="btn btn-primary w-full mt-4"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Registering…' : 'Register'}
@@ -217,11 +172,6 @@ export default function RegisterPage() {
 
               {apiError && (
                 <p className="text-red-600 text-sm mt-2">{apiError}</p>
-              )}
-              {result && (
-                <pre className="mt-3 rounded-app bg-shell p-3 text-xs border">
-                  {JSON.stringify(result, null, 2)}
-                </pre>
               )}
             </form>
           </div>
@@ -234,7 +184,7 @@ export default function RegisterPage() {
           </p>
         </section>
 
-        {/* Right: Big image */}
+        {/* Right: Image */}
         <div className="relative hidden md:block">
           <Image
             src={HERO}

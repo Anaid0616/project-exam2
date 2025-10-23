@@ -46,3 +46,34 @@ export const venueSchema = yup
   .required();
 
 export type VenueFormValues = yup.InferType<typeof venueSchema>;
+
+/* -------------------------------------------------------------------------- */
+/*                               TYPE: PAYLOAD                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The payload shape sent to the API when creating or updating a venue.
+ * Mirrors the fields expected by Noroff's Holidaze API.
+ */
+export type NewVenuePayload = {
+  name: string;
+  description?: string | null;
+  media?: { url: string; alt?: string | null }[];
+  price: number;
+  maxGuests: number;
+  meta: {
+    wifi: boolean;
+    parking: boolean;
+    breakfast: boolean;
+    pets: boolean;
+  };
+  location: {
+    address?: string | null;
+    city?: string | null;
+    zip?: string | null;
+    country?: string | null;
+    continent?: string | null;
+    lat?: number | null;
+    lng?: number | null;
+  };
+};

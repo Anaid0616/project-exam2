@@ -1,5 +1,6 @@
 // src/features/venues/forms/mappers.ts
-import type { NewVenuePayload } from '@/lib/venuescrud';
+import type { NewVenuePayload } from './schema';
+
 import type { VenueFormValues } from './schema';
 
 export function toVenuePayload(values: VenueFormValues): NewVenuePayload {
