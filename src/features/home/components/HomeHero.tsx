@@ -38,7 +38,7 @@ export default function HomeHero() {
 
             <Link
               href="/venues"
-              className="mt-6 inline-block btn btn-secondary px-4 py-2 shadow-md transition-all"
+              className="mt-6 inline-block btn btn-primary px-4 py-2 shadow-md transition-all"
             >
               Explore Venues
             </Link>
@@ -47,9 +47,7 @@ export default function HomeHero() {
       </div>
 
       {/* --- Search panel --- */}
-      {/* 
-        The negative margin lifts the search panel upward over the hero image. 
-      */}
+
       <div className="flex justify-center px-2 xl:px-4 -mt-16 sm:-mt-18">
         <div className="pointer-events-auto w-[min(100%,1100px)]">
           <div

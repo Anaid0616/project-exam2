@@ -82,7 +82,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-5xl p-6">
       <div className="grid md:grid-cols-2 items-stretch">
         {/* Left: Registration form */}
         <section className="panel flex flex-col justify-between">

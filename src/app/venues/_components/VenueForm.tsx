@@ -18,6 +18,8 @@ import {
 } from '@/features/venues/forms/schema';
 import { createDefaultValues } from '@/features/venues/forms/types';
 import GalleryFields from '@/features/venues/forms/GalleryFields';
+import { Controller } from 'react-hook-form';
+import RatingPicker from '@/components/RatingPicker';
 
 type Props = {
   initial?: Venue;
@@ -96,6 +98,26 @@ export default function VenueForm({
         />
         {errors.description && (
           <p className="text-xs text-red-600">{errors.description.message}</p>
+        )}
+      </div>
+
+      {/* Rating med logo-ikon */}
+      <div>
+        <label className="label">Rating</label>
+        <Controller
+          name="rating"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <RatingPicker
+              value={typeof value === 'number' ? value : null}
+              onChange={onChange}
+              iconSrc="/logofooter.svg"
+              label="Set venue rating"
+            />
+          )}
+        />
+        {errors.rating && (
+          <p className="text-xs text-sunset">{errors.rating.message}</p>
         )}
       </div>
 

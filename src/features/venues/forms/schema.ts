@@ -42,6 +42,13 @@ export const venueSchema = yup
     parking: yup.boolean().optional(),
     breakfast: yup.boolean().optional(),
     pets: yup.boolean().optional(),
+
+    rating: yup
+      .number()
+      .transform((val, orig) => (orig === '' || orig == null ? undefined : val))
+      .min(0, 'Min 0')
+      .max(5, 'Max 5')
+      .optional(),
   })
   .required();
 
@@ -61,6 +68,7 @@ export type NewVenuePayload = {
   media?: { url: string; alt?: string | null }[];
   price: number;
   maxGuests: number;
+  rating?: number;
   meta: {
     wifi: boolean;
     parking: boolean;

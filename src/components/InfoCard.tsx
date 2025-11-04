@@ -104,8 +104,8 @@ export default function InfoCard({
       </h2>
 
       {/* Banner */}
-      <div className="mx-auto w-full px-4 relative z-0">
-        <div className="relative z-0 mx-auto h-56 md:h-72 bleed-small overflow-hidden rounded-app">
+      <div className="bleed overflow-hidden">
+        <div className="relative z-0 mx-auto h-72 md:h-92 w-full">
           <Image
             src={bannerUrl}
             alt="Profile cover"
@@ -119,7 +119,7 @@ export default function InfoCard({
         </div>
       </div>
 
-      <article className="panel relative z-[10] mx-auto -mt-10 md:-mt-14 p-3 md:p-4">
+      <article className="panel relative z-[10] mx-auto -mt-8 md:-mt-10 p-3 md:p-4">
         {/* Avatar + text + buttons */}
         <div className="flex flex-col gap-3 md:flex-row md:items-start">
           {/* Avatar + text */}

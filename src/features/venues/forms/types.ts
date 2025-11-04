@@ -16,5 +16,7 @@ export function createDefaultValues(initial?: Venue): VenueFormValues {
     parking: initial?.meta?.parking ?? false,
     breakfast: initial?.meta?.breakfast ?? false,
     pets: initial?.meta?.pets ?? false,
+
+    rating: typeof initial?.rating === 'number' ? initial.rating : undefined,
   };
 }

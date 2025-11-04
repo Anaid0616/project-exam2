@@ -1,7 +1,5 @@
 // src/features/venues/forms/mappers.ts
-import type { NewVenuePayload } from './schema';
-
-import type { VenueFormValues } from './schema';
+import type { NewVenuePayload, VenueFormValues } from './schema';
 
 export function toVenuePayload(values: VenueFormValues): NewVenuePayload {
   return {
@@ -10,11 +8,17 @@ export function toVenuePayload(values: VenueFormValues): NewVenuePayload {
     media: (values.media || [])
       .map((m) => ({
         url: String(m.url ?? '').trim(),
-        alt: (m.alt ?? '').trim().slice(0, 80) || null, // curt alt to 80 chars
+        alt: (m.alt ?? '').trim().slice(0, 80) || null, // cut alt to 80 chars
       }))
       .filter((m) => m.url),
+
     price: Number(values.price),
     maxGuests: Number(values.maxGuests),
+    rating:
+      typeof values.rating === 'number' && !isNaN(values.rating)
+        ? values.rating
+        : undefined,
+
     meta: {
       wifi: !!values.wifi,
       parking: !!values.parking,

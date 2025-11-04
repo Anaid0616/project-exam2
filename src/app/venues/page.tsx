@@ -7,7 +7,7 @@ import { one, int, last, type Sp } from '@/lib/url-params';
 import Pagination from '@/components/Pagination';
 import SearchHeaderCard from '@/features/search/SearchHeaderCard';
 import { normalizeCountry } from '@/lib/normalizeCountry';
-
+import VenuesHero from '@/features/venues/VenuesHero';
 /**
  * Returns `true` when two date ranges overlap.
  * We avoid inclusive-on-touch (A.to > B.from) so a booking that ends on a day
@@ -195,16 +195,31 @@ export default async function SearchPage({
 
   // ----- UI -----
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 space-y-4">
-      {/* Header card with toggle */}
-      <SearchHeaderCard
-        whereRaw={whereRaw}
-        fromStr={fromStr}
-        toStr={toStr}
-        guests={guests ?? undefined}
-        resultCount={results.length}
-        loc={loc}
-      />
+    <main className="mx-auto max-w-6xl px-4">
+      <VenuesHero />
+
+      {/* --- Panel over hero --- */}
+      <div className="relative z-10 flex justify-center -mt-8 sm:-mt-10">
+        <div className="pointer-events-auto w-[min(100%,1150px)] pb-4">
+          <div
+            className="
+            rounded-app border shadow-elev p-4 md:p-5
+            bg-white/70 supports-[backdrop-filter]:bg-white/60
+            backdrop-blur-md border-white/50
+          "
+          >
+            <SearchHeaderCard
+              unstyled
+              whereRaw={whereRaw}
+              fromStr={fromStr}
+              toStr={toStr}
+              guests={guests ?? undefined}
+              resultCount={results.length}
+              loc={loc}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Desktop layout: sticky sidebar + results */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[300px,1fr]">

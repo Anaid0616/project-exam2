@@ -34,61 +34,63 @@ export default function Footer() {
       {/* Thin top divider in brand color */}
       <div className="h-4 bg-aegean" />
 
-      <div
-        className="
+      <div className="bg-white">
+        <div
+          className="
           mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8
           items-center text-center
           md:grid-cols-3 md:text-left
         "
-      >
-        {/* Left: links (center on mobile, left on md+) */}
-        <div className="space-y-2 justify-self-center md:justify-self-start">
-          <h3 className="font-semibold">Holidaze</h3>
-          <ul className="space-y-1 text-sm text-ink/70">
-            <li>
-              <Link href="/profile" className="hover:underline">
-                My Profile
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:underline">
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </div>
+        >
+          {/* Left: links (center on mobile, left on md+) */}
+          <div className="space-y-2 justify-self-center md:justify-self-start">
+            <h3 className="font-semibold">Holidaze</h3>
+            <ul className="space-y-1 text-sm text-ink/70">
+              <li>
+                <Link href="/profile" className="hover:underline">
+                  My Profile
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:underline">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-        {/* Center: circular logo */}
-        <div className="flex justify-center md:justify-center">
-          <Image
-            src="/logofooter.svg"
-            alt="Holidaze mark"
-            width={56}
-            height={56}
-            className="h-14 w-14 rounded-app"
-            priority
-          />
-        </div>
+          {/* Center: circular logo */}
+          <div className="flex justify-center md:justify-center">
+            <Image
+              src="/logofooter.svg"
+              alt="Holidaze mark"
+              width={56}
+              height={56}
+              className="h-14 w-14 rounded-app"
+              priority
+            />
+          </div>
 
-        {/* Right: payment icons (center on mobile, right on md+) */}
-        <div className="justify-self-center md:justify-self-end">
-          <h3 className="mb-2 font-semibold md:text-right">Payments</h3>
-          <div
-            className="
+          {/* Right: payment icons (center on mobile, right on md+) */}
+          <div className="justify-self-center md:justify-self-end">
+            <h3 className="mb-2 font-semibold md:text-right">Payments</h3>
+            <div
+              className="
               flex flex-wrap items-center justify-center gap-4 text-ink/70
               md:justify-end
             "
-          >
-            <SiKlarna aria-label="Klarna" className="h-8 w-10 text-ink" />
-            <SiVisa aria-label="Visa" className="h-8 w-10 text-ink" />
-            <SiMastercard
-              aria-label="Mastercard"
-              className="h-8 w-10 text-ink"
-            />
-            <SiAmericanexpress
-              aria-label="American Express"
-              className="h-8 w-10 text-ink"
-            />
+            >
+              <SiKlarna aria-label="Klarna" className="h-8 w-10 text-ink" />
+              <SiVisa aria-label="Visa" className="h-8 w-10 text-ink" />
+              <SiMastercard
+                aria-label="Mastercard"
+                className="h-8 w-10 text-ink"
+              />
+              <SiAmericanexpress
+                aria-label="American Express"
+                className="h-8 w-10 text-ink"
+              />
+            </div>
           </div>
         </div>
       </div>

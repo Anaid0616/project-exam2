@@ -14,6 +14,8 @@ export default function SearchHeaderCard({
   guests,
   resultCount,
   loc,
+  className,
+  unstyled,
 }: {
   whereRaw?: string;
   fromStr?: string;
@@ -21,15 +23,21 @@ export default function SearchHeaderCard({
   guests?: number;
   resultCount: number;
   loc?: string | null;
+  className?: string;
+  unstyled?: boolean;
 }) {
   const [showSearchForm, setShowSearchForm] = useState(false);
 
   return (
-    <div className="panel transition-all duration-300">
+    <div
+      className={`${unstyled ? '' : 'panel'} ${
+        className ?? ''
+      } transition-all duration-300`}
+    >
       {!showSearchForm ? (
         <>
           {/* --- HEADER MODE --- */}
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 py-2">
             <div>
               <h2 className="text-xl font-semibold">
                 {loc

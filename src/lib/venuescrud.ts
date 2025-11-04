@@ -7,6 +7,7 @@ import type {
   MaybeEnvelope,
   VenueWithBookings,
 } from '@/types/venue';
+import type { VenueFormValues } from '@/features/venues/forms/schema';
 
 /**
  * Type guard to check if a response is wrapped in an envelope.

@@ -107,8 +107,24 @@ export default function VenueCard({
           {typeof v.price === 'number' ? `${money(v.price)} / night` : '—'}
         </p>
 
-        <Link href={`/venues/${v.id}`} className="btn btn-primary">
-          View venue
+        <Link
+          href={`/venues/${v.id}`}
+          className="group inline-flex items-center gap-1 font-semibold text-ink hover:text-ink/80 transition-all"
+        >
+          <span>View venue</span>
+          <svg
+            className="w-4 h-4 translate-x-0 group-hover:translate-x-1 transition-transform duration-200"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
         </Link>
       </div>
     </article>
