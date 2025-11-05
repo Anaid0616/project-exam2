@@ -27,7 +27,11 @@ import type { VenueWithBookings } from '@/types/venue';
  */
 export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
   /** Primary image URL (falls back to a generic icon if none exists). */
-  const img = v.media[0]?.url || '/icon.png';
+  const img =
+    v.media && v.media[0] && v.media[0].url?.trim()
+      ? v.media[0].url
+      : '/placeholder.jpg';
+
   /** City and country labels with safe fallbacks. */
   const city = v.location?.city ?? '—';
   const country = v.location?.country ?? '—';
@@ -54,7 +58,7 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
         >
           <Image
             src={img}
-            alt={v.media[0]?.alt ?? v.name}
+            alt={v.media?.[0]?.alt || v.name || 'Venue image'}
             fill
             sizes="(max-width: 768px) 100vw, 260px"
             className="object-cover"

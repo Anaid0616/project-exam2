@@ -81,7 +81,7 @@ export default function HeroCarousel({
 
       {showFavorite && (
         <div className="absolute right-4 top-4 z-20">
-          <SaveButton venueId={venueId} variant="overlay" size="lg" />
+          <SaveButton venueId={venueId} variant="overlay" size="md" />
         </div>
       )}
 
@@ -89,7 +89,7 @@ export default function HeroCarousel({
         <>
           <Arrow onClick={prev} position="left" />
           <Arrow onClick={next} position="right" />
-          {/* lyft prickarna på desktop så de inte krockar med kortet */}
+
           <Dots count={len} active={i} />
         </>
       )}

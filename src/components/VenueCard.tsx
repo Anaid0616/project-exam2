@@ -34,8 +34,9 @@ export default function VenueCard({
   priority?: boolean;
 }) {
   const img =
-    v.media?.[0]?.url ??
-    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=60&auto=format&fit=crop';
+    v.media && v.media[0] && v.media[0].url?.trim()
+      ? v.media[0].url
+      : '/placeholder.jpg';
 
   const loc = v.location
     ? [v.location.city, v.location.country].filter(Boolean).join(', ')
@@ -46,7 +47,7 @@ export default function VenueCard({
       <div className="relative">
         <Image
           src={img}
-          alt={v.media?.[0]?.alt ?? v.name}
+          alt={v.media?.[0]?.alt || v.name || 'Venue image'}
           width={800}
           height={450}
           className="mb-2 w-full h-[220px] rounded-app object-cover"

@@ -7,7 +7,6 @@ import type {
   MaybeEnvelope,
   VenueWithBookings,
 } from '@/types/venue';
-import type { VenueFormValues } from '@/features/venues/forms/schema';
 
 /**
  * Type guard to check if a response is wrapped in an envelope.
@@ -257,4 +256,30 @@ export async function listVenuesWithBookings(
   );
 
   return Array.isArray(res) ? (res as VenueWithBookings[]) : res?.data ?? [];
+}
+
+/** Get all venues */
+export async function listAllVenuesWithBookings(
+  maxItems = 1000,
+  pageSize = 100
+): Promise<VenueWithBookings[]> {
+  const all: VenueWithBookings[] = [];
+  let page = 1;
+
+  while (all.length < maxItems) {
+    const url = `${API.venues}?_bookings=true&limit=${pageSize}&page=${page}`;
+
+    // try fetching with publicApi first, fallback to authApi
+    const res = await publicApi<MaybeEnvelope<VenueWithBookings[]>>(url).catch(
+      () => authApi<MaybeEnvelope<VenueWithBookings[]>>(url)
+    );
+
+    const batch = unwrap(res) ?? [];
+    if (!Array.isArray(batch) || batch.length === 0) break;
+
+    all.push(...batch);
+    page++;
+  }
+
+  return all.slice(0, maxItems);
 }

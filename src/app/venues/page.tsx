@@ -1,13 +1,15 @@
 // app/venues/page.tsx
 import SearchFilters from '@/features/search/SearchFilters';
 import SearchResultCard from '@/features/search/SearchResultCard';
-import { listVenuesWithBookings, searchVenues } from '@/lib/venuescrud';
+import { listAllVenuesWithBookings } from '@/lib/venuescrud';
 import type { VenueWithBookings } from '@/types/venue';
 import { one, int, last, type Sp } from '@/lib/url-params';
 import Pagination from '@/components/Pagination';
 import SearchHeaderCard from '@/features/search/SearchHeaderCard';
 import { normalizeCountry } from '@/lib/normalizeCountry';
 import VenuesHero from '@/features/venues/VenuesHero';
+import { matchVenueTerm, normalizePlain } from '@/lib/textMatch';
+
 /**
  * Returns `true` when two date ranges overlap.
  * We avoid inclusive-on-touch (A.to > B.from) so a booking that ends on a day
@@ -36,11 +38,6 @@ function overlaps(aFrom: Date, aTo: Date, bFrom: Date, bTo: Date): boolean {
  * - All filtering/sorting is server-side for a single render pass.
  * - Controls (SearchFilters, SortMenu) update the URL → this page re-renders.
  *
- * Accepted URL params (string values unless stated)
- * - where, from(yyyy-mm-dd), to(yyyy-mm-dd)
- * - guests(number), priceMax(number), ratingMin(number)
- * - wifi('1'), parking('1'), breakfast('1'), pets('1')
- * - sort: 'reco' | 'price_asc' | 'price_desc' | 'rating_desc'
  */
 export default async function SearchPage({
   searchParams,
@@ -89,24 +86,16 @@ export default async function SearchPage({
   // ----- Fetch venues -----
   let venues: VenueWithBookings[];
   if (whereLc) {
-    // Keyword search (server-side), include bookings for clash detection
-    venues = (await searchVenues(whereLc, {
-      bookings: true,
-      limit: 100,
-    })) as VenueWithBookings[];
+    venues = await listAllVenuesWithBookings(1000, 100);
   } else {
-    // Plain list (server-side), capped to a sensible limit
-    venues = await listVenuesWithBookings(100);
+    venues = await listAllVenuesWithBookings(1000, 100);
   }
 
   // ----- Filter -----
   let results = venues.filter((v) => {
-    // Text match (name, city, country)
+    // Textmatch (name, city, country) — tolerant
     if (whereLc) {
-      const hay = `${v.name} ${v.location?.city ?? ''} ${
-        v.location?.country ?? ''
-      }`.toLowerCase();
-      if (!hay.includes(whereLc)) return false;
+      if (!matchVenueTerm(v, whereLc, 1)) return false; // 0–2 wrong tolerated
     }
 
     // Guests
@@ -139,13 +128,22 @@ export default async function SearchPage({
     return true;
   });
 
-  // ----- Extra filter: hideZzz & onlyWithImage -----
+  // ----- Location filter (country or city) -----
+  if (loc) {
+    const term = normalizePlain(loc);
+    results = results.filter((v) => {
+      const city = normalizePlain(v.location?.city ?? '');
+      const country = normalizePlain(v.location?.country ?? '');
+      return city.includes(term) || country.includes(term);
+    });
+  }
+
+  // ----- Extra filter: hideZzz -----
   const hideZzz = true;
-  const onlyWithImage = true;
 
   results = results.filter((v) => {
     if (hideZzz && /^z+/i.test(v.name ?? '')) return false;
-    if (onlyWithImage && !v.media?.[0]?.url) return false;
+
     return true;
   });
 
