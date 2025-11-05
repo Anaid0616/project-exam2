@@ -1,17 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import VenueCard from '@/components/VenueCard';
+import VenueCard from '@/components/ui/VenueCard';
 import VenueCardSkeleton from '@/components/skeletons/VenueCardSkeleton';
-import BookingCard from '@/components/BookingCard';
+import BookingCard from '@/features/profile/components/BookingCard';
 import BookingCardSkeleton from '@/components/skeletons/BookingCardSkeleton';
 import VenueBookingsSkeleton from '@/components/skeletons/VenueBookingsSkeleton';
-import VenueBookingsPanel from '@/components/VenueBookingsPanel';
-import SavedVenues from '@/app/profile/_components/SavedVenues';
+import VenueBookingsPanel from '@/features/profile/components/VenueBookingsPanel';
+import SavedVenues from '@/features/profile/components/SavedVenues';
 
 import type { Venue } from '@/types/venue';
 import type { UiBooking } from './CustomerTabContent';
-import { useOwnerVenueBookings } from '@/features/venue-bookings/useOwnerVenueBookings';
+import { useOwnerVenueBookings } from '@/features/profile/hooks/useOwnerVenueBookings';
 
 type OwnerRows = ReturnType<typeof useOwnerVenueBookings>['rows'];
 

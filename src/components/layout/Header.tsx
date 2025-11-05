@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import MobileNav from '@/components/MobileNav';
+import MobileNav from '@/components/header/MobileNav';
 import Image from 'next/image';
 import * as React from 'react';
 import { Heart, Plus } from 'lucide-react';
-import { decodeJwt } from '@/components/utils';
+import { decodeJwt } from '@/lib/utils';
 import type { JwtPayload, Profile } from '@/types/venue';
 import { isVenueManager } from '@/lib/isVenueManager';
-import { getProfile } from '@/lib/venuescrud';
-import Portal from '@/components/Portal';
+import { getProfile } from '@/features/profile/api/profile.api';
+import Portal from '@/components/ui/Portal';
 import NavLink from '@/components/header/NavLink';
 import ProfileMenu from '@/components/header/ProfileMenu';
 

@@ -19,7 +19,7 @@ import {
 import { createDefaultValues } from '@/features/venues/forms/types';
 import GalleryFields from '@/features/venues/forms/GalleryFields';
 import { Controller } from 'react-hook-form';
-import RatingPicker from '@/components/RatingPicker';
+import RatingPicker from '@/components/ui/RatingPicker';
 
 type Props = {
   initial?: Venue;

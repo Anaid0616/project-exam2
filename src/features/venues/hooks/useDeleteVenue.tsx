@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import DeleteModal from '@/components/DeleteModal';
-import { deleteVenue } from '@/lib/venuescrud';
+import DeleteModal from '@/components/ui/DeleteModal';
+import { deleteVenue } from '@/features/venues/api/venues.api';
 import { toast } from '@/lib/toast';
 
 type Options = {

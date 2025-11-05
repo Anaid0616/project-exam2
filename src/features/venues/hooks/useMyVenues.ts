@@ -1,7 +1,7 @@
 // src/features/venues/useMyVenues.ts (in profilescreen)
 'use client';
 import * as React from 'react';
-import { getMyVenues } from '@/lib/venuescrud';
+import { getMyVenues } from '@/features/venues/api/venues.api';
 import type { Venue } from '@/types/venue';
 
 export function useMyVenues(name?: string, enabled = false) {

@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 
-import { getVenueWithBookings } from '@/lib/venuescrud';
+import { getVenueWithBookings } from '@/features/venues/api/venues.api';
+
 import type { VenueWithBookings, BookedLite } from '@/types/venue';
 
-import HeroCarousel from './_components/HeroCarousel';
-import BookingPanel from './_components/BookingPanel';
-import OwnerActions from './_components/OwnerActions';
+import HeroCarousel from '@/features/venues/components/HeroCarousel';
+import BookingPanel from '@/features/venues/components/BookingPanel';
+import OwnerActions from '@/features/venues/components/OwnerActions';
 
-import Rating from '@/components/Rating';
-import AmenitiesRow from '@/components/AmenitiesRow';
+import Rating from '@/components/ui/Rating';
+import AmenitiesRow from '@/components/ui/AmenitiesRow';
 
 export const revalidate = 0;
 

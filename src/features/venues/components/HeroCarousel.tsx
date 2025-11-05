@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import SaveButton from '@/components/SaveButton';
+import SaveButton from '@/components/ui/SaveButton';
 
 type Media = { url: string; alt?: string | null };
 

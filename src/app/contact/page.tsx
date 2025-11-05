@@ -1,6 +1,9 @@
 'use client';
 
-import ContactForm, { ContactFormValues } from './_components/ContactForm';
+import ContactForm, {
+  ContactFormValues,
+} from '@/features/contact/components/ContactForm';
+
 export default function ContactPage() {
   const handleSubmit = async (values: ContactFormValues) => {
     try {

@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import GuestsPicker from '@/components/GuestsPicker';
+import GuestsPicker from '@/components/ui/GuestsPicker';
 
 /**
  * Field

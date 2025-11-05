@@ -1,13 +1,14 @@
 // app/venues/page.tsx
 import SearchFilters from '@/features/search/SearchFilters';
 import SearchResultCard from '@/features/search/SearchResultCard';
-import { listAllVenuesWithBookings } from '@/lib/venuescrud';
+import { listAllVenuesWithBookings } from '@/features/venues/api/venues.api';
+
 import type { VenueWithBookings } from '@/types/venue';
 import { one, int, last, type Sp } from '@/lib/url-params';
-import Pagination from '@/components/Pagination';
+import Pagination from '@/components/ui/Pagination';
 import SearchHeaderCard from '@/features/search/SearchHeaderCard';
 import { normalizeCountry } from '@/lib/normalizeCountry';
-import VenuesHero from '@/features/venues/VenuesHero';
+import VenuesHero from '@/features/venues/components/VenuesHero';
 import { matchVenueTerm, normalizePlain } from '@/lib/textMatch';
 
 /**
@@ -93,7 +94,7 @@ export default async function SearchPage({
 
   // ----- Filter -----
   let results = venues.filter((v) => {
-    // Textmatch (name, city, country) — tolerant
+    // Text match (name, city, country) — tolerant
     if (whereLc) {
       if (!matchVenueTerm(v, whereLc, 1)) return false; // 0–2 wrong tolerated
     }
@@ -138,11 +139,18 @@ export default async function SearchPage({
     });
   }
 
-  // ----- Extra filter: hideZzz -----
+  // ----- Extra filters -----
   const hideZzz = true;
+  const hideTest = true;
 
   results = results.filter((v) => {
-    if (hideZzz && /^z+/i.test(v.name ?? '')) return false;
+    const name = v.name?.toLowerCase() ?? '';
+
+    // hide venues starting with "z"
+    if (hideZzz && name.startsWith('z')) return false;
+
+    // hide venues containing "test"
+    if (hideTest && name.includes('test')) return false;
 
     return true;
   });

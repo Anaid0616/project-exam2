@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, CalendarRange } from 'lucide-react';
-import SaveButton from '@/components/SaveButton';
-import Rating from '@/components/Rating';
-import AmenitiesRow from '@/components/AmenitiesRow';
+import SaveButton from '@/components/ui/SaveButton';
+import Rating from '@/components/ui/Rating';
+import AmenitiesRow from '@/components/ui/AmenitiesRow';
 import type { VenueWithBookings } from '@/types/venue';
 
 /**

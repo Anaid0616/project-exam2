@@ -1,8 +1,11 @@
 'use client';
 import * as React from 'react';
-import { getMyBookings, type ApiBooking } from '@/lib/venuescrud';
-import { toUiBooking } from './mappers';
-import type { UiBooking } from '@/app/profile/_components/CustomerTabContent';
+import {
+  getMyBookings,
+  type ApiBooking,
+} from '@/features/bookings/api/bookings.api';
+import { toUiBooking } from '@/features/bookings/mappers';
+import type { UiBooking } from '@/features/profile/components/CustomerTabContent';
 
 export function useMyBookings(name?: string) {
   const [rows, setRows] = React.useState<UiBooking[]>([]);

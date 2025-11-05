@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import type { SubmitHandler } from 'react-hook-form';
 
-import VenueForm from '@/app/venues/_components/VenueForm';
+import VenueForm from '@/features/venues/components/VenueForm';
 import type { VenueFormValues } from '@/features/venues/forms/schema';
 import { toVenuePayload } from '@/features/venues/forms/mappers';
-import { updateVenue, getVenue } from '@/lib/venuescrud';
+import { updateVenue, getVenue } from '@/features/venues/api/venues.api';
 
 import type { Venue } from '@/types/venue';
 import { toast } from '@/lib/toast';

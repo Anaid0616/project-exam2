@@ -8,8 +8,8 @@ import { format } from 'date-fns';
 
 import DateRangeCalendar, {
   type BlockedRange,
-} from '@/components/DateRangeCalendar';
-import { createBooking } from '@/lib/venuescrud';
+} from '@/components/ui/DateRangeCalendar';
+import { createBooking } from '@/features/bookings/api/bookings.api';
 import { toast } from '@/lib/toast';
 
 type BookedLite = { dateFrom: string; dateTo: string };

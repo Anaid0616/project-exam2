@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { decodeJwt } from '@/components/utils';
+import { decodeJwt } from '@/lib/utils';
 
 type Ctx = { email: string | null; ready: boolean };
 const UserCtx = React.createContext<Ctx>({ email: null, ready: false });

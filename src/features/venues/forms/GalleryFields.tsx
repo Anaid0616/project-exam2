@@ -8,7 +8,7 @@ import {
   type UseFormRegister,
   type UseFormWatch,
 } from 'react-hook-form';
-import type { VenueFormValues } from './schema';
+import type { VenueFormValues } from '@/features/venues/forms/schema';
 
 // överst i filen
 const isValidUrl = (s: string) => {

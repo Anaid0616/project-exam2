@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import type { SubmitHandler } from 'react-hook-form';
-import VenueForm from '@/app/venues/_components/VenueForm';
+
+import VenueForm from '@/features/venues/components/VenueForm';
 import type { VenueFormValues } from '@/features/venues/forms/schema';
 import { toVenuePayload } from '@/features/venues/forms/mappers';
-import { createVenue } from '@/lib/venuescrud';
+import { createVenue } from '@/features/venues/api/venues.api';
 import { toast } from '@/lib/toast';
 
 export default function NewVenuePage() {

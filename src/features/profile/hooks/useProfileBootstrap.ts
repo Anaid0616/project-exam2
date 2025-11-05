@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
-import { decodeJwt } from '@/components/utils';
-import { getProfile } from '@/lib/venuescrud';
+import { decodeJwt } from '@/lib/utils';
+import { getProfile } from '@/features/profile/api/profile.api';
 import type { JwtPayload, Profile } from '@/types/venue';
 
 export type Role = 'customer' | 'manager';

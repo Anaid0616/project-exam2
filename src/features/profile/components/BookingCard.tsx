@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, CalendarRange, Users } from 'lucide-react';
-import { money } from './utils';
+import { money } from '@/lib/utils';
 
 /**
  * BookingLite

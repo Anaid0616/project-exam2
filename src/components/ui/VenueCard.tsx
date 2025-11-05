@@ -1,10 +1,10 @@
 // src/components/VenueCard.tsx
 import Image from 'next/image';
 import Link from 'next/link';
-import { money } from '@/components/utils';
+import { money } from '@/lib/utils';
 import type { Venue } from '@/types/venue';
-import SaveButton from '@/components/SaveButton';
-import Rating from '@/components/Rating';
+import SaveButton from '@/components/ui/SaveButton';
+import Rating from '@/components/ui/Rating';
 import { Pencil, Trash } from 'lucide-react';
 
 /**

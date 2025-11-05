@@ -1,9 +1,10 @@
-import './globals.css';
+import '@/styles/globals.css';
+
 import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
-import Header from '@/components/header/Header';
-import Footer from '@/components/Footer';
-import ToastProvider from '@/components/ToastProvider';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ToastProvider from '@/components/ui/ToastProvider';
 import { UserProvider } from '@/providers/UserProvider';
 import 'react-day-picker/dist/style.css';
 

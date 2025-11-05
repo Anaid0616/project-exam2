@@ -1,6 +1,6 @@
 // src/components/VenueBookingsTable.tsx
 import type { VenueBooking } from '@/types/venue';
-import { money } from './utils';
+import { money } from '@/lib/utils';
 
 function StatusPill({ value }: { value: VenueBooking['status'] }) {
   const map: Record<VenueBooking['status'], string> = {

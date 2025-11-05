@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import BookingCard from '@/components/BookingCard';
+import BookingCard from '@/features/profile/components/BookingCard';
 import BookingCardSkeleton from '@/components/skeletons/BookingCardSkeleton';
 import SavedVenues from './SavedVenues';
 

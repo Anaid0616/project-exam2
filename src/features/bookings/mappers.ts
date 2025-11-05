@@ -1,6 +1,6 @@
 // src/features/bookings/mappers.ts
-import type { ApiBooking } from '@/lib/venuescrud';
-import type { UiBooking } from '@/app/profile/_components/CustomerTabContent';
+import type { ApiBooking } from '@/features/bookings/api/bookings.api';
+import type { UiBooking } from '@/features/profile/components/CustomerTabContent';
 import { nightsBetween } from '@/lib/dates';
 
 export function toUiBooking(b: ApiBooking): UiBooking {

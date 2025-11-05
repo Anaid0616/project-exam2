@@ -3,9 +3,10 @@
 import * as React from 'react';
 import { useUser } from '@/providers/UserProvider';
 import { useFavorites } from '@/features/favorites/useFavorites';
-import { getVenue } from '@/lib/venuescrud';
+import { getVenue } from '@/features/venues/api/venues.api';
+
 import type { Venue } from '@/types/venue';
-import VenueCard from '@/components/VenueCard';
+import VenueCard from '@/components/ui/VenueCard';
 import VenueCardSkeleton from '@/components/skeletons/VenueCardSkeleton';
 
 export default function SavedVenues({

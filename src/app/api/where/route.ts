@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { searchVenues } from '@/lib/venuescrud';
+import { searchVenues } from '@/features/venues/api/venues.api';
+
 import type { Venue } from '@/types/venue';
 
 const WINDOW_MS = 60_000;

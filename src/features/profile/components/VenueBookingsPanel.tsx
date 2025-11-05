@@ -1,9 +1,9 @@
 // src/components/VenueBookingsPanel.tsx
 'use client';
 import * as React from 'react';
-import VenueBookingsTable from '@/components/VenueBookingsTable';
+import VenueBookingsTable from '@/features/profile/components/VenueBookingsTable';
 import type { VenueBooking } from '@/types/venue';
-import { money } from './utils';
+import { money } from '@/lib/utils';
 
 /** Allowed booking statuses shown in the UI. */
 const ALL_STATUSES: VenueBooking['status'][] = [

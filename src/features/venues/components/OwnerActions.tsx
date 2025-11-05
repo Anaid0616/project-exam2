@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { decodeJwt } from '@/components/utils';
-import { deleteVenue } from '@/lib/venuescrud';
+import { decodeJwt } from '@/lib/utils';
+import { deleteVenue } from '@/features/venues/api/venues.api';
 import { Pencil, Trash } from 'lucide-react';
 import { toast } from '@/lib/toast';
-import DeleteModal from '@/components/DeleteModal';
+import DeleteModal from '@/components/ui/DeleteModal';
 
 /**
  * OwnerActions

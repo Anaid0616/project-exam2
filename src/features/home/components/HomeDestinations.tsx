@@ -1,49 +1,44 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { listVenuesWithBookings } from '@/lib/venuescrud';
+import { listAllVenuesWithBookings } from '@/features/venues/api/venues.api';
 import type { VenueWithBookings } from '@/types/venue';
 import { normalizeCountry } from '@/lib/normalizeCountry';
 
 /**
  * HomeDestinations
- *
- * Dynamically shows the 4 most popular countries based on available venues.
- * Each destination card links to `/venues?loc=<country>`.
+ * Displays a grid of popular destination countries based on available venues.
+ * Each country links to a search page filtered by that location.
  */
 export default async function HomeDestinations() {
-  const venues = await listVenuesWithBookings(100);
+  const venues = await listAllVenuesWithBookings(1000, 100);
 
   // Group venues by country
   const byCountry: Record<string, VenueWithBookings[]> = {};
   for (const v of venues) {
     const country = normalizeCountry(v.location?.country ?? '');
     if (!country) continue;
-    if (!byCountry[country]) byCountry[country] = [];
-    byCountry[country].push(v);
+    (byCountry[country] ??= []).push(v);
   }
 
-  // Sort countries by number of venues (descending)
+  // Sort countries by number of venues and take top 6
   const sorted = Object.entries(byCountry)
     .sort(([, a], [, b]) => b.length - a.length)
     .slice(0, 6);
 
   if (sorted.length === 0) return null;
 
-  // For each country, sort venues by updated/created date and pick the latest
-  const countryData = sorted.map(([country, venues]) => {
-    const latestVenue = [...venues].sort((a, b) => {
+  // Choose a representative venue for each country (most recently updated/created)
+  const countryData = sorted.map(([country, list]) => {
+    const latest = [...list].sort((a, b) => {
       const ta =
         (a.updated ? Date.parse(a.updated) : 0) ||
-        (a.created ? Date.parse(a.created) : 0) ||
-        0;
+        (a.created ? Date.parse(a.created) : 0);
       const tb =
         (b.updated ? Date.parse(b.updated) : 0) ||
-        (b.created ? Date.parse(b.created) : 0) ||
-        0;
-      return tb - ta; // newest first
+        (b.created ? Date.parse(b.created) : 0);
+      return tb - ta;
     })[0];
-
-    return { country, latestVenue };
+    return { country, latest };
   });
 
   return (
@@ -51,12 +46,16 @@ export default async function HomeDestinations() {
       <h3 className="text-2xl font-semibold lg:px-5">Popular Destinations</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto lg:px-5">
-        {countryData.map(({ country, latestVenue }) => {
-          const img = latestVenue?.media?.[0]?.url ?? '/placeholder.png';
+        {countryData.map(({ country, latest }) => {
+          const img = latest?.media?.[0]?.url ?? '/placeholder.png';
+          const href = `/venues?loc=${encodeURIComponent(
+            country.toLowerCase()
+          )}`;
+
           return (
             <Link
               key={country}
-              href={`/venues?loc=${encodeURIComponent(country.toLowerCase())}`}
+              href={href}
               aria-label={`View venues in ${country}`}
               className="group relative block overflow-hidden rounded-app shadow-elev hover:shadow-lg transition"
             >

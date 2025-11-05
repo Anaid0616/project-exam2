@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import ProfileScreen from './ui/ProfileScreen';
+import ProfileScreen from '@/features/profile/components/ProfileScreen';
 
 export default function Page() {
   return (

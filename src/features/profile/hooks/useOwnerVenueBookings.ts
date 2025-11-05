@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { getMyVenues, getVenueWithBookings } from '@/lib/venuescrud';
+import {
+  getMyVenues,
+  getVenueWithBookings,
+} from '@/features/venues/api/venues.api';
 import type { VenueWithBookings, VenueBooking } from '@/types/venue';
 
 // --- Types ---
@@ -59,6 +62,18 @@ function toRow(v: VenueForBookings, b: ApiBookingLike): VenueBooking {
 }
 
 // --- Hook ---
+/**
+ * useOwnerVenueBookings
+ *
+ * Fetches all venues owned by a given profile and expands each venue
+ * with its bookings, then flattens that into a table-friendly array.
+ *
+ * Typical use case: a manager’s dashboard “Bookings” tab.
+ *
+ * @param ownerName - Profile name (username) of the venue owner.
+ * @param enabled   - Toggle the effect on/off (default true).
+ * @returns { rows, loading, error }  A flat list of booking rows and state flags.
+ */
 export function useOwnerVenueBookings(ownerName?: string, enabled = true) {
   const [rows, setRows] = React.useState<VenueBooking[]>([]);
   const [loading, setLoading] = React.useState(false);

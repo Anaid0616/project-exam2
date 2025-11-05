@@ -2,24 +2,25 @@
 
 import * as React from 'react';
 
-import InfoCard from '@/components/InfoCard';
+import InfoCard from '@/features/profile/components/BioCard';
 import InfoCardSkeleton from '@/components/skeletons/InfoCardSkeleton';
 import EditProfileModal, {
   type EditProfileForm,
-} from '@/components/EditProfileModal';
+} from '@/features/profile/components/EditProfileModal';
+import { updateProfile } from '@/features/profile/api/profile.api';
 
-import { updateProfile } from '@/lib/venuescrud';
-import { useOwnerVenueBookings } from '@/features/venue-bookings/useOwnerVenueBookings';
-import { useProfileBootstrap } from '@/features/profile/useProfileBootstrap';
-import { useProfileTabs } from '@/features/profile/useProfileTabs';
-import { useMyBookings } from '@/features/bookings/useMyBookings';
-import { useMyVenues } from '@/features/venues/useMyVenues';
-import { useDeleteVenue } from '@/features/venues/useDeleteVenue';
+// hooks
+import { useOwnerVenueBookings } from '@/features/profile/hooks/useOwnerVenueBookings';
+import { useProfileBootstrap } from '@/features/profile/hooks/useProfileBootstrap';
+import { useProfileTabs } from '@/features/profile/hooks/useProfileTabs';
+import { useMyBookings } from '@/features/bookings/hooks/useMyBookings';
+import { useMyVenues } from '@/features/venues/hooks/useMyVenues';
+import { useDeleteVenue } from '@/features/venues/hooks/useDeleteVenue';
 
 // components
-import ProfileTabsBar from '../_components/ProfileTabsBar';
-import CustomerTabContent from '../_components/CustomerTabContent';
-import ManagerTabContent from '../_components/ManagerTabContent';
+import ProfileTabsBar from '@/features/profile/components/ProfileTabsBar';
+import CustomerTabContent from '@/features/profile/components/CustomerTabContent';
+import ManagerTabContent from '@/features/profile/components/ManagerTabContent';
 
 /**
  * ProfileScreen

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import VenueCard from '@/components/VenueCard';
-import { listVenuesWithBookings } from '@/lib/venuescrud';
+import VenueCard from '@/components/ui/VenueCard';
+import { listVenuesWithBookings } from '@/features/venues/api/venues.api';
 import type { Venue } from '@/types/venue';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
