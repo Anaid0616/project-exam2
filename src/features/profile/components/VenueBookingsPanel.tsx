@@ -2,7 +2,7 @@
 'use client';
 import * as React from 'react';
 import VenueBookingsTable from '@/features/profile/components/VenueBookingsTable';
-import type { VenueBooking } from '@/types/venue';
+import type { VenueBooking } from '@/types/booking';
 import { money } from '@/lib/utils';
 
 /** Allowed booking statuses shown in the UI. */

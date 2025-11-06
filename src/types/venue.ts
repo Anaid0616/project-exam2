@@ -1,3 +1,6 @@
+// src/types/venue.ts
+import type { BookedLite } from './booking';
+
 /* --- Types --- */
 export type Media = {
   url: string;
@@ -57,41 +60,19 @@ export type Profile = {
 export type ApiEnvelope<T> = { data: T; meta?: unknown };
 export type MaybeEnvelope<T> = T | ApiEnvelope<T>;
 
-export type Booking = {
-  id: string;
-  venueId?: string;
-  venueName: string;
-  when: string;
-  total: number; // EUR
-  image?: string;
-};
-
-export type VenueBooking = {
-  id: string;
-  venueName: string;
-  guestName: string;
-  checkIn: string;
-  checkOut: string;
-  nights: number;
-  guests: number;
-  total: number; // EUR
-  status: 'Upcoming' | 'Pending' | 'Completed' | 'Canceled';
-};
-
-export type BookedLite = {
-  dateFrom: string; // ISO YYYY-MM-DD or ISO-stamp from API
-  dateTo: string; // ISO
-};
-
+/**
+ * A Venue object extended with an optional array of booked date ranges.
+ * Used for availability checks and calendar blocking.
+ */
 export type VenueWithBookings = Venue & {
   bookings?: BookedLite[];
 };
 
-/* --- API--- */
+/* --- API --- */
 export type VenueListResponse = { data: Venue[] };
 export type VenueResponse = Venue | { data: Venue };
 
-/* helper */
+/* --- Helper --- */
 export function toVenue(input: VenueResponse): Venue {
   return 'data' in input ? input.data : input;
 }

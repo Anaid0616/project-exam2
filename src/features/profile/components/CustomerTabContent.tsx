@@ -4,18 +4,7 @@ import * as React from 'react';
 import BookingCard from '@/features/profile/components/BookingCard';
 import BookingCardSkeleton from '@/components/skeletons/BookingCardSkeleton';
 import SavedVenues from './SavedVenues';
-
-export type UiBooking = {
-  id: string;
-  venueId?: string;
-  venueName: string;
-  when: string;
-  total: number;
-  image?: string;
-  location?: string;
-  guests?: number;
-  nights: number;
-};
+import type { BookingLite } from '@/types/booking';
 
 export default function CustomerTabContent({
   tab,
@@ -23,7 +12,7 @@ export default function CustomerTabContent({
   loading,
 }: {
   tab: 'bookings' | 'saved';
-  bookings: UiBooking[];
+  bookings: BookingLite[];
   loading: boolean;
 }) {
   if (tab === 'saved') return <SavedVenues showSaveOverlay />;

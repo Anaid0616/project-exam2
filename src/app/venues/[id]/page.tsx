@@ -3,7 +3,8 @@ import { MapPin } from 'lucide-react';
 
 import { getVenueWithBookings } from '@/features/venues/api/venues.api';
 
-import type { VenueWithBookings, BookedLite } from '@/types/venue';
+import type { VenueWithBookings } from '@/types/venue';
+import type { BookedLite } from '@/types/booking';
 
 import HeroCarousel from '@/features/venues/components/HeroCarousel';
 import BookingPanel from '@/features/venues/components/BookingPanel';

@@ -10,7 +10,7 @@ import VenueBookingsPanel from '@/features/profile/components/VenueBookingsPanel
 import SavedVenues from '@/features/profile/components/SavedVenues';
 
 import type { Venue } from '@/types/venue';
-import type { UiBooking } from './CustomerTabContent';
+import type { BookingLite } from '@/types/booking';
 import { useOwnerVenueBookings } from '@/features/profile/hooks/useOwnerVenueBookings';
 
 type OwnerRows = ReturnType<typeof useOwnerVenueBookings>['rows'];
@@ -27,7 +27,7 @@ export default function ManagerTabContent({
   venueRowsError,
 }: {
   tab: 'bookings' | 'myVenues' | 'venueBookings' | 'saved';
-  bookings: UiBooking[];
+  bookings: BookingLite[];
   loadingBookings: boolean;
   venues: Venue[];
   loadingVenues: boolean;

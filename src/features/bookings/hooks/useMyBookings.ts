@@ -4,11 +4,11 @@ import {
   getMyBookings,
   type ApiBooking,
 } from '@/features/bookings/api/bookings.api';
-import { toUiBooking } from '@/features/bookings/mappers';
-import type { UiBooking } from '@/features/profile/components/CustomerTabContent';
+import { toBookingLite } from '@/features/bookings/mappers';
+import type { BookingLite } from '@/types/booking';
 
 export function useMyBookings(name?: string) {
-  const [rows, setRows] = React.useState<UiBooking[]>([]);
+  const [rows, setRows] = React.useState<BookingLite[]>([]);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -22,7 +22,7 @@ export function useMyBookings(name?: string) {
       try {
         const api: ApiBooking[] = await getMyBookings(name);
         if (!alive) return;
-        setRows(api.map(toUiBooking));
+        setRows(api.map(toBookingLite));
       } finally {
         if (alive) setLoading(false);
       }

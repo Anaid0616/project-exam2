@@ -5,7 +5,8 @@ import {
   getMyVenues,
   getVenueWithBookings,
 } from '@/features/venues/api/venues.api';
-import type { VenueWithBookings, VenueBooking } from '@/types/venue';
+import type { VenueWithBookings } from '@/types/venue';
+import type { VenueBooking } from '@/types/booking';
 
 // --- Types ---
 type ApiBookingLike = {

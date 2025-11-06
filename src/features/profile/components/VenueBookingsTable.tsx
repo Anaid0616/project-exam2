@@ -1,5 +1,5 @@
 // src/components/VenueBookingsTable.tsx
-import type { VenueBooking } from '@/types/venue';
+import type { VenueBooking } from '@/types/booking';
 import { money } from '@/lib/utils';
 
 function StatusPill({ value }: { value: VenueBooking['status'] }) {
