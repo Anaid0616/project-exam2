@@ -4,8 +4,8 @@ export default function InfoCardSkeleton() {
   return (
     <section className="relative">
       {/* Banner placeholder */}
-      <div className="mx-auto w-full px-4">
-        <div className="relative mx-auto h-56 md:h-72 bleed-small overflow-hidden rounded-app">
+      <div className="bleed overflow-hidden">
+        <div className="relative z-0 mx-auto h-72 md:h-92 w-full">
           <div className="h-full w-full bg-ink/10 animate-pulse" />
         </div>
       </div>

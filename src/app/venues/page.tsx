@@ -239,7 +239,14 @@ export default async function SearchPage({
           ) : (
             results
               .slice(start, end)
-              .map((v) => <SearchResultCard key={v.id} v={v} />)
+              .map((v) => (
+                <SearchResultCard
+                  key={v.id}
+                  v={v}
+                  fromStr={fromStr || undefined}
+                  toStr={toStr || undefined}
+                />
+              ))
           )}
 
           {/* Pagination */}

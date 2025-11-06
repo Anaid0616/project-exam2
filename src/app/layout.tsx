@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
-      <body className="font-sans bg-sand text-ink">
+      <body className="flex min-h-screen flex-col font-sans bg-sand text-ink">
         <Header />
         <main className="overflow-x-clip flex-1">
           {' '}

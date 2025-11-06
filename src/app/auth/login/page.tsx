@@ -78,8 +78,8 @@ export default function LoginPage() {
       // Store token locally for authenticated routes
       localStorage.setItem('token', token);
 
-      // Redirect to home
-      window.location.href = '/';
+      // Redirect to profile
+      window.location.href = '/profile';
     } catch (err) {
       const msg =
         err instanceof HttpError

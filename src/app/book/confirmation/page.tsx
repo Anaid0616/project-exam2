@@ -6,6 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { one, int, type Sp } from '@/lib/url-params';
+import { formatBookingDates } from '@/lib/date';
+import { motion } from 'framer-motion';
 
 /** ConfirmParams
  * Expected query parameters for the booking confirmation page.
@@ -59,8 +61,7 @@ function BookContent() {
 
   const venueName = params.venueName ?? '—';
   const venueId = params.id;
-  const from = params.from ?? '—';
-  const to = params.to ?? '—';
+
   const guests = params.guests?.toString() ?? '—';
   const total = params.total != null ? params.total.toString() : undefined;
   const location = params.location ?? '—';
@@ -68,25 +69,41 @@ function BookContent() {
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-4">
       <div className="card p-5 text-center">
-        <div className="mx-auto flex items-center justify-center gap-3">
+        <motion.div
+          initial={{ scale: 0, rotate: -45, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 120, damping: 8 }}
+          className="mx-auto flex items-center justify-center gap-3"
+        >
           <Image
             src="/confirmcheck.svg"
-            alt=""
-            width={36}
-            height={36}
-            className="h-9 w-9"
+            alt="Checkmark"
+            width={48}
+            height={48}
+            className="h-12 w-12"
             priority
           />
-          <h1 className="text-3xl font-semibold text-ink">
-            Booking confirmed!
-          </h1>
-        </div>
+        </motion.div>
 
-        <p className="mt-2 text-xl font-medium text-ink/70">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="text-3xl font-semibold text-ink mt-3"
+        >
+          Booking confirmed!
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+          className="mt-2 text-xl font-medium text-ink/70"
+        >
           Your stay at{' '}
           <span className="font-semibold text-aegean">{venueName}</span> is
           confirmed.
-        </p>
+        </motion.p>
       </div>
 
       <div className="card p-5 text-center">
@@ -95,8 +112,10 @@ function BookContent() {
             <strong>Venue:</strong> {venueName}
           </p>
           <p>
-            <strong>Dates:</strong> {from} → {to}
+            <strong>Dates:</strong>{' '}
+            {formatBookingDates(params.from ?? '', params.to ?? '')}
           </p>
+
           <p>
             <strong>Guests:</strong> {guests}
           </p>
@@ -117,9 +136,10 @@ function BookContent() {
         </div>
 
         <div className="mt-6 flex justify-center gap-2">
-          <Link href="/profile" className="btn btn-primary">
+          <Link href="/profile?tab=bookings" className="btn btn-primary">
             View my bookings
           </Link>
+
           {venueId && (
             <Link href={`/venues/${venueId}`} className="btn btn-outline">
               Back to venue

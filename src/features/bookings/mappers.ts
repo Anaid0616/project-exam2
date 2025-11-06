@@ -1,7 +1,7 @@
 // src/features/bookings/mappers.ts
 import type { ApiBooking } from '@/features/bookings/api/bookings.api';
 import type { UiBooking } from '@/features/profile/components/CustomerTabContent';
-import { nightsBetween } from '@/lib/dates';
+import { nightsBetween } from '@/lib/date';
 
 export function toUiBooking(b: ApiBooking): UiBooking {
   const from = String(b.dateFrom).slice(0, 10);

@@ -106,8 +106,8 @@ export default function VenueBookingsPanel({
       {/* Filter panel */}
       <div className="panel p-3 space-y-3">
         {/* Row 1: Inputs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 items-end">
-          <div className="xl:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+          <div className="lg:col-span-2">
             <label className="label">Search</label>
             <input
               className="input w-full"
@@ -221,7 +221,7 @@ export default function VenueBookingsPanel({
                   <footer className="mt-3 flex justify-end">
                     <a
                       href={`${viewBasePath}/${b.id}`}
-                      className="inline-flex items-center rounded-app border border-aegean bg-aegean px-3 py-1 text-xs font-medium text-white shadow-sm hover:bg-aegean/90 focus:outline-none focus:ring-2 focus:ring-aegean/40"
+                      className="inline-flex items-center rounded-app border border-lagoon bg-lagoon px-3 py-1 font-semibold text-black shadow-sm hover:bg-lagoon/90 focus:outline-none focus:ring-2 focus:ring-lagoon/40"
                     >
                       View
                     </a>

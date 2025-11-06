@@ -1,6 +1,6 @@
 'use client';
 
-import Skeleton from '@/components/skeletons/ui/Skeleton';
+import Skeleton from '@/components/skeletons/Skeleton';
 
 /**
  * Skeleton for the venue details route (/venues/[id]).

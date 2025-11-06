@@ -6,6 +6,7 @@ import VenueCard from '@/components/ui/VenueCard';
 import { listVenuesWithBookings } from '@/features/venues/api/venues.api';
 import type { Venue } from '@/types/venue';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import VenuesSliderSkeleton from '@/components/skeletons/VenuesSliderSkeleton';
 
 /**
  * HomeVenues
@@ -57,6 +58,16 @@ export default function HomeVenues() {
       behavior: 'smooth',
     });
   };
+
+  // --- INTERN SKELETON WHEN LOADING ---
+  if (venues.length === 0) {
+    return (
+      <section className="space-y-6 pt-2 relative">
+        <h3 className="text-2xl font-semibold mb-0 lg:px-5">Featured Venues</h3>
+        <VenuesSliderSkeleton count={3} />
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-6 pt-2 relative">

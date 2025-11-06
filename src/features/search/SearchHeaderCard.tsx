@@ -7,6 +7,8 @@ import SearchFilters from '@/features/search/SearchFilters';
 import VenueSearchForm from './VenueSearchForm';
 import { normalizeCountry } from '@/lib/normalizeCountry';
 
+import { formatBookingDates } from '@/lib/date';
+
 export default function SearchHeaderCard({
   whereRaw,
   fromStr,
@@ -50,7 +52,10 @@ export default function SearchHeaderCard({
               </h2>
 
               <p className="text-ink/70 text-sm">
-                {fromStr && toStr ? `${fromStr} – ${toStr}` : 'Any dates'}
+                {fromStr && toStr
+                  ? formatBookingDates(fromStr, toStr)
+                  : 'Any dates'}
+
                 {guests
                   ? ` · ${guests} guest${guests > 1 ? 's' : ''}`
                   : ' · Any guests'}
@@ -81,7 +86,7 @@ export default function SearchHeaderCard({
       ) : (
         <>
           {/* --- SEARCH FORM MODE --- */}
-          <div className="relative p-1">
+          <div className="relative">
             <VenueSearchForm onSearchEnd={() => setShowSearchForm(false)} />
             <button
               onClick={() => setShowSearchForm(false)}

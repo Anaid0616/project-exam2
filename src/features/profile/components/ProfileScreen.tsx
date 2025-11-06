@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import InfoCard from '@/features/profile/components/BioCard';
-import InfoCardSkeleton from '@/components/skeletons/InfoCardSkeleton';
+import InfoCardSkeleton from '@/components/skeletons/BioCardSkeleton';
 import EditProfileModal, {
   type EditProfileForm,
 } from '@/features/profile/components/EditProfileModal';

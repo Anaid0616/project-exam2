@@ -7,6 +7,7 @@ import SaveButton from '@/components/ui/SaveButton';
 import Rating from '@/components/ui/Rating';
 import AmenitiesRow from '@/components/ui/AmenitiesRow';
 import type { VenueWithBookings } from '@/types/venue';
+import { formatBookingDates } from '@/lib/date';
 
 /**
  * SearchResultCard
@@ -25,7 +26,15 @@ import type { VenueWithBookings } from '@/types/venue';
  * @param param0 - Component props
  * @param param0.v - Venue data (incl. media, meta, price) to render in the card
  */
-export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
+export default function SearchResultCard({
+  v,
+  fromStr,
+  toStr,
+}: {
+  v: VenueWithBookings;
+  fromStr?: string;
+  toStr?: string;
+}) {
   /** Primary image URL (falls back to a generic icon if none exists). */
   const img =
     v.media && v.media[0] && v.media[0].url?.trim()
@@ -106,7 +115,11 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
           {/* Date row */}
           <div className="mt-1.5 flex flex-wrap items-center gap-2 text-ink/90">
             <CalendarRange className="h-4 w-4" aria-hidden />
-            <span>Date from – Date to, 2 nights</span>
+            <span>
+              {fromStr && toStr
+                ? formatBookingDates(fromStr, toStr)
+                : 'Any dates'}
+            </span>
           </div>
 
           {/* Amenities  */}
@@ -124,8 +137,12 @@ export default function SearchResultCard({ v }: { v: VenueWithBookings }) {
                 €{v.price * v.maxGuests} · {v.maxGuests} guests
               </div>
             </div>
-
-            <Link href={`/venues/${v.id}`} className="btn btn-primary">
+            <Link
+              href={`/venues/${v.id}?from=${fromStr ?? ''}&to=${
+                toStr ?? ''
+              }&guests=2`}
+              className="btn btn-primary"
+            >
               View details
             </Link>
           </div>

@@ -121,7 +121,14 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="relative h-[40px] w-[130px]">
-            <Image src="/logo.svg" alt="Holidaze logo" fill priority />
+            <Image
+              src="/logo.svg"
+              alt="Holidaze logo"
+              fill
+              sizes="130px"
+              priority
+              fetchPriority="high"
+            />
           </div>
           <span className="sr-only">Holidaze</span>
         </Link>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ApiBooking } from '@/features/bookings/api/bookings.api';
+import { formatBookingDates, nightsBetween } from '@/lib/date';
 
 /**
  * Formats a number as currency in EUR (no decimals).
@@ -18,54 +19,20 @@ function money(n: number) {
   }).format(n);
 }
 
-/** One day in milliseconds. */
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-/**
- * Converts a date string to UTC midnight.
- *
- * @param s - ISO date string (e.g. "2025-10-05").
- * @returns The UTC timestamp for midnight that day.
- */
-function parseUtcMidnight(s: string) {
-  const d = new Date(s);
-  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-}
-
-/**
- * Calculates the number of nights between two ISO date strings.
- *
- * @param a - Start date (ISO).
- * @param b - End date (ISO).
- * @returns Number of nights between the two dates.
- */
-function nightsBetween(a: string, b: string) {
-  const from = parseUtcMidnight(a);
-  const to = parseUtcMidnight(b);
-  const diff = Math.max(0, Math.round((to - from) / DAY_MS));
-  return diff;
-}
-
-/**
- * Formats a date as a readable short string (e.g. "05 Oct 2025").
- *
- * @param s - ISO date string.
- * @returns Formatted date string.
- */
-function fmtDate(s: string) {
-  const d = new Date(s);
-  return d.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
 /**
  * BookingDetailsCard
  *
- * Reusable presentation component for displaying detailed booking information.
- * Used by the booking details page and can be embedded elsewhere (e.g. profile overview).
+ * Displays detailed information for a single booking.
+ * - Shows venue name, location, image, and booking reference.
+ * - Lists booking dates, guests, price per night, and total.
+ * - Reuses centralized date utilities (`formatBookingDates`) to ensure
+ *   consistent and timezone-safe date formatting across the app.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <BookingDetailsCard booking={bookingData} />
+ * ```
  *
  * @param props.booking - The booking data returned from the API.
  */
@@ -77,12 +44,14 @@ export default function BookingDetailsCard({
   const venue = booking.venue ?? {};
   const vName = venue.name ?? 'Venue';
 
+  // Provide a fallback image if the venue has none
   const cover =
     venue.media?.[0]?.url ??
     'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=60&auto=format&fit=crop';
 
-  const nights = nightsBetween(booking.dateFrom, booking.dateTo);
   const price = Number(venue.price ?? 0);
+  const nights = nightsBetween(booking.dateFrom, booking.dateTo);
+
   const total = price && nights ? price * nights : 0;
 
   const loc =
@@ -121,11 +90,12 @@ export default function BookingDetailsCard({
         <h2 className="font-semibold">Booking details</h2>
 
         <div className="grid gap-2 text-sm">
+          {/* Dates formatted in English using formatBookingDates */}
           <p>
             Dates:{' '}
-            <span className="font-medium">{fmtDate(booking.dateFrom)}</span> →{' '}
-            <span className="font-medium">{fmtDate(booking.dateTo)}</span> (
-            {nights} night{nights !== 1 ? 's' : ''})
+            <span className="font-medium">
+              {formatBookingDates(booking.dateFrom, booking.dateTo)}
+            </span>
           </p>
 
           <p>Guests: {booking.guests}</p>

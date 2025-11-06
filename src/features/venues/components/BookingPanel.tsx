@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
 
@@ -12,11 +12,14 @@ import DateRangeCalendar, {
 import { createBooking } from '@/features/bookings/api/bookings.api';
 import { toast } from '@/lib/toast';
 
+/** Minimal booked-range shape coming from the venue API. */
 type BookedLite = { dateFrom: string; dateTo: string };
 
 const ICONS = { minus: '/minus.svg', plus: '/plus.svg' };
 
-// --- utilities ---
+/**
+ * Format a number as EUR without decimals (e.g. "€145").
+ */
 function money(n: number) {
   return new Intl.NumberFormat('en-GB', {
     style: 'currency',
@@ -24,14 +27,27 @@ function money(n: number) {
     maximumFractionDigits: 0,
   }).format(n);
 }
+
+/**
+ * Calculate nights between two local Date objects.
+ * Uses ceil to treat partial days as a full night and clamps at 0.
+ */
 function nightsBetween(a: Date, b: Date) {
   const ms = b.getTime() - a.getTime();
   const d = Math.ceil(ms / (1000 * 60 * 60 * 24));
   return d > 0 ? d : 0;
 }
+
+/**
+ * Format a Date to ISO date-only (YYYY-MM-DD).
+ * (Aligns with API expectation for date-only fields.)
+ */
 const iso = (d: Date) => format(d, 'yyyy-MM-dd');
 
-// ── helper ────────────────────────────────
+/**
+ * Parse "YYYY-MM-DD" (or ISO-like) safely as a local-date object at midnight.
+ * If a full ISO string is passed, UTC parts are used to avoid TZ shifts.
+ */
 function asLocalDate(input: string) {
   const d = new Date(input);
   if (!Number.isNaN(d.getTime())) {
@@ -40,14 +56,29 @@ function asLocalDate(input: string) {
   const [y, m, dd] = input.split('-').map(Number);
   return new Date(y, (m ?? 1) - 1, dd ?? 1);
 }
+
+/** Return a new Date offset by `n` days. */
 function addDays(d: Date, n: number) {
   const c = new Date(d);
   c.setDate(c.getDate() + n);
   return c;
 }
 
-// ───────────────────────────────────────────────────────────────────────────
-
+/**
+ * BookingPanel
+ *
+ * Side panel used on the venue detail page to select dates and guests, and create a booking.
+ * - Pre-fills date range and guests from URL query (?from, ?to, ?guests) when present.
+ * - Blocks already-booked ranges in the inline calendar.
+ * - Announces async success/error via an aria-live region.
+ *
+ * @param venueId   - The current venue id (required).
+ * @param price     - Price per night in EUR.
+ * @param maxGuests - Maximum allowed guests for the venue (defaults to 1).
+ * @param booked    - Existing bookings for this venue (to block out in the calendar).
+ * @param venueName - Optional venue name for confirmation payload/URL.
+ * @param location  - Optional location string for confirmation payload/URL.
+ */
 export default function BookingPanel({
   venueId,
   price,
@@ -64,11 +95,47 @@ export default function BookingPanel({
   location?: string;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [range, setRange] = React.useState<DateRange | undefined>(undefined);
-  const [guests, setGuests] = React.useState(1);
+  // --- read query params to prefill ---
+  const fromParam = searchParams.get('from');
+  const toParam = searchParams.get('to');
+  const guestsParam = searchParams.get('guests');
 
-  // ── block dates days before ──────
+  /**
+   * Selected date range for the inline calendar.
+   * Prefilled from URL (?from, ?to) if both are present and valid.
+   */
+  const [range, setRange] = React.useState<DateRange | undefined>(() => {
+    if (fromParam && toParam) {
+      const from = asLocalDate(fromParam);
+      const to = asLocalDate(toParam);
+      if (!isNaN(from.getTime()) && !isNaN(to.getTime())) return { from, to };
+    }
+    return undefined;
+  });
+
+  /**
+   * Selected guests.
+   * Prefilled from URL (?guests) and clamped to [1, maxGuests].
+   */
+  const [guests, setGuests] = React.useState<number>(() => {
+    const g = guestsParam ? parseInt(guestsParam, 10) : NaN;
+    if (!Number.isFinite(g)) return 1;
+    return Math.min(Math.max(g, 1), maxGuests);
+    // If maxGuests changes later, we clamp again below.
+  });
+
+  // Clamp guests if maxGuests prop changes.
+  React.useEffect(() => {
+    setGuests((g) => Math.min(Math.max(g, 1), maxGuests));
+  }, [maxGuests]);
+
+  /**
+   * Blocked ranges for the calendar (booked days are not selectable).
+   * We block [dateFrom, dateTo) by subtracting one day at the end,
+   * so a booking ending on X doesn't block the next guest from arriving on X.
+   */
   const blockedRanges: BlockedRange[] = React.useMemo(
     () =>
       (booked ?? []).map((b) => {
@@ -79,15 +146,21 @@ export default function BookingPanel({
     [booked]
   );
 
-  // Derived
+  // --- derived values for UI and payload ---
   const checkIn = range?.from ? iso(range.from) : '';
   const checkOut = range?.to ? iso(range.to) : '';
   const nights =
     range?.from && range?.to ? nightsBetween(range.from, range.to) : 0;
   const total = price && nights ? price * nights : undefined;
-
   const canBook = !!venueId && !!price && nights > 0;
 
+  /** Screen-reader live region message for async feedback. */
+  const [liveMsg, setLiveMsg] = React.useState<string>('');
+
+  /**
+   * Create booking and redirect to confirmation.
+   * On success/failure we also set an aria-live message and a toast.
+   */
   async function onBook() {
     if (!canBook || !checkIn || !checkOut) return;
     try {
@@ -98,6 +171,7 @@ export default function BookingPanel({
         venueId,
       });
 
+      setLiveMsg('Booking confirmed.');
       toast.success({ title: 'Booking confirmed' });
 
       const q = new URLSearchParams({
@@ -114,13 +188,19 @@ export default function BookingPanel({
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : 'Could not create booking';
+      setLiveMsg('Booking failed.');
       toast.error({ title: 'Booking failed', description: msg });
     }
   }
 
   return (
     <aside className="min-w-0 w-full min-[900px]:sticky min-[900px]:top-24 self-start">
-      {/* själva kortet */}
+      {/* aria-live region for async status (invisible visually) */}
+      <p aria-live="polite" className="sr-only">
+        {liveMsg}
+      </p>
+
+      {/* panel card */}
       <div className="panel space-y-3 p-4">
         {/* Price */}
         <div className="flex items-end justify-between">
@@ -140,12 +220,11 @@ export default function BookingPanel({
             onChange={setRange}
             blocked={blockedRanges}
             className="
-    booking-calendar rounded-app border border-ink/10 p-2
-    w-full max-w-[360px] md:max-w-[400px] mx-auto
-    [&_.rdp]:inline-block origin-top overflow-visible
-
-    max-[338px]:scale-[0.80] max-[338px]:-mb-20
-  "
+              booking-calendar rounded-app border border-ink/10 p-2
+              w-full max-w-[360px] md:max-w-[400px] mx-auto
+              [&_.rdp]:inline-block origin-top overflow-visible
+              max-[338px]:scale-[0.80] max-[338px]:-mb-20
+            "
           />
         </div>
 
@@ -175,7 +254,7 @@ export default function BookingPanel({
           </div>
         </div>
 
-        {/* Sum */}
+        {/* Summary */}
         <div className="mt-1 flex items-center justify-between">
           <p className="text-sm text-ink/60">
             {nights ? `Total for ${nights} night${nights > 1 ? 's' : ''}` : '—'}
@@ -195,6 +274,10 @@ export default function BookingPanel({
   );
 }
 
+/**
+ * Small icon-only button used for the guests stepper.
+ * Accessible with an aria-label and proper disabled styling.
+ */
 function IconBtn({
   src,
   label,

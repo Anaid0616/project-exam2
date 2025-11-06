@@ -67,7 +67,6 @@ export default function Footer() {
               width={56}
               height={56}
               className="h-14 w-14 rounded-app"
-              priority
             />
           </div>
 
