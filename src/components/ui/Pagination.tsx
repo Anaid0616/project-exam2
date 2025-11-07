@@ -1,4 +1,7 @@
+'use client'; // add this line
+
 import Link from 'next/link';
+import Head from 'next/head'; // add this
 
 type Qs = Record<string, string | number | null | undefined>;
 
@@ -43,27 +46,40 @@ export default function Pagination({
   const disabled = 'pointer-events-none opacity-40';
 
   return (
-    <nav className={`mt-6 flex items-center justify-center gap-2 ${className}`}>
-      <Link
-        href={prevHref}
-        aria-disabled={page <= 1}
-        className={`btn ${page <= 1 ? disabled : ''}`}
-      >
-        ‹ Prev
-      </Link>
+    <>
+      {/* Inject rel="prev/next" into <head> for SEO */}
+      <Head>
+        {page > 1 && <link rel="prev" href={prevHref} />}
+        {hasNext && <link rel="next" href={nextHref} />}
+      </Head>
 
-      <span className="px-3 text-sm text-ink/70">
-        Page {page}
-        {totalPages ? ` of ${totalPages}` : ''}
-      </span>
-
-      <Link
-        href={nextHref}
-        aria-disabled={!hasNext}
-        className={`btn ${!hasNext ? disabled : ''}`}
+      <nav
+        className={`mt-6 flex items-center justify-center gap-2 ${className}`}
+        aria-label="Pagination"
       >
-        Next ›
-      </Link>
-    </nav>
+        <Link
+          href={prevHref}
+          aria-disabled={page <= 1}
+          className={`btn ${page <= 1 ? disabled : ''}`}
+          rel="prev"
+        >
+          ‹ Prev
+        </Link>
+
+        <span className="px-3 text-sm text-ink/70">
+          Page {page}
+          {totalPages ? ` of ${totalPages}` : ''}
+        </span>
+
+        <Link
+          href={nextHref}
+          aria-disabled={!hasNext}
+          className={`btn ${!hasNext ? disabled : ''}`}
+          rel="next"
+        >
+          Next ›
+        </Link>
+      </nav>
+    </>
   );
 }

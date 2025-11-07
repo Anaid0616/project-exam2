@@ -1,20 +1,94 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
-import { subscribe, type Toast } from '@/lib/toast';
+import { subscribe, type Toast, toast as baseToast } from '@/lib/toast';
+import { invariant } from '@/lib/invariant';
 
-export default function ToastProvider() {
+/* -------------------------------------------------------------------------- */
+/*                             Context                                  */
+/* -------------------------------------------------------------------------- */
+
+/** Public Toast API type (mirrors functions from @/lib/toast). */
+type ToastAPI = {
+  success: typeof baseToast.success;
+  error: typeof baseToast.error;
+  info: typeof baseToast.info;
+};
+
+/** React Context for toast API. */
+const ToastCtx = createContext<ToastAPI | null>(null);
+
+/**
+ * Hook: useToast()
+ *
+ * Access toast API (success/error/info) anywhere in the app.
+ * If used outside the provider, throws a clear error in development.
+ *
+ * @example
+ * ```tsx
+ * import { useToast } from '@/components/ui/ToastProvider';
+ *
+ * const { success, error } = useToast();
+ * success({ title: 'Booking confirmed!' });
+ * error({ title: 'Something went wrong.' });
+ * ```
+ */
+export function useToast() {
+  const ctx = useContext(ToastCtx);
+
+  if (process.env.NODE_ENV !== 'production') {
+    invariant(ctx, 'useToast() must be used inside <ToastProvider>');
+  }
+
+  // fallback to base toast to avoid runtime breakage
+  return (
+    ctx ?? {
+      success: baseToast.success,
+      error: baseToast.error,
+      info: baseToast.info,
+    }
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                        ToastProvider UI                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * ToastProvider
+ *
+ * React client component that manages a global toast (notification) system.
+ * It listens to the `toast` event bus (from `@/lib/toast`) and renders active
+ * notifications as accessible toasts using React portals.
+ *
+ * Features:
+ * - Automatically mounts/unmounts toasts based on lifetime.
+ * - Uses `createPortal()` to render toasts above all page content.
+ * - Includes visual progress bar, color coding per variant, and animations.
+ * - Fully accessible (`role="status"` / `alert"`, `aria-live` for SR users).
+ *
+ * @component
+ */
+export default function ToastProvider({
+  children,
+}: {
+  children?: React.ReactNode;
+}) {
   const [mounted, setMounted] = useState(false);
   const portalEl = useRef<HTMLDivElement | null>(null);
-
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const timers = useRef<Record<string, number>>({}); // id -> timeoutId
+  const timers = useRef<Record<string, number>>({});
 
   // mark client
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
   // create/destroy portal node
   useEffect(() => {
@@ -33,7 +107,7 @@ export default function ToastProvider() {
     };
   }, [mounted]);
 
-  // stable dismiss
+  // dismiss handler
   const dismiss = useCallback((id: string) => {
     const t = timers.current[id];
     if (t) {
@@ -43,7 +117,7 @@ export default function ToastProvider() {
     setToasts((s) => s.filter((x) => x.id !== id));
   }, []);
 
-  // subscribe to new toasts
+  // subscribe to new toast events
   useEffect(() => {
     if (!mounted) return;
 
@@ -59,27 +133,57 @@ export default function ToastProvider() {
     return () => unsubscribe();
   }, [mounted, dismiss]);
 
-  if (!mounted || !portalEl.current) return null;
+  if (!mounted || !portalEl.current)
+    return (
+      <ToastCtx.Provider
+        value={{
+          success: baseToast.success,
+          error: baseToast.error,
+          info: baseToast.info,
+        }}
+      >
+        {children}
+      </ToastCtx.Provider>
+    );
 
-  // Top-center container so it’s visible immediately
-  return createPortal(
-    <div className="fixed inset-x-0 top-4 z-[1000] flex justify-center px-2 pointer-events-none">
-      <div className="flex w-full max-w-md flex-col gap-2">
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onClose={() => dismiss(t.id)} />
-        ))}
-      </div>
-    </div>,
-    portalEl.current
+  // Top-center toast container rendered through portal
+  return (
+    <ToastCtx.Provider
+      value={{
+        success: baseToast.success,
+        error: baseToast.error,
+        info: baseToast.info,
+      }}
+    >
+      {children}
+
+      {createPortal(
+        <div className="fixed inset-x-0 top-4 z-[1000] flex justify-center px-2 pointer-events-none">
+          <div className="flex w-full max-w-md flex-col gap-2">
+            {toasts.map((t) => (
+              <ToastItem key={t.id} toast={t} onClose={() => dismiss(t.id)} />
+            ))}
+          </div>
+        </div>,
+        portalEl.current
+      )}
+    </ToastCtx.Provider>
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/*                        ToastItem Component                           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Renders a single toast notification with color coding, close button,
+ * progress animation, and accessibility attributes.
+ */
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const { title, description, variant = 'info', duration = 3500 } = toast;
   const role = variant === 'error' ? 'alert' : 'status';
   const live = variant === 'error' ? 'assertive' : 'polite';
 
-  // matchar din palett
   const styles = {
     info: { bar: 'bg-aegean', border: 'border-aegean/30', icon: 'text-aegean' },
     success: {
@@ -101,7 +205,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
       aria-live={live}
       className={`pointer-events-auto relative overflow-hidden rounded-app border ${s.border} bg-shell text-ink shadow-elev animate-[toast-in_150ms_ease-out]`}
     >
-      {/* accentbar till vänster */}
+      {/* Accent bar */}
       <div className={`absolute inset-y-0 left-0 w-1 ${s.bar}`} />
 
       <div className="flex items-start gap-3 p-3 pl-4">
@@ -128,7 +232,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
         </button>
       </div>
 
-      {/* progress bar */}
+      {/* Progress bar */}
       <div className="absolute bottom-0 left-0 h-0.5 w-full bg-ink/10">
         <div
           className={`${s.bar} h-full`}
@@ -139,7 +243,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
         />
       </div>
 
-      {/* keyframes lokalt så du slipper röra config nu */}
+      {/* Local keyframes (no need to touch Tailwind config) */}
       <style jsx>{`
         @keyframes toast-in {
           0% {
@@ -164,6 +268,9 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   );
 }
 
+/**
+ * Inline SVG icon for toast variants (success, error, info).
+ */
 function Icon({
   variant,
   className,

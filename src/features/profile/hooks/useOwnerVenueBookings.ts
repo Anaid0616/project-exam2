@@ -7,8 +7,9 @@ import {
 } from '@/features/venues/api/venues.api';
 import type { VenueWithBookings } from '@/types/venue';
 import type { VenueBooking } from '@/types/booking';
+import { toDateOnly, nightsBetween } from '@/lib/date';
 
-// --- Types ---
+// --- API-ish booking shape we expect on a venue details response ---
 type ApiBookingLike = {
   id?: string | null;
   dateFrom: string; // ISO
@@ -19,20 +20,12 @@ type ApiBookingLike = {
   status?: VenueBooking['status'] | null;
 };
 
-type VenueForBookings = {
-  id: string;
-  name?: string | null;
-  price?: number | null;
+// Only the venue fields we actually need here
+type VenueForBookings = Pick<VenueWithBookings, 'id' | 'name' | 'price'> & {
   bookings?: ApiBookingLike[] | null;
 };
 
 // --- Helpers ---
-function nightsBetweenIso(fromIso: string, toIso: string) {
-  const a = new Date(fromIso);
-  const b = new Date(toIso);
-  const d = Math.ceil((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
-  return d > 0 ? d : 0;
-}
 function inferStatus(fromIso: string, toIso: string): VenueBooking['status'] {
   const now = new Date();
   const from = new Date(fromIso);
@@ -42,10 +35,15 @@ function inferStatus(fromIso: string, toIso: string): VenueBooking['status'] {
   return 'Pending';
 }
 
-function toRow(v: VenueForBookings, b: ApiBookingLike): VenueBooking {
-  const checkIn = String(b.dateFrom).slice(0, 10);
-  const checkOut = String(b.dateTo).slice(0, 10);
-  const nights = nightsBetweenIso(checkIn, checkOut);
+function toRow(v: VenueForBookings, b: ApiBookingLike): VenueBooking | null {
+  // Normalize to UTC-safe date only (YYYY-MM-DD)
+  const checkIn = toDateOnly(b.dateFrom);
+  const checkOut = toDateOnly(b.dateTo);
+
+  // Guard: invalid range → skip
+  if (!checkIn || !checkOut) return null;
+
+  const nights = nightsBetween(checkIn, checkOut);
   const price = Number(v.price ?? 0);
   const total = price && nights ? price * nights : 0;
 
@@ -66,14 +64,12 @@ function toRow(v: VenueForBookings, b: ApiBookingLike): VenueBooking {
 /**
  * useOwnerVenueBookings
  *
- * Fetches all venues owned by a given profile and expands each venue
- * with its bookings, then flattens that into a table-friendly array.
+ * Fetch venues owned by the given profile, expand bookings on each,
+ * flatten to a table-friendly array and sort by check-in (ASC).
  *
- * Typical use case: a manager’s dashboard “Bookings” tab.
- *
- * @param ownerName - Profile name (username) of the venue owner.
- * @param enabled   - Toggle the effect on/off (default true).
- * @returns { rows, loading, error }  A flat list of booking rows and state flags.
+ * @param ownerName Profile name (username) of the venue owner.
+ * @param enabled   Toggle the effect on/off (default true).
+ * @returns { rows, loading, error }
  */
 export function useOwnerVenueBookings(ownerName?: string, enabled = true) {
   const [rows, setRows] = React.useState<VenueBooking[]>([]);
@@ -88,22 +84,26 @@ export function useOwnerVenueBookings(ownerName?: string, enabled = true) {
       setLoading(true);
       setError(null);
       try {
-        // 1) Get my venues
+        // 1) List my venues
         const venues = await getMyVenues(ownerName);
 
-        // 2) Get details + bookings for venue
+        // 2) For each, fetch details incl. bookings
         const details = await Promise.all(
           (venues ?? []).map((v) => getVenueWithBookings(v.id))
         );
 
-        // 3) Map to rows
-        const mapped: VenueBooking[] = details.flatMap(
-          (vd: VenueWithBookings) => {
-            // type hack
-            const v = vd as unknown as VenueForBookings;
-            const list = v.bookings ?? [];
-            return list.map((b) => toRow(v, b));
-          }
+        // 3) Map to flat rows using shared date helpers
+        const mapped: VenueBooking[] = details.flatMap((vd) => {
+          const v = vd as unknown as VenueForBookings;
+          const list = v.bookings ?? [];
+          return list
+            .map((b) => toRow(v, b))
+            .filter((r): r is VenueBooking => Boolean(r));
+        });
+
+        // 4) Sort by check-in date for nicer UX
+        mapped.sort((a, b) =>
+          a.checkIn < b.checkIn ? -1 : a.checkIn > b.checkIn ? 1 : 0
         );
 
         if (active) setRows(mapped);

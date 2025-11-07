@@ -29,13 +29,15 @@ type RegisterResponse = {
 /**
  * Registration Page
  *
- * - Uses React Hook Form + Yup for client-side validation.
- * - Submits via `publicApi` (safe fetch wrapper).
- * - Allows toggling "Venue Manager" role only.
- * - Displays inline validation errors and one toast if registration fails.
+ * - React Hook Form + Yup validation
+ * - Proper label ↔ input association (htmlFor/id)
+ * - Error messages linked via aria-describedby
+ * - Polite aria-live status for async feedback
  */
 export default function RegisterPage() {
   const [apiError, setApiError] = React.useState<string | null>(null);
+  const [statusMsg, setStatusMsg] = React.useState('');
+  const statusRef = React.useRef<HTMLParagraphElement>(null);
 
   const {
     register,
@@ -58,15 +60,16 @@ export default function RegisterPage() {
    */
   async function onSubmit(values: RegisterForm) {
     setApiError(null);
-
+    setStatusMsg('Registering…');
     try {
       const res = await publicApi<RegisterResponse>(API.register, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
       });
-
       if (res?.data?.email) {
+        setStatusMsg('Registered. Redirecting to login…');
+        requestAnimationFrame(() => statusRef.current?.focus());
         window.location.href = '/auth/login';
       }
     } catch (err) {
@@ -77,9 +80,22 @@ export default function RegisterPage() {
           ? err.message
           : 'Registration failed';
       setApiError(msg);
+      setStatusMsg('Registration failed.');
+      requestAnimationFrame(() => statusRef.current?.focus());
       toast.error({ title: 'Register failed', description: msg });
     }
   }
+
+  // Stable IDs for labels and error texts
+  const ids = {
+    name: 'reg-name',
+    nameErr: 'reg-name-error',
+    email: 'reg-email',
+    emailErr: 'reg-email-error',
+    password: 'reg-password',
+    passwordErr: 'reg-password-error',
+    venueManager: 'venueManager',
+  };
 
   return (
     <main className="mx-auto max-w-5xl p-6">
@@ -96,50 +112,92 @@ export default function RegisterPage() {
             >
               {/* Name */}
               <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
+                <label
+                  htmlFor={ids.name}
+                  className="block text-sm font-medium mb-1"
+                >
+                  Name
+                </label>
                 <input
+                  id={ids.name}
                   className="input"
                   type="text"
                   placeholder="Your name"
                   {...register('name')}
                   aria-invalid={!!errors.name || undefined}
+                  aria-describedby={errors.name ? ids.nameErr : undefined}
+                  autoComplete="name"
                 />
                 {errors.name && (
-                  <p className="text-red-600 text-sm">{errors.name.message}</p>
+                  <p
+                    id={ids.nameErr}
+                    className="text-red-600 text-sm"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label
+                  htmlFor={ids.email}
+                  className="block text-sm font-medium mb-1"
+                >
+                  Email
+                </label>
                 <input
+                  id={ids.email}
                   className="input"
                   type="email"
                   placeholder="you@stud.noroff.no"
                   autoComplete="email"
                   {...register('email')}
                   aria-invalid={!!errors.email || undefined}
+                  aria-describedby={errors.email ? ids.emailErr : undefined}
+                  inputMode="email"
                 />
                 {errors.email && (
-                  <p className="text-red-600 text-sm">{errors.email.message}</p>
+                  <p
+                    id={ids.emailErr}
+                    className="text-red-600 text-sm"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label
+                  htmlFor={ids.password}
+                  className="block text-sm font-medium mb-1"
+                >
                   Password
                 </label>
                 <input
+                  id={ids.password}
                   className="input"
                   type="password"
                   placeholder="Password (min 8 characters)"
                   autoComplete="new-password"
                   {...register('password')}
                   aria-invalid={!!errors.password || undefined}
+                  aria-describedby={
+                    errors.password ? ids.passwordErr : undefined
+                  }
                 />
                 {errors.password && (
-                  <p className="text-red-600 text-sm">
+                  <p
+                    id={ids.passwordErr}
+                    className="text-red-600 text-sm"
+                    role="status"
+                    aria-live="polite"
+                  >
                     {errors.password.message}
                   </p>
                 )}
@@ -148,13 +206,13 @@ export default function RegisterPage() {
               {/* Venue Manager toggle */}
               <div className="flex items-center gap-2 mt-3">
                 <input
-                  id="venueManager"
+                  id={ids.venueManager}
                   type="checkbox"
                   {...register('venueManager')}
                   className="h-4 w-4 accent-aegean focus:ring-0"
                 />
                 <label
-                  htmlFor="venueManager"
+                  htmlFor={ids.venueManager}
                   className="text-sm cursor-pointer select-none"
                 >
                   Venue Manager
@@ -166,13 +224,32 @@ export default function RegisterPage() {
                 type="submit"
                 className="btn btn-primary w-full mt-4"
                 disabled={isSubmitting}
+                aria-busy={isSubmitting || undefined}
+                aria-label={isSubmitting ? 'Registering…' : 'Register'}
               >
                 {isSubmitting ? 'Registering…' : 'Register'}
               </button>
 
               {apiError && (
-                <p className="text-red-600 text-sm mt-2">{apiError}</p>
+                <p
+                  className="text-red-600 text-sm mt-2"
+                  role="status"
+                  aria-live="polite"
+                >
+                  {apiError}
+                </p>
               )}
+
+              {/* Polite live region for async status */}
+              <p
+                ref={statusRef}
+                tabIndex={-1}
+                className="text-sm text-ink/70"
+                role="status"
+                aria-live="polite"
+              >
+                {statusMsg}
+              </p>
             </form>
           </div>
 

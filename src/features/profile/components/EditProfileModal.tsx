@@ -10,15 +10,27 @@ export type EditProfileForm = {
   bio: string;
 };
 
+/**
+ * Accessible modal dialog for editing a user profile.
+ *
+ * - Uses `role="dialog"` and `aria-modal="true"` for screen readers
+ * - Includes Escape key and backdrop click handling
+ * - Each input field has a proper label association (htmlFor ↔ id)
+ * - Includes a polite aria-live region for async submit status
+ */
 export default function EditProfileModal({
   open,
   onClose,
   initial,
   onSave,
 }: {
+  /** Whether the modal is open */
   open: boolean;
+  /** Called when modal should close */
   onClose: () => void;
+  /** Prefilled values for the form */
   initial: Partial<EditProfileForm>;
+  /** Called when the form is submitted successfully */
   onSave: (values: EditProfileForm) => Promise<void>;
 }) {
   const {
@@ -35,6 +47,7 @@ export default function EditProfileModal({
     },
   });
 
+  // Reset when modal opens
   React.useEffect(() => {
     if (open) {
       reset({
@@ -46,6 +59,7 @@ export default function EditProfileModal({
     }
   }, [open, initial, reset]);
 
+  // ESC key closes modal
   React.useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -53,11 +67,22 @@ export default function EditProfileModal({
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
+  const [statusMsg, setStatusMsg] = React.useState('');
+  const statusRef = React.useRef<HTMLParagraphElement>(null);
+
   if (!open) return null;
 
   const submit = async (values: EditProfileForm) => {
-    await onSave(values);
-    onClose();
+    setStatusMsg('Saving profile…');
+    try {
+      await onSave(values);
+      setStatusMsg('Profile updated.');
+    } catch {
+      setStatusMsg('Save failed.');
+    } finally {
+      requestAnimationFrame(() => statusRef.current?.focus());
+      onClose();
+    }
   };
 
   return (
@@ -65,13 +90,16 @@ export default function EditProfileModal({
       className="fixed inset-0 z-[200] grid place-items-center bg-black/40 p-4"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="edit-profile-title"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div className="w-full max-w-xl rounded-app bg-white p-5 shadow-elev">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Edit Profile</h2>
+          <h2 id="edit-profile-title" className="text-lg font-semibold">
+            Edit Profile
+          </h2>
           <button
             type="button"
             className="rounded p-1 text-ink/60 hover:bg-ink/5"
@@ -89,41 +117,53 @@ export default function EditProfileModal({
         </div>
 
         <form onSubmit={handleSubmit(submit)} className="grid gap-3">
-          <label className="grid gap-1">
-            <span className="text-sm font-medium">Avatar URL</span>
+          <div>
+            <label htmlFor="avatarUrl" className="text-sm font-medium">
+              Avatar URL
+            </label>
             <input
+              id="avatarUrl"
               className="input"
               placeholder="https://..."
               {...register('avatarUrl')}
             />
-          </label>
+          </div>
 
-          <label className="grid gap-1">
-            <span className="text-sm font-medium">Banner URL</span>
+          <div>
+            <label htmlFor="bannerUrl" className="text-sm font-medium">
+              Banner URL
+            </label>
             <input
+              id="bannerUrl"
               className="input"
               placeholder="https://..."
               {...register('bannerUrl')}
             />
-          </label>
+          </div>
 
-          <label className="grid gap-1">
-            <span className="text-sm font-medium">Name</span>
+          <div>
+            <label htmlFor="name" className="text-sm font-medium">
+              Name
+            </label>
             <input
+              id="name"
               className="input"
               placeholder="Your name"
               {...register('name')}
             />
-          </label>
+          </div>
 
-          <label className="grid gap-1">
-            <span className="text-sm font-medium">Bio</span>
+          <div>
+            <label htmlFor="bio" className="text-sm font-medium">
+              Bio
+            </label>
             <textarea
+              id="bio"
               className="input min-h-24"
               placeholder="A short bio…"
               {...register('bio')}
             />
-          </label>
+          </div>
 
           <div className="mt-2 flex justify-end gap-2">
             <button type="button" className="btn btn-white" onClick={onClose}>
@@ -133,10 +173,23 @@ export default function EditProfileModal({
               type="submit"
               className="btn btn-primary"
               disabled={isSubmitting}
+              aria-busy={isSubmitting || undefined}
+              aria-label={isSubmitting ? 'Saving profile…' : 'Update profile'}
             >
               {isSubmitting ? 'Saving…' : 'Update Profile'}
             </button>
           </div>
+
+          {/* Live region for async feedback */}
+          <p
+            ref={statusRef}
+            tabIndex={-1}
+            role="status"
+            aria-live="polite"
+            className="text-sm text-ink/70"
+          >
+            {statusMsg}
+          </p>
         </form>
       </div>
     </div>

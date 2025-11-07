@@ -4,6 +4,10 @@ import ContactForm, {
   ContactFormValues,
 } from '@/features/contact/components/ContactForm';
 
+/**
+ * Contact page that submits the form to /api/contact
+ * and returns a human-readable status message to the form.
+ */
 export default function ContactPage() {
   const handleSubmit = async (values: ContactFormValues) => {
     try {
@@ -14,12 +18,14 @@ export default function ContactPage() {
       });
       if (!res.ok) throw new Error('Failed to send');
 
-      alert('Thank you, we received your message.');
-      return true;
+      // Let the form show & announce this message via aria-live
+      return { ok: true, message: 'Thank you, we received your message.' };
     } catch (err) {
       console.error(err);
-      alert("We couldn't receive your message. Please try again.");
-      return false;
+      return {
+        ok: false,
+        message: "We couldn't receive your message. Please try again.",
+      };
     }
   };
 

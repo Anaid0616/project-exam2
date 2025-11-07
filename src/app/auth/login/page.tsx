@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { publicApi, API, HttpError } from '@/lib/api';
@@ -39,15 +39,14 @@ function extractAccessToken(res: unknown): string | null {
 /**
  * LoginPage
  *
- * Handles user authentication.
- * - Validates user input with Yup + React Hook Form.
- * - Calls the Noroff login API via `publicApi`.
- * - Stores the returned token in `localStorage`.
- * - Redirects to the home page on success.
- * - Shows error toast if login fails.
+ * - Proper label ↔ input association (htmlFor/id)
+ * - Error messages linked via aria-describedby
+ * - Polite aria-live region for async feedback
  */
 export default function LoginPage() {
   const [apiError, setApiError] = useState<string | null>(null);
+  const [statusMsg, setStatusMsg] = useState('');
+  const statusRef = useRef<HTMLParagraphElement>(null);
 
   const {
     register,
@@ -65,6 +64,7 @@ export default function LoginPage() {
    */
   async function onSubmit(values: LoginForm) {
     setApiError(null);
+    setStatusMsg('Signing in…');
     try {
       const res = await publicApi<LoginResponse>(API.login, {
         method: 'POST',
@@ -75,10 +75,9 @@ export default function LoginPage() {
       const token = extractAccessToken(res);
       if (!token) throw new Error('No access token returned');
 
-      // Store token locally for authenticated routes
       localStorage.setItem('token', token);
-
-      // Redirect to profile
+      setStatusMsg('Signed in. Redirecting…');
+      requestAnimationFrame(() => statusRef.current?.focus());
       window.location.href = '/profile';
     } catch (err) {
       const msg =
@@ -89,9 +88,18 @@ export default function LoginPage() {
           : 'Login failed';
 
       setApiError(msg);
+      setStatusMsg('Login failed.');
+      requestAnimationFrame(() => statusRef.current?.focus());
       toast.error({ title: 'Login failed', description: msg });
     }
   }
+
+  const ids = {
+    email: 'login-email',
+    emailErr: 'login-email-error',
+    password: 'login-password',
+    passwordErr: 'login-password-error',
+  };
 
   return (
     <main className="mx-auto max-w-6xl px-2 md:px-6">
@@ -112,32 +120,60 @@ export default function LoginPage() {
           >
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label
+                htmlFor={ids.email}
+                className="block text-sm font-medium mb-1"
+              >
+                Email
+              </label>
               <input
+                id={ids.email}
                 className="input"
                 type="email"
                 placeholder="you@stud.noroff.no"
                 aria-invalid={!!errors.email || undefined}
+                aria-describedby={errors.email ? ids.emailErr : undefined}
+                inputMode="email"
+                autoComplete="email"
                 {...register('email')}
               />
               {errors.email && (
-                <p className="text-red-600 text-sm">{errors.email.message}</p>
+                <p
+                  id={ids.emailErr}
+                  className="text-red-600 text-sm"
+                  role="status"
+                  aria-live="polite"
+                >
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
+              <label
+                htmlFor={ids.password}
+                className="block text-sm font-medium mb-1"
+              >
+                Password
+              </label>
               <input
+                id={ids.password}
                 className="input"
                 type="password"
                 placeholder="password"
                 autoComplete="current-password"
                 aria-invalid={!!errors.password || undefined}
+                aria-describedby={errors.password ? ids.passwordErr : undefined}
                 {...register('password')}
               />
               {errors.password && (
-                <p className="text-red-600 text-sm">
+                <p
+                  id={ids.passwordErr}
+                  className="text-red-600 text-sm"
+                  role="status"
+                  aria-live="polite"
+                >
                   {errors.password.message}
                 </p>
               )}
@@ -148,13 +184,32 @@ export default function LoginPage() {
               type="submit"
               className="btn btn-primary w-full"
               disabled={isSubmitting}
+              aria-busy={isSubmitting || undefined}
+              aria-label={isSubmitting ? 'Signing in…' : 'Sign in'}
             >
               {isSubmitting ? 'Signing in…' : 'Sign in'}
             </button>
 
             {apiError && (
-              <p className="text-red-600 text-sm mt-2">{apiError}</p>
+              <p
+                className="text-red-600 text-sm mt-2"
+                role="status"
+                aria-live="polite"
+              >
+                {apiError}
+              </p>
             )}
+
+            {/* Polite live region for async feedback */}
+            <p
+              ref={statusRef}
+              tabIndex={-1}
+              role="status"
+              aria-live="polite"
+              className="text-sm text-ink/70"
+            >
+              {statusMsg}
+            </p>
           </form>
 
           <p className="mt-6 text-sm">

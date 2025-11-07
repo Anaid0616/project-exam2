@@ -44,7 +44,7 @@ export default function Footer() {
         >
           {/* Left: links (center on mobile, left on md+) */}
           <div className="space-y-2 justify-self-center md:justify-self-start">
-            <h3 className="font-semibold">Holidaze</h3>
+            <span className="font-display text-lg font-semibold">Holidaze</span>
             <ul className="space-y-1 text-sm text-ink/70">
               <li>
                 <Link href="/profile" className="hover:underline">
@@ -71,8 +71,8 @@ export default function Footer() {
           </div>
 
           {/* Right: payment icons (center on mobile, right on md+) */}
-          <div className="justify-self-center md:justify-self-end">
-            <h3 className="mb-2 font-semibold md:text-right">Payments</h3>
+          <div className="space-y-2 justify-self-center md:justify-self-end">
+            <span className="font-display text-lg font-semibold">Payments</span>
             <div
               className="
               flex flex-wrap items-center justify-center gap-4 text-ink/70

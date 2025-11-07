@@ -5,12 +5,29 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { DateRange } from 'react-day-picker';
 import { format } from 'date-fns';
+import dynamic from 'next/dynamic';
+import type { BlockedRange } from '@/components/ui/DateRangeCalendar';
 
-import DateRangeCalendar, {
-  type BlockedRange,
-} from '@/components/ui/DateRangeCalendar';
 import { createBooking } from '@/features/bookings/api/bookings.api';
-import { toast } from '@/lib/toast';
+import { useToast } from '@/providers/ToastProvider';
+
+const DateRangeCalendar = dynamic(
+  () => import('@/components/ui/DateRangeCalendar'),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="
+         rounded-app border border-ink/10 p-2
+         w-full max-w-[360px] md:max-w-[400px] mx-auto
+        "
+      >
+        {/* keep height to avoid layout shift */}
+        <div className="aspect-[4/3] w-full rounded bg-ink/10 animate-pulse" />
+      </div>
+    ),
+  }
+);
 
 /** Minimal booked-range shape coming from the venue API. */
 type BookedLite = { dateFrom: string; dateTo: string };
@@ -96,6 +113,7 @@ export default function BookingPanel({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { success, error } = useToast();
 
   // --- read query params to prefill ---
   const fromParam = searchParams.get('from');
@@ -172,7 +190,7 @@ export default function BookingPanel({
       });
 
       setLiveMsg('Booking confirmed.');
-      toast.success({ title: 'Booking confirmed' });
+      success({ title: 'Booking confirmed' });
 
       const q = new URLSearchParams({
         id: venueId,
@@ -189,7 +207,7 @@ export default function BookingPanel({
       const msg =
         err instanceof Error ? err.message : 'Could not create booking';
       setLiveMsg('Booking failed.');
-      toast.error({ title: 'Booking failed', description: msg });
+      error({ title: 'Booking failed', description: msg });
     }
   }
 
@@ -214,24 +232,37 @@ export default function BookingPanel({
 
         {/* Inline calendar */}
         <div>
-          <label className="label mb-1 block">Select dates</label>
-          <DateRangeCalendar
-            value={range}
-            onChange={setRange}
-            blocked={blockedRanges}
-            className="
-              booking-calendar rounded-app border border-ink/10 p-2
-              w-full max-w-[360px] md:max-w-[400px] mx-auto
-              [&_.rdp]:inline-block origin-top overflow-visible
-              max-[338px]:scale-[0.80] max-[338px]:-mb-20
-            "
-          />
+          <span id="select-dates-label" className="label mb-1 block">
+            Select dates
+          </span>
+
+          <div role="group" aria-labelledby="select-dates-label">
+            <DateRangeCalendar
+              value={range}
+              onChange={setRange}
+              blocked={blockedRanges}
+              className="
+        booking-calendar rounded-app border border-ink/10 p-2
+        w-full max-w-[360px] md:max-w-[400px] mx-auto
+        [&_.rdp]:inline-block origin-top overflow-visible
+        max-[338px]:scale-[0.80] max-[338px]:-mb-20
+      "
+            />
+          </div>
         </div>
 
         {/* Guests */}
         <div>
-          <label className="label">Guests (max {maxGuests})</label>
-          <div className="flex items-center gap-2">
+          {/* byt label -> p */}
+          <p id="guests-label" className="label">
+            Guests (max {maxGuests})
+          </p>
+
+          <div
+            role="group"
+            aria-labelledby="guests-label"
+            className="flex items-center gap-2"
+          >
             <IconBtn
               src={ICONS.minus}
               label="Decrease guests"

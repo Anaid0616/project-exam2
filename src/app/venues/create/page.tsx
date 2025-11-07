@@ -9,13 +9,16 @@ import { toVenuePayload } from '@/features/venues/forms/mappers';
 import { createVenue } from '@/features/venues/api/venues.api';
 import { toast } from '@/lib/toast';
 
+/**
+ * Page for creating a new venue.
+ * Relies on the form's local aria-live region to announce save status.
+ */
 export default function NewVenuePage() {
   const router = useRouter();
 
   const handleSubmit: SubmitHandler<VenueFormValues> = async (values) => {
     try {
       const payload = toVenuePayload(values);
-      console.log('POST payload:', payload);
       const created = await createVenue(payload); // POST
       toast.success({ title: 'Venue created' });
       router.push(`/venues/${created.id}`);

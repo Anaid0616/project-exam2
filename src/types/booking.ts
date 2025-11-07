@@ -21,9 +21,9 @@ export type BookingLite = {
   id: string;
   venueId?: string;
   venueName: string;
-  dateFrom?: string; // prefer raw dates for consistent formatting
+  dateFrom?: string;
   dateTo?: string;
-  when?: string; // legacy fallback
+  when?: string;
   total: number; // EUR
   image?: string;
   location?: string;

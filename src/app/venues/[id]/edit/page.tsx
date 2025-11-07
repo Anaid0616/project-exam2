@@ -12,16 +12,19 @@ import { updateVenue, getVenue } from '@/features/venues/api/venues.api';
 import type { Venue } from '@/types/venue';
 import { toast } from '@/lib/toast';
 
+/**
+ * Page for editing an existing venue.
+ * Keeps the original SubmitHandler signature; the form announces status via aria-live.
+ */
 export default function EditVenuePage() {
   const router = useRouter();
   const params = useParams();
-  const id = String(params?.id); // id is defined here
+  const id = String(params?.id);
 
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Load venue data
-
   useEffect(() => {
     let alive = true;
     (async () => {

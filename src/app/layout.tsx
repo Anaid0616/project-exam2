@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import ToastProvider from '@/components/ui/ToastProvider';
+import ToastProvider from '@/providers/ToastProvider';
 import { UserProvider } from '@/providers/UserProvider';
 import 'react-day-picker/dist/style.css';
 
@@ -32,13 +32,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jakarta.variable}`}>
       <body className="flex min-h-screen flex-col font-sans bg-sand text-ink">
-        <Header />
-        <main className="overflow-x-clip flex-1">
-          {' '}
-          <UserProvider>{children}</UserProvider>
-        </main>
-        <Footer />
-        <ToastProvider />
+        <ToastProvider>
+          <UserProvider>
+            <Header />
+            <main className="overflow-x-clip flex-1"> {children}</main>
+            <Footer />
+          </UserProvider>
+        </ToastProvider>
       </body>
     </html>
   );

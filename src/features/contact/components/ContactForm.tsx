@@ -3,7 +3,7 @@
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 export type ContactFormValues = {
   name: string;
@@ -26,11 +26,27 @@ const schema = yup
   .required();
 
 type Props = {
-  onSubmit: (values: ContactFormValues) => Promise<boolean> | boolean;
+  /**
+   * Submit handler. Return shape:
+   *   { ok: true, message: string } on success
+   *   { ok: false, message: string } on failure
+   */
+  onSubmit: (
+    values: ContactFormValues
+  ) =>
+    | Promise<{ ok: boolean; message: string }>
+    | { ok: boolean; message: string };
   submitLabel?: string;
   defaultValues?: Partial<ContactFormValues>;
 };
 
+/**
+ * Accessible contact form with:
+ * - Proper label ↔ input association via htmlFor/id
+ * - Field-level errors announced via aria-describedby
+ * - Submit status announced via a local aria-live="polite" region
+ * - Button reflects busy state via disabled + aria-busy
+ */
 export default function ContactForm({
   onSubmit,
   submitLabel = 'Send',
@@ -52,76 +68,172 @@ export default function ContactForm({
     },
   });
 
-  //  Guard: block double-submit while awaiting
+  // Prevent double-submit while awaiting
   const busyRef = useRef(false);
+
+  // Local status message for aria-live (success/error)
+  const [statusMsg, setStatusMsg] = useState<string>('');
+  const statusRef = useRef<HTMLParagraphElement>(null);
 
   const submit: SubmitHandler<ContactFormValues> = async (values) => {
     if (busyRef.current) return;
     busyRef.current = true;
+    setStatusMsg('Sending message…');
+
     try {
-      const ok = await onSubmit(values);
-      if (ok) reset();
+      const res = await onSubmit(values);
+      setStatusMsg(res.message);
+
+      if (res.ok) {
+        reset();
+      }
+
+      // Move focus to the status so SR users hear it immediately
+      requestAnimationFrame(() => statusRef.current?.focus());
     } finally {
       busyRef.current = false;
     }
   };
 
+  // Convenient ids for proper label association
+  const id = {
+    name: 'contact-name',
+    email: 'contact-email',
+    subject: 'contact-subject',
+    message: 'contact-message',
+  };
+
   return (
     <form
+      noValidate
       autoComplete="off"
       onSubmit={handleSubmit(submit)}
       className="space-y-5"
     >
       <div>
-        <label className="label">Name</label>
-        <input className="input" placeholder="Name" {...register('name')} />
+        <label className="label" htmlFor={id.name}>
+          Name
+        </label>
+        <input
+          id={id.name}
+          className="input"
+          placeholder="Name"
+          {...register('name')}
+          aria-invalid={!!errors.name || undefined}
+          aria-describedby={errors.name ? `${id.name}-error` : undefined}
+          autoComplete="name"
+        />
         {errors.name && (
-          <p className="text-xs text-red-600">{errors.name.message}</p>
+          <p
+            id={`${id.name}-error`}
+            className="text-xs text-red-600"
+            role="status"
+            aria-live="polite"
+          >
+            {errors.name.message}
+          </p>
         )}
       </div>
 
       <div>
-        <label className="label">Email</label>
+        <label className="label" htmlFor={id.email}>
+          Email
+        </label>
         <input
+          id={id.email}
           className="input"
           placeholder="Email"
           type="email"
           {...register('email')}
+          aria-invalid={!!errors.email || undefined}
+          aria-describedby={errors.email ? `${id.email}-error` : undefined}
+          autoComplete="email"
         />
         {errors.email && (
-          <p className="text-xs text-red-600">{errors.email.message}</p>
+          <p
+            id={`${id.email}-error`}
+            className="text-xs text-red-600"
+            role="status"
+            aria-live="polite"
+          >
+            {errors.email.message}
+          </p>
         )}
       </div>
 
       <div>
-        <label className="label">Subject</label>
+        <label className="label" htmlFor={id.subject}>
+          Subject
+        </label>
         <input
+          id={id.subject}
           className="input"
           placeholder="Subject"
           {...register('subject')}
+          aria-invalid={!!errors.subject || undefined}
+          aria-describedby={errors.subject ? `${id.subject}-error` : undefined}
+          autoComplete="off"
         />
         {errors.subject && (
-          <p className="text-xs text-red-600">{errors.subject.message}</p>
+          <p
+            id={`${id.subject}-error`}
+            className="text-xs text-red-600"
+            role="status"
+            aria-live="polite"
+          >
+            {errors.subject.message}
+          </p>
         )}
       </div>
 
       <div>
-        <label className="label">Message</label>
+        <label className="label" htmlFor={id.message}>
+          Message
+        </label>
         <textarea
+          id={id.message}
           rows={4}
           className="input min-h-[120px]"
           placeholder="Your message here..."
           {...register('message')}
+          aria-invalid={!!errors.message || undefined}
+          aria-describedby={errors.message ? `${id.message}-error` : undefined}
         />
         {errors.message && (
-          <p className="text-xs text-red-600">{errors.message.message}</p>
+          <p
+            id={`${id.message}-error`}
+            className="text-xs text-red-600"
+            role="status"
+            aria-live="polite"
+          >
+            {errors.message.message}
+          </p>
         )}
       </div>
 
-      <div className="flex justify-start">
-        <button className="btn btn-primary px-6" disabled={isSubmitting}>
-          {submitLabel}
+      {/* Submit + local live region */}
+      <div className="flex flex-col items-start gap-2">
+        <button
+          type="submit"
+          className="btn btn-primary px-6"
+          disabled={isSubmitting || busyRef.current}
+          aria-busy={isSubmitting || busyRef.current || undefined}
+          aria-live="off"
+          aria-label={isSubmitting ? 'Sending message…' : submitLabel}
+        >
+          {isSubmitting ? 'Sending…' : submitLabel}
         </button>
+
+        {/* Visible status for sighted users; focusable + aria-live for SR */}
+        <p
+          ref={statusRef}
+          tabIndex={-1}
+          aria-live="polite"
+          role="status"
+          className="text-sm"
+        >
+          {statusMsg}
+        </p>
       </div>
     </form>
   );

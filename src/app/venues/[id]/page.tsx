@@ -7,7 +7,7 @@ import type { VenueWithBookings } from '@/types/venue';
 import type { BookedLite } from '@/types/booking';
 
 import HeroCarousel from '@/features/venues/components/HeroCarousel';
-import BookingPanel from '@/features/venues/components/BookingPanel';
+import BookingPanel from '@/features/bookings/components/BookingPanel';
 import OwnerActions from '@/features/venues/components/OwnerActions';
 
 import Rating from '@/components/ui/Rating';

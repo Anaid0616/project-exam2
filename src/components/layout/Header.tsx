@@ -59,6 +59,7 @@ export default function Header() {
    * Decoded JWT payload (null when not authenticated).
    * Initialized synchronously from localStorage on the client to minimize "loading" time.
    */
+
   const [payload, setPayload] = React.useState<JwtPayload | null>(() => {
     if (typeof window === 'undefined') return null; // SSR-safe
     const token = localStorage.getItem('token');
@@ -164,6 +165,7 @@ export default function Header() {
                 </div>
               </NavLink>
             )}
+
             {/* Saved (desktop) */}
             <Link
               href="/profile?saved=1"

@@ -1,7 +1,8 @@
 'use client';
 import { Heart } from 'lucide-react';
 import { useFavorites } from '@/features/favorites/useFavorites';
-import { useUser } from '@/providers/UserProvider';
+import { useAuth } from '@/providers/UserProvider';
+import { useToast } from '@/providers/ToastProvider';
 
 type Variant = 'overlay' | 'chip';
 type Size = 'sm' | 'md' | 'lg';
@@ -24,11 +25,27 @@ export default function SaveButton({
   tone?: Tone;
   iconClassName?: string;
 }) {
-  const { email, ready: userReady } = useUser();
+  const { email, ready: userReady } = useAuth(); // useAuth
   const { has, toggle, ready } = useFavorites(email);
+  const { info, error: toastError, success } = useToast(); // toast
   const saved = has(venueId);
 
-  // colors overlay
+  async function onToggle() {
+    if (!userReady) return; // still bootstrapping
+    if (!email) {
+      info({ title: 'Sign in to save venues' });
+      return;
+    }
+    try {
+      await toggle(venueId);
+      const title = saved ? 'Removed from saved' : 'Added to saved';
+      success({ title });
+    } catch {
+      toastError({ title: 'Could not update favorites' });
+    }
+  }
+
+  // overlay colors
   const overlayBase =
     tone === 'sunset'
       ? 'text-sunset'
@@ -48,7 +65,7 @@ export default function SaveButton({
       <button
         type="button"
         disabled={!userReady || !ready}
-        onClick={() => toggle(venueId)}
+        onClick={onToggle}
         aria-pressed={saved}
         aria-label={saved ? 'Remove from saved' : 'Save venue'}
         className={`p-1 m-0 bg-transparent border-0 outline-none hover:bg-transparent focus-visible:outline-none ${
@@ -57,22 +74,20 @@ export default function SaveButton({
       >
         <Heart
           strokeWidth={1.8}
-          className={`${iconSize} ${saved ? overlaySaved : overlayBase}
-            
-            transition-transform duration-150 hover:scale-105`}
+          className={`${iconSize} ${
+            saved ? overlaySaved : overlayBase
+          } transition-transform duration-150 hover:scale-105`}
         />
       </button>
     );
   }
 
-  // chip-variant
+  // chip variant
   const chipPad = size === 'lg' ? 'px-3 py-1.5' : 'px-2 py-1';
   const chipIcon = iconClassName ?? (size === 'lg' ? 'h-5 w-5' : 'h-4 w-4');
   const chipTone =
     tone === 'sunset'
-      ? saved
-        ? 'bg-sunset/10 text-sunset'
-        : 'bg-sunset/10 text-sunset'
+      ? 'bg-sunset/10 text-sunset'
       : tone === 'ink'
       ? saved
         ? 'bg-ink/10 text-ink'
@@ -85,7 +100,7 @@ export default function SaveButton({
     <button
       type="button"
       disabled={!userReady || !ready}
-      onClick={() => toggle(venueId)}
+      onClick={onToggle}
       aria-pressed={saved}
       aria-label={saved ? 'Remove from saved' : 'Save venue'}
       className={`inline-flex items-center gap-1 rounded-full ${chipPad} ${chipTone} hover:opacity-90 focus-visible:outline-none ${
