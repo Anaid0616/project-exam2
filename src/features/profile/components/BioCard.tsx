@@ -141,11 +141,15 @@ export default function InfoCard({
                   {name}
                 </h1>
                 <h2 className="sr-only">My venues</h2>
-                <span className="chip-role">
-                  <span className="chip-dot" aria-hidden="true" />
-                  {role === 'manager' ? 'Venue Manager' : 'Customer'}
-                </span>
+
+                {role === 'manager' && (
+                  <span className="chip-role" aria-label="Venue manager">
+                    <span className="chip-dot" aria-hidden="true" />
+                    Venue manager
+                  </span>
+                )}
               </div>
+
               <p className="text-ink/90 text-sm mt-1">{email}</p>
               <p className="text-ink/90"> {bio}</p>
             </div>
