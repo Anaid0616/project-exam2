@@ -26,7 +26,8 @@ export default function HomeHero() {
           fill
           className="object-cover pointer-events-none"
           priority
-          unoptimized
+          fetchPriority="high"
+          sizes="100vw"
         />
 
         {/* --- Overlay content --- */}

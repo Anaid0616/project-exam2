@@ -42,7 +42,7 @@ export default function MobileNav({
       />
 
       {/* sheet */}
-      <aside
+      <div
         className={[
           'absolute inset-y-0 right-0 h-full w-[min(92vw,360px)]',
           'bg-white shadow-elev flex flex-col',
@@ -157,7 +157,7 @@ export default function MobileNav({
         <div className="px-4 pb-4 pt-2 border-t text-sm text-ink/70 bg-white">
           © Holidaze
         </div>
-      </aside>
+      </div>
     </div>
   );
 }

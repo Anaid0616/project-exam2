@@ -35,9 +35,15 @@ export default function NavLink({
   size = 'md',
 }: NavLinkProps) {
   const pathname = usePathname();
-  const active = pathname === href || pathname.startsWith(href + '/');
-  const sizeCls = size === 'sm' ? 'nav-link-underline--sm' : '';
 
+  let active = pathname === href || pathname.startsWith(href + '/');
+
+  // "Venues" NOT active when on /venues/create
+  if (href === '/venues' && pathname.startsWith('/venues/create')) {
+    active = false;
+  }
+
+  const sizeCls = size === 'sm' ? 'nav-link-underline--sm' : '';
   return (
     <Link
       href={href}
