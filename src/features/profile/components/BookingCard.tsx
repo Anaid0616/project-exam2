@@ -63,9 +63,9 @@ export default function BookingCard({
       </div>
 
       {/* --- Venue Title --- */}
-      <h4 className="truncate text-lg font-semibold leading-tight">
+      <h3 className="truncate text-lg font-semibold leading-tight">
         {b.venueName}
-      </h4>
+      </h3>
 
       {/* --- Booking Details --- */}
       <ul className="mt-1 space-y-1 text-sm">

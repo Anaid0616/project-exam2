@@ -45,22 +45,28 @@ function money(n: number): string {
 export default async function VenueDetailsPage({
   params,
 }: {
-  /** Dynamic segment from /venues/[id] (kept as a Promise per your setup). */
+  /** Dynamic segment from /venues/[id]. */
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const v: VenueWithBookings = await getVenueWithBookings(id);
 
+  const loc =
+    v.location &&
+    [v.location.city, v.location.country].filter(Boolean).join(', ');
+
   const heroFallback = {
     url:
       v.media?.[0]?.url ??
       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=60&auto=format&fit=crop',
-    alt: v.media?.[0]?.alt ?? v.name ?? 'Venue',
+    alt: (() => {
+      const base = [v.name, loc].filter(Boolean).join(', ');
+      // If we have either a name or a location, make a nice alt
+      if (base) return `${base} – hero photo`;
+      // If we truly know nothing, treat it as decorative
+      return '';
+    })(),
   };
-
-  const loc =
-    v.location &&
-    [v.location.city, v.location.country].filter(Boolean).join(', ');
 
   const booked: BookedLite[] = v.bookings ?? [];
 

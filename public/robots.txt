@@ -1,0 +1,6 @@
+# robots.txt for Holidaze
+
+User-agent: *
+Allow: /
+
+Sitemap: https://holidazetravels.netlify.app/sitemap.xml

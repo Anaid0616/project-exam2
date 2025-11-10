@@ -108,8 +108,11 @@ export default function VenueBookingsPanel({
         {/* Row 1: Inputs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
           <div className="lg:col-span-2">
-            <label className="label">Search</label>
+            <label className="label" htmlFor="booking-search">
+              Search
+            </label>
             <input
+              id="booking-search"
               className="input w-full"
               placeholder="Search venue or guest…"
               value={q}
@@ -117,8 +120,11 @@ export default function VenueBookingsPanel({
             />
           </div>
           <div>
-            <label className="label">Check-in from</label>
+            <label className="label" htmlFor="booking-from">
+              Check-in from
+            </label>
             <input
+              id="booking-from"
               type="date"
               className="input w-full"
               value={fromStr}
@@ -127,8 +133,11 @@ export default function VenueBookingsPanel({
             />
           </div>
           <div>
-            <label className="label">Check-in to</label>
+            <label className="label" htmlFor="booking-to">
+              Check-in to
+            </label>
             <input
+              id="booking-to"
               type="date"
               className="input w-full"
               value={toStr}

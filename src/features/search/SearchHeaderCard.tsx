@@ -41,7 +41,7 @@ export default function SearchHeaderCard({
           {/* --- HEADER MODE --- */}
           <div className="flex items-center justify-between gap-4 py-2">
             <div>
-              <h2 className="text-xl font-semibold">
+              <h1 className="text-xl font-semibold">
                 {loc
                   ? `Venues in ${normalizeCountry(loc)}`
                   : whereRaw
@@ -49,7 +49,7 @@ export default function SearchHeaderCard({
                       .charAt(0)
                       .toUpperCase()}${whereRaw.slice(1)}`
                   : 'All venues'}
-              </h2>
+              </h1>
 
               <p className="text-ink/70 text-sm">
                 {fromStr && toStr

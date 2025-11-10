@@ -253,7 +253,6 @@ export default function BookingPanel({
 
         {/* Guests */}
         <div>
-          {/* byt label -> p */}
           <p id="guests-label" className="label">
             Guests (max {maxGuests})
           </p>

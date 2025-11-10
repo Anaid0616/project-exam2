@@ -137,9 +137,10 @@ export default function InfoCard({
 
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                <h3 className="truncate text-lg sm:text-xl font-bold">
+                <h1 className="truncate text-lg sm:text-xl font-bold">
                   {name}
-                </h3>
+                </h1>
+                <h2 className="sr-only">My venues</h2>
                 <span className="chip-role">
                   <span className="chip-dot" aria-hidden="true" />
                   {role === 'manager' ? 'Venue Manager' : 'Customer'}

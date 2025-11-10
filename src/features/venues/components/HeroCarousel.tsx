@@ -3,7 +3,30 @@
 import * as React from 'react';
 import Image from 'next/image';
 import SaveButton from '@/components/ui/SaveButton';
-
+/**
+ * HeroCarousel
+ *
+ * Displays the venue's hero images as a large, swipeable carousel.
+ *
+ * Accessibility:
+ * - Each image has a descriptive `alt` text if available.
+ * - If the alt text is missing or non-informative ("image", "photo", etc.),
+ *   the slide is treated as decorative (`alt=""`) so screen readers skip it.
+ * - Buttons for previous/next images have descriptive `aria-label`s.
+ *
+ * Performance:
+ * - The first image is marked with `priority` and `fetchPriority="high"` to optimize LCP.
+ * - A fixed `height` (default 520px) prevents layout shifts (CLS).
+ * - Images use responsive `sizes` and low-quality blurred placeholders for smoother loading.
+ *
+ * Props:
+ * @param {Media[]} [images] - Optional list of hero images for the venue.
+ * @param {Media} fallback - Fallback image when no images exist.
+ * @param {number} [height=520] - Fixed height of the hero container in pixels.
+ * @param {boolean} [fullBleed=false] - Whether the carousel stretches full width.
+ * @param {boolean} [showFavorite=true] - Whether to show the favorite/save button overlay.
+ * @param {string} venueId - The current venue ID (used for SaveButton).
+ */
 type Media = { url: string; alt?: string | null };
 
 /** Lightweight hero carousel focused on fast LCP. */
@@ -26,7 +49,9 @@ export default function HeroCarousel({
   const [i, setI] = React.useState(0);
   const len = slides.length;
 
+  /** Navigate to previous slide (wraps around). */
   const prev = () => setI((n) => (n - 1 + len) % len);
+  /** Navigate to next slide (wraps around). */
   const next = () => setI((n) => (n + 1) % len);
 
   // simple swipe
@@ -41,20 +66,21 @@ export default function HeroCarousel({
     touch.current.x = null;
   };
 
+  /** Determine container style based on fullBleed setting. */
   const wrapperClass = fullBleed
     ? 'relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen'
     : 'relative w-full rounded-app shadow-elev overflow-hidden';
 
-  // Matcha din containerbredd (max ~1152px på desktop)
+  /** Responsive image sizes attribute (desktop ≈ 1152px). */
   const sizesAttr = fullBleed ? '100vw' : '(min-width:1280px) 1152px, 100vw';
 
-  // Liten hjälpare: generera blurDataURL för Unsplash
+  /** Generate low-quality blur placeholder for Unsplash images. */
   const blurFor = (url: string) =>
     url.includes('images.unsplash.com')
       ? `${url}&w=32&q=10&auto=format`
       : undefined;
 
-  // För LCP: bara första bilden får priority/eager
+  // LCP: Only first img get priority/eager
   const isFirstSlide = i === 0;
   const slide = slides[i];
 
@@ -97,6 +123,18 @@ export default function HeroCarousel({
   );
 }
 
+/**
+ * Arrow
+ *
+ * A circular button that navigates to the previous or next slide.
+ *
+ * Accessibility:
+ * - Each button has a descriptive `aria-label` ("Previous image" or "Next image").
+ *
+ * Props:
+ * @param onClick Function to trigger navigation.
+ * @param position Either `'left'` or `'right'`, controls placement and rotation.
+ */
 function Arrow({
   onClick,
   position,
@@ -132,6 +170,16 @@ function Arrow({
   );
 }
 
+/**
+ * Dots
+ *
+ * Renders small circular indicators for each carousel slide.
+ * The active dot is visually highlighted to show the current image.
+ *
+ * Props:
+ * @param count Total number of slides.
+ * @param active Index (0-based) of the currently active slide.
+ */
 function Dots({ count, active }: { count: number; active: number }) {
   return (
     <div className="absolute inset-x-0 bottom-12 md:bottom-16 lg:bottom-19 flex justify-center gap-2 z-10">

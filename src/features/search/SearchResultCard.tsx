@@ -95,9 +95,9 @@ export default function SearchResultCard({
 
         {/* Info (column 2, row 1) */}
         <div className="min-w-0">
-          <h4 className="truncate text-lg font-semibold leading-tight text-ink">
+          <h3 className="truncate text-lg font-semibold leading-tight text-ink">
             {v.name}
-          </h4>
+          </h3>
 
           {/* Rating just below the name */}
           <div className="mt-1">

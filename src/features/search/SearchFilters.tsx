@@ -79,17 +79,19 @@ export default function SearchFilters() {
 
   return (
     <aside className="panel space-y-5">
-      <h3 className="text-lg font-semibold">Filter</h3>
+      <h2 className="text-lg font-semibold">Filter</h2>
 
-      {/* ---- Price (aegean) ---- */}
-      <div>
-        <label className="block font-medium mb-2">Price</label>
+      {/* ---- Price ---- */}
+      <fieldset className="mt-4">
+        <legend className="block font-medium mb-2">
+          Maximum price per night
+        </legend>
 
-        {/* 
-          Range slider with a custom filled track using inline style.
-          Note: the inline style uses CSS variables where available and falls back to hex.
-        */}
+        <label htmlFor="priceMax" className="sr-only">
+          Maximum price per night
+        </label>
         <input
+          id="priceMax"
           type="range"
           min={PRICE_MIN}
           max={PRICE_MAX}
@@ -104,26 +106,27 @@ export default function SearchFilters() {
               appearance: 'none',
             } as React.CSSProperties
           }
-          aria-label="Maximum price per night"
+          aria-describedby="priceMax-help"
         />
-        <div className="text-ink/80 mt-1">Up to €{priceMax}</div>
-      </div>
+        <div id="priceMax-help" className="text-ink/80 mt-1">
+          Up to €{priceMax}
+        </div>
+      </fieldset>
 
       {/* ---- Guests stepper +/- ---- */}
-      <div>
-        <label className="block font-medium mb-2">Guests</label>
+      <fieldset className="mt-4" aria-label="Number of guests">
+        <legend className="block font-medium mb-2">Guests</legend>
 
-        {/* Simple stepper, clamped to [1, 10] */}
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => setParam('guests', String(Math.max(1, guests - 1)))}
             className="p-2 text-aegean hover:opacity-80 focus-visible:outline-none"
-            aria-label="Minus one guest"
+            aria-label="Decrease number of guests"
           >
             <Image
               src="/minus.svg"
-              alt="minus"
+              alt="" // dekorativ
               width={20}
               height={20}
               className="w-6 h-6"
@@ -142,11 +145,11 @@ export default function SearchFilters() {
             type="button"
             onClick={() => setParam('guests', String(Math.min(10, guests + 1)))}
             className="p-2 text-aegean hover:opacity-80 focus-visible:outline-none"
-            aria-label="Plus one guest"
+            aria-label="Increase number of guests"
           >
             <Image
               src="/plus.svg"
-              alt="plus"
+              alt="" // dekorativ
               width={20}
               height={20}
               className="w-6 h-6"
@@ -154,37 +157,46 @@ export default function SearchFilters() {
             />
           </button>
         </div>
-      </div>
+      </fieldset>
 
       {/* ---- Ratings ---- */}
-      <div>
-        <label className="block font-medium mb-2">Ratings</label>
+      <fieldset className="mt-4">
+        <legend className="block font-medium mb-2">Minimum rating</legend>
 
-        {/* Vertical list of radio options (5 → 1). Each row shows N brand icons. */}
         <div className="flex flex-col gap-2">
           {[5, 4, 3, 2, 1].map((r) => (
-            <label key={r} className="block cursor-pointer">
+            <div key={r}>
               <input
+                id={`rating-${r}`}
                 type="radio"
                 name="ratingMin"
                 checked={ratingMin === r}
                 onChange={() => setParam('ratingMin', String(r))}
                 className="sr-only"
-                aria-label={`Minimum rating ${r}`}
               />
-              <span
+              <label
+                htmlFor={`rating-${r}`}
                 className={[
-                  'inline-flex items-center gap-1 whitespace-nowrap rounded-md p-1 transition',
+                  'inline-flex items-center gap-1 whitespace-nowrap rounded-md p-1 transition cursor-pointer',
                   ratingMin === r
                     ? 'bg-aegean/10 ring-1 ring-aegean'
                     : 'hover:bg-ink/5',
                 ].join(' ')}
               >
+                {/* den här texten är bara för skärmläsare → inte tom label längre */}
+                <span className="sr-only">Minimum rating {r} out of 5</span>
+
                 {Array.from({ length: r }).map((_, i) => (
-                  <Image key={i} src={logoSrc} alt="" width={18} height={18} />
+                  <Image
+                    key={i}
+                    src={logoSrc}
+                    alt="" // dekorativa ”stjärnor”
+                    width={18}
+                    height={18}
+                  />
                 ))}
-              </span>
-            </label>
+              </label>
+            </div>
           ))}
 
           <button
@@ -195,11 +207,12 @@ export default function SearchFilters() {
             Clear rating
           </button>
         </div>
-      </div>
+      </fieldset>
 
       {/* ---- Amenities ---- */}
-      <div>
-        <label className="block font-medium mb-2">Amenities</label>
+      <fieldset className="mt-4">
+        <legend className="block font-medium mb-2">Amenities</legend>
+
         <ul className="space-y-2">
           <li className="flex items-center gap-2">
             <input
@@ -250,7 +263,7 @@ export default function SearchFilters() {
             <label htmlFor="amen-pets">Pets</label>
           </li>
         </ul>
-      </div>
+      </fieldset>
 
       {/* ---- Clear all ---- */}
       <div className="pt-2">

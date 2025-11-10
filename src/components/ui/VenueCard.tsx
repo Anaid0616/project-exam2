@@ -33,21 +33,39 @@ export default function VenueCard({
   showSave?: boolean;
   priority?: boolean;
 }) {
+  const loc = v.location
+    ? [v.location.city, v.location.country].filter(Boolean).join(', ')
+    : '—';
+
   const img =
     v.media && v.media[0] && v.media[0].url?.trim()
       ? v.media[0].url
       : '/placeholder.jpg';
 
-  const loc = v.location
-    ? [v.location.city, v.location.country].filter(Boolean).join(', ')
-    : '—';
+  const isPlaceholder = img === '/placeholder.jpg';
+
+  const rawAlt = v.media?.[0]?.alt?.trim();
+
+  const isSuspiciousAlt =
+    !rawAlt || /^(image|photo|picture|venue image)$/i.test(rawAlt);
+
+  const imgAlt = isPlaceholder
+    ? '' // decorative for placeholder
+    : !isSuspiciousAlt
+    ? rawAlt!
+    : v.name
+    ? loc
+      ? `${v.name} in ${loc}`
+      : v.name
+    : 'Holiday rental';
 
   return (
     <article className="card p-3">
       <div className="relative">
         <Image
           src={img}
-          alt={v.media?.[0]?.alt || v.name || 'Venue image'}
+          alt={imgAlt}
+          aria-hidden={isPlaceholder ? true : undefined}
           width={800}
           height={450}
           className="mb-2 w-full h-[220px] rounded-app object-cover"
