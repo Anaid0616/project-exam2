@@ -10,7 +10,7 @@ import { loginSchema, type LoginForm } from '@/validation/auth';
 import { toast } from '@/lib/toast';
 
 const HERO =
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=70&auto=format&fit=crop';
+  'https://images.unsplash.com/photo-1618064541372-289bdb6f5b7b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1933';
 
 /**
  * LoginResponse
