@@ -138,8 +138,8 @@ export default function Header() {
         {!authReady ? (
           // Neutral skeleton to avoid flash and layout shift
           <div className="hidden md:flex items-center gap-6">
-            <div className="h-9 w-28 rounded-md bg-black/5" aria-hidden />
-            <div className="h-9 w-24 rounded-md bg-black/5" aria-hidden />
+            <div className="h-9 w-28" aria-hidden />
+            <div className="h-9 w-24" aria-hidden />
           </div>
         ) : !isAuthed ? (
           <nav className="hidden items-center gap-6 md:flex">

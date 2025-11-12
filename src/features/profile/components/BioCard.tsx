@@ -111,10 +111,11 @@ export default function InfoCard({
             alt="Profile cover"
             fill
             priority
-            unoptimized
+            fetchPriority="high"
             className="object-cover"
             sizes="100vw"
           />
+
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/10" />
         </div>
       </div>
@@ -131,7 +132,6 @@ export default function InfoCard({
                 fill
                 className="object-cover"
                 sizes="(min-width: 768px) 128px, 112px"
-                unoptimized
               />
             </div>
 
@@ -150,7 +150,9 @@ export default function InfoCard({
                 )}
               </div>
 
-              <p className="text-ink/90 text-sm mt-1">{email}</p>
+              <p className="text-ink/90 mt-1 text-sm [overflow-wrap:anywhere] break-all">
+                {email}
+              </p>
               <p className="text-ink/90"> {bio}</p>
             </div>
           </div>

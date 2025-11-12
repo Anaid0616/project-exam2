@@ -66,7 +66,7 @@ export default function SearchHeaderCard({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowSearchForm(true)}
-                className="rounded-app border bg-white px-3 py-2 text-sm shadow-elev hover:bg-ink/5"
+                className="rounded-app border bg-white px-2.5 py-1.5 text-xs leading-none whitespace-nowrap shrink-0 sm:px-3 sm:py-2 sm:text-sm shadow-elev hover:bg-ink/5"
               >
                 Change search
               </button>

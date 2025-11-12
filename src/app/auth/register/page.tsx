@@ -10,7 +10,7 @@ import { registerSchema, type RegisterForm } from '@/validation/auth';
 import { toast } from '@/lib/toast';
 
 const HERO =
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=70&auto=format&fit=crop';
+  'https://images.unsplash.com/photo-1636725496299-0a7c4c96f058?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1974';
 
 /**
  * Response returned by the Noroff registration endpoint.
