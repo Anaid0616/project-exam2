@@ -73,9 +73,9 @@ export default function ProfileScreen() {
 
   // combine bootstrap-loading with hook loadings to avoid early "empty" states
   const bootLoading = loading || !ownerName;
-  const bookingsLoading = bootLoading || loadingBookings;
-  const venuesLoading = bootLoading || (role === 'manager' && loadingVenues);
-  const venueRowsLoading = bootLoading || loadingVenueRows;
+  const bookingsLoading = loadingBookings;
+  const venuesLoading = role === 'manager' && loadingVenues;
+  const venueRowsLoading = loadingVenueRows;
 
   /**
    * Delete flow for a venue (confirm modal + API + toast).
@@ -152,7 +152,10 @@ export default function ProfileScreen() {
       )}
 
       {/* ==== Tabs content ==== */}
-      {role === 'customer' ? (
+      {bootLoading ? (
+        // Neutral skeleton to hold space while profile & role are bootstrapping
+        <section className="mt-2 rounded-app bg-ink/5 min-h-[260px] animate-pulse" />
+      ) : role === 'customer' ? (
         <CustomerTabContent
           tab={custTab}
           bookings={myBookings}
