@@ -1,9 +1,29 @@
 // src/features/profile/useProfileTabs.ts
 'use client';
+
 import * as React from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { Role } from './useProfileBootstrap';
 
+/**
+ * Manages tab state for the profile page, keeping it in sync with URL query parameters.
+ *
+ * Behavior:
+ * - For **customers**: available tabs → `bookings`, `saved`
+ * - For **managers**: available tabs → `bookings`, `myVenues`, `venueBookings`, `saved`
+ * - Reads initial tab from `?tab=` in the URL
+ * - Falls back to default tabs when no valid tab param is found
+ * - Reacts to URL changes to keep state aligned with navigation
+ *
+ * @param {Role} role - The user's role, used to determine which tab set to use.
+ *
+ * @returns {{
+ *   custTab: 'bookings' | 'saved';
+ *   setCustTab: React.Dispatch<React.SetStateAction<'bookings' | 'saved'>>;
+ *   mgrTab: 'bookings' | 'myVenues' | 'venueBookings' | 'saved';
+ *   setMgrTab: React.Dispatch<React.SetStateAction<'bookings' | 'myVenues' | 'venueBookings' | 'saved'>>;
+ * }} Customer/manager tab state and setters.
+ */
 export function useProfileTabs(role: Role) {
   const params = useSearchParams();
 
@@ -28,12 +48,16 @@ export function useProfileTabs(role: Role) {
     'bookings' | 'myVenues' | 'venueBookings' | 'saved'
   >(initialMgrTab);
 
-  // --- Sync on URL changes ---
+  // --- Sync when URL params change ---
   React.useEffect(() => {
     const tab = params.get('tab');
+
     if (role === 'customer') {
-      if (tab === 'bookings' || tab === 'saved') setCustTab(tab);
-      else setCustTab(params.get('saved') ? 'saved' : 'bookings');
+      if (tab === 'bookings' || tab === 'saved') {
+        setCustTab(tab);
+      } else {
+        setCustTab(params.get('saved') ? 'saved' : 'bookings');
+      }
     } else {
       if (
         tab === 'bookings' ||

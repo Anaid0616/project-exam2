@@ -14,11 +14,6 @@ import SaveButton from '@/components/ui/SaveButton';
  *   the slide is treated as decorative (`alt=""`) so screen readers skip it.
  * - Buttons for previous/next images have descriptive `aria-label`s.
  *
- * Performance:
- * - The first image is marked with `priority` and `fetchPriority="high"` to optimize LCP.
- * - A fixed `height` (default 520px) prevents layout shifts (CLS).
- * - Images use responsive `sizes` and low-quality blurred placeholders for smoother loading.
- *
  * Props:
  * @param {Media[]} [images] - Optional list of hero images for the venue.
  * @param {Media} fallback - Fallback image when no images exist.

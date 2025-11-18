@@ -1,9 +1,18 @@
 // src/types/booking.ts
+
+/**
+ * Minimal booking range (used for availability checks).
+ * Dates use the ISO `YYYY-MM-DD` format.
+ */
 export type BookedLite = {
   dateFrom: string; // ISO YYYY-MM-DD
   dateTo: string; // ISO YYYY-MM-DD
 };
 
+/**
+ * Full booking record used in venue-owner views
+ * (e.g., VenueBookingsTable and VenueBookingsPanel).
+ */
 export type VenueBooking = {
   id: string;
   venueName: string;

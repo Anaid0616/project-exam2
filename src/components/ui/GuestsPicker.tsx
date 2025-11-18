@@ -2,6 +2,17 @@
 import * as React from 'react';
 import Image from 'next/image';
 
+/**
+ * Props for the GuestsPicker component.
+ *
+ * @property {number | null} value - Current number of guests, or `null` if not set yet.
+ * @property {(v: number | null) - void} onChange - Callback fired whenever the guest count changes.
+ * @property {number} [min=1] - Minimum allowed number of guests.
+ * @property {number} [max=10] - Maximum allowed number of guests.
+ * @property {number} [suggest=2] - Suggested default value when no value is selected yet.
+ * @property {string} [className] - Optional additional class names for the wrapper.
+ * @property {string} [inputId] - Optional ID used to associate the control with an external label.
+ */
 type Props = {
   value: number | null;
   onChange: (v: number | null) => void;
@@ -12,6 +23,17 @@ type Props = {
   inputId?: string;
 };
 
+/**
+ * GuestsPicker is a custom numeric picker for selecting the number of guests.
+ *
+ * - Renders a button-like input that opens a small dialog.
+ * - Supports increment/decrement with min/max bounds.
+ * - Allows resetting back to an "unset" (`null`) state.
+ * - Closes on outside click and Escape key.
+ *
+ * @param {Props} props - Configuration for the guests picker behavior.
+ * @returns {JSX.Element} The guests picker UI.
+ */
 export default function GuestsPicker({
   value,
   onChange,
@@ -25,12 +47,12 @@ export default function GuestsPicker({
   const [internal, setInternal] = React.useState<number | null>(value);
   const ref = React.useRef<HTMLDivElement>(null);
 
-  // 🔁 Sync från parent → internt state
+  // Sync from parent → internal state
   React.useEffect(() => {
     setInternal(value);
   }, [value]);
 
-  // Stäng på klick utanför / Escape
+  // Close on outside click / Escape
   React.useEffect(() => {
     const handleDoc = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
@@ -57,7 +79,7 @@ export default function GuestsPicker({
 
   return (
     <div ref={ref} className={`relative ${className}`}>
-      {/* För label-association */}
+      {/* For label association */}
       {inputId && (
         <input
           type="hidden"
@@ -150,7 +172,6 @@ export default function GuestsPicker({
           </div>
 
           <div className="mt-3 flex items-center justify-between">
-            {/* ✅ Fixad Reset */}
             <button
               type="button"
               onClick={() => handleChange(null)}

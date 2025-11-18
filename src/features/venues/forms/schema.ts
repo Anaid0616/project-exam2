@@ -55,7 +55,7 @@ export const venueSchema = yup
 export type VenueFormValues = yup.InferType<typeof venueSchema>;
 
 /* -------------------------------------------------------------------------- */
-/*                               TYPE: PAYLOAD                               */
+/*                          TYPE: PAYLOAD                               */
 /* -------------------------------------------------------------------------- */
 
 /**

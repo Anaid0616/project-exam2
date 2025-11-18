@@ -2,6 +2,12 @@
 import type { VenueBooking } from '@/types/booking';
 import { money } from '@/lib/utils';
 
+/**
+ * Renders a colored status pill for a booking.
+ *
+ * @param {{ value: VenueBooking['status'] }} props - Booking status value.
+ * @returns {JSX.Element} A styled pill representing the status.
+ */
 function StatusPill({ value }: { value: VenueBooking['status'] }) {
   const map: Record<VenueBooking['status'], string> = {
     Upcoming: 'bg-lagoon/20 text-aegean',
@@ -19,17 +25,26 @@ function StatusPill({ value }: { value: VenueBooking['status'] }) {
 }
 
 /**
- * Tabellvy för bokningar (desktop). Mobilvy hanteras i Panel-komponenten.
+ * Desktop table view for venue bookings.
+ *
+ * The mobile layout is handled separately by the VenueBookingsPanel component.
+ *
+ * @param {{
+ *   rows: VenueBooking[];
+ *   viewBasePath?: string;
+ *   onDelete?: (id: string) - void;
+ * }} props - Booking rows and view configuration.
+ * @returns {JSX.Element} A table listing venue bookings.
  */
 export default function VenueBookingsTable({
   rows,
   viewBasePath = '/profile/bookings',
 }: {
-  /** Rader att rendera i tabellen. */
+  /** Rows to render in the table. */
   rows: VenueBooking[];
-  /** Baspath för "View"-länken. */
+  /** Base path used for the "View" link in each row. */
   viewBasePath?: string;
-  /** (Reserv: ej använd här) */
+  /** Placeholder for a delete handler (not used here). */
   onDelete?: (id: string) => void;
 }) {
   return (

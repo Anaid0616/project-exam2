@@ -6,6 +6,18 @@ import BookingCardSkeleton from '@/components/skeletons/BookingCardSkeleton';
 import SavedVenues from './SavedVenues';
 import type { BookingLite } from '@/types/booking';
 
+/**
+ * Displays the content of the customer profile tab.
+ *
+ * - `bookings` tab → shows user's bookings (or skeletons / empty state)
+ * - `saved` tab → shows user's saved venues
+ *
+ * @param {{
+ *   tab: 'bookings' | 'saved';
+ *   bookings: BookingLite[];
+ *   loading: boolean;
+ * }} props - Tab selection and booking data.
+ */
 export default function CustomerTabContent({
   tab,
   bookings,

@@ -15,6 +15,29 @@ import { useOwnerVenueBookings } from '@/features/profile/hooks/useOwnerVenueBoo
 
 type OwnerRows = ReturnType<typeof useOwnerVenueBookings>['rows'];
 
+/**
+ * ManagerTabContent renders the content for the manager section of the profile page.
+ *
+ * Supports four tabs:
+ * - `bookings` → Shows the manager’s personal bookings.
+ * - `myVenues` → Shows venues owned by the manager.
+ * - `venueBookings` → Shows bookings for a specific owned venue.
+ * - `saved` → Shows saved venues.
+ *
+ * Handles loading states, empty states, and error states for each tab.
+ *
+ * @param {{
+ *   tab: 'bookings' | 'myVenues' | 'venueBookings' | 'saved';
+ *   bookings: BookingLite[];
+ *   loadingBookings: boolean;
+ *   venues: Venue[];
+ *   loadingVenues: boolean;
+ *   onDeleteVenue: (id: string) - void;
+ *   venueRows: OwnerRows;
+ *   loadingVenueRows: boolean;
+ *   venueRowsError?: string | null;
+ * }} props - Data and state used to render each tab.
+ */
 export default function ManagerTabContent({
   tab,
   bookings,

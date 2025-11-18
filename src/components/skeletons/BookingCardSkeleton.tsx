@@ -1,4 +1,5 @@
 'use client';
+
 export default function BookingCardSkeleton() {
   return (
     <article className="rounded-app border bg-shell p-3 shadow-elev">

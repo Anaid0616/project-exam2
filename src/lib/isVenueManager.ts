@@ -7,7 +7,20 @@ function toBool(v: unknown): boolean {
   return false;
 }
 
-/** flag */
+/**
+ * Determines whether the user is a venue manager.
+ *
+ * The manager flag may appear either:
+ * - on the `Profile` object (from the API), or
+ * - inside the decoded JWT payload.
+ *
+ * Because different sources may encode the value as boolean, string,
+ * or number, this helper normalizes everything via `toBool()`.
+ *
+ * @param {Profile | null | undefined} profile - The user's full profile object.
+ * @param {JwtPayload | null | undefined} payload - Decoded auth token payload.
+ * @returns {boolean} `true` if the user is a venue manager in either source.
+ */
 export function isVenueManager(
   profile?: Profile | null,
   payload?: JwtPayload | null

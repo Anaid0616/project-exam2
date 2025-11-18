@@ -1,19 +1,38 @@
 // src/lib/textMatch.ts
 import type { VenueWithBookings } from '@/types/venue';
 
-/** Normalize */
+/**
+ * Normalizes a string for plain-text matching:
+ * - Unicode NFD normalization
+ * - Removes diacritics (accents)
+ * - Lowercases
+ * - Trims whitespace
+ *
+ * Useful for case-insensitive and accent-insensitive comparison.
+ *
+ * @param {string} s - Input string.
+ * @returns {string} Normalized string.
+ */
 export function normalizePlain(s: string): string {
   return (
     s
       .normalize('NFD')
-      // remove accents
+      // Remove accents
       .replace(/\p{Diacritic}/gu, '')
       .toLowerCase()
       .trim()
   );
 }
 
-/** Levenshtein */
+/**
+ * Computes the Levenshtein distance between two strings.
+ * Measures the minimum number of edits required to transform one string
+ * into the other (insert, delete, substitute).
+ *
+ * @param {string} a - First string.
+ * @param {string} b - Second string.
+ * @returns {number} The edit distance.
+ */
 export function levenshtein(a: string, b: string): number {
   const la = a.length;
   const lb = b.length;
@@ -38,9 +57,18 @@ export function levenshtein(a: string, b: string): number {
 }
 
 /**
- * Fuzzy match: checks if `query` is approximately included in `text`
- * 1)   Direct inclusion
- * 2)   Word-level fuzzy match (Levenshtein distance)
+ * Fuzzy match: checks whether `query` is approximately contained in `text`.
+ *
+ * Matching rules:
+ * 1. Direct substring match (`text.includes(query)`)
+ * 2. Word-level fuzzy match using Levenshtein distance
+ *
+ * Useful for forgiving user input search (typos, small mistakes).
+ *
+ * @param {string} text - Normalized text to search in.
+ * @param {string} query - Normalized query string.
+ * @param {number} [maxDistance=2] - Maximum allowed edit distance.
+ * @returns {boolean} True if the query fuzzily matches the text.
  */
 export function fuzzyIncludes(
   text: string,
@@ -51,6 +79,7 @@ export function fuzzyIncludes(
   if (text.includes(query)) return true;
 
   const words = text.split(/\s+/).filter(Boolean);
+
   for (const w of words) {
     if (Math.abs(w.length - query.length) > maxDistance) continue;
     if (levenshtein(w, query) <= maxDistance) return true;
@@ -58,7 +87,20 @@ export function fuzzyIncludes(
   return false;
 }
 
-/**  */
+/**
+ * Checks if a venue matches a search term using normalized
+ * substring matching and fuzzy matching.
+ *
+ * Fields included in the searchable text:
+ * - venue name
+ * - city
+ * - country
+ *
+ * @param {Pick<VenueWithBookings, 'name' | 'location'>} v - Venue data.
+ * @param {string} rawQuery - Raw search term entered by the user.
+ * @param {number} [maxDistance=2] - Max allowed distance for fuzzy matching.
+ * @returns {boolean} True if the venue approximately matches the query.
+ */
 export function matchVenueTerm(
   v: Pick<VenueWithBookings, 'name' | 'location'>,
   rawQuery: string,

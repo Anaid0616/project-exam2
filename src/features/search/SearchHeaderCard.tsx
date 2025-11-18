@@ -6,9 +6,42 @@ import HeaderActionsMobile from '@/features/search/HeaderActionsMobile';
 import SearchFilters from '@/features/search/SearchFilters';
 import VenueSearchForm from './VenueSearchForm';
 import { normalizeCountry } from '@/lib/normalizeCountry';
-
 import { formatBookingDates } from '@/lib/date';
 
+type Props = {
+  /** Raw "where" value from the URL (unprocessed). */
+  whereRaw?: string;
+  /** Check-in date string (ISO or yyyy-mm-dd). */
+  fromStr?: string;
+  /** Check-out date string (ISO or yyyy-mm-dd). */
+  toStr?: string;
+  /** Number of guests in the search parameters. */
+  guests?: number;
+  /** Total number of search results. */
+  resultCount: number;
+  /** Normalized location string when using structured search. */
+  loc?: string | null;
+  /** Additional class names for the outer container. */
+  className?: string;
+  /** If true, disables the default "panel" styling. */
+  unstyled?: boolean;
+};
+
+/**
+ * Header card for the search results page.
+ *
+ * Shows:
+ * - The current search summary (location, dates, guests, result count)
+ * - Sorting controls (desktop)
+ * - Filter + sort actions (mobile)
+ * - A button to open the inline search form
+ *
+ * When "Change search" is clicked, the component switches into **search form mode**
+ * and displays the `VenueSearchForm`. Closing the form returns back to header mode.
+ *
+ * @param {Props} props - Search query info and layout options.
+ * @returns {JSX.Element} The header panel with summary, controls, and optional search form.
+ */
 export default function SearchHeaderCard({
   whereRaw,
   fromStr,
@@ -18,16 +51,7 @@ export default function SearchHeaderCard({
   loc,
   className,
   unstyled,
-}: {
-  whereRaw?: string;
-  fromStr?: string;
-  toStr?: string;
-  guests?: number;
-  resultCount: number;
-  loc?: string | null;
-  className?: string;
-  unstyled?: boolean;
-}) {
+}: Props) {
   const [showSearchForm, setShowSearchForm] = useState(false);
 
   return (
@@ -59,6 +83,7 @@ export default function SearchHeaderCard({
                 {guests
                   ? ` · ${guests} guest${guests > 1 ? 's' : ''}`
                   : ' · Any guests'}
+
                 {` · ${resultCount} result${resultCount !== 1 ? 's' : ''}`}
               </p>
             </div>

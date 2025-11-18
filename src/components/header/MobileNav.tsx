@@ -3,6 +3,16 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Plus, UserRound, Mail, LogOut } from 'lucide-react';
 
+/**
+ * Props for the MobileNav component.
+ *
+ * @property {boolean} open - Whether the mobile navigation drawer is currently visible.
+ * @property  onClose - Callback invoked when the menu should be closed
+ * (e.g. overlay click, ESC key, clicking a link).
+ * @property {boolean} isAuthed - Indicates whether the user is authenticated.
+ * @property {boolean} isManager - Indicates whether the authenticated user has manager permissions.
+ * @property onLogout - Callback to log the user out when the logout button is clicked.
+ */
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -11,6 +21,16 @@ type Props = {
   onLogout: () => void;
 };
 
+/**
+ * Mobile navigation drawer used on small screens.
+ *
+ * - Renders a slide-in panel from the right.
+ * - Closes on ESC key, overlay click, and when navigating.
+ * - Shows different links depending on authentication state and manager role.
+ *
+ * @param {Props} props - Configuration for how the mobile navigation should behave and render.
+ * @returns {JSX.Element} The mobile navigation UI.
+ */
 export default function MobileNav({
   open,
   onClose,

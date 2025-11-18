@@ -9,6 +9,17 @@ import type { Venue } from '@/types/venue';
 import VenueCard from '@/components/ui/VenueCard';
 import VenueCardSkeleton from '@/components/skeletons/VenueCardSkeleton';
 
+/**
+ * Renders the user's saved venues.
+ *
+ * - Retrieves favorite venue IDs via `useFavorites`.
+ * - Loads full venue details for each favorite.
+ * - Shows skeletons while loading.
+ * - Handles empty and error states.
+ *
+ * @param {{ showSaveOverlay?: boolean }} props - Optional UI configuration.
+ * @param {boolean} [props.showSaveOverlay=false] - Whether VenueCards should show the "save" overlay control.
+ */
 export default function SavedVenues({
   showSaveOverlay = false,
 }: {
@@ -47,7 +58,7 @@ export default function SavedVenues({
 
   // ----- Render states -----
 
-  // Skeletons while we’re fetching or while we have ids but haven’t resolved venues yet
+  // Skeletons while loading, or when we have ids but haven't resolved venues yet
   const showSkeletons =
     loading || (Array.isArray(ids) && ids.length > 0 && venues.length === 0);
 
@@ -66,7 +77,7 @@ export default function SavedVenues({
     return <p className="text-sm text-ink/60">No saved venues yet.</p>;
   }
 
-  // Favorites exist but failed to load their details
+  // Favorites exist but failed to load details
   if (venues.length === 0) {
     return <p className="text-sm text-ink/60">Couldn’t load saved venues.</p>;
   }

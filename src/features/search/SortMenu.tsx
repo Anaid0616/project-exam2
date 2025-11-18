@@ -19,6 +19,20 @@ const OPTIONS: { value: SortValue; label: string }[] = [
   { value: 'rating_desc', label: 'Rating: High to low' },
 ];
 
+/**
+ * Sort dropdown for the venue search results.
+ *
+ * Features:
+ * - Displays the currently active sort option
+ * - Opens a dropdown listbox with all sort choices
+ * - Closes on outside click or Escape key
+ * - Syncs the `sort` value into the URL (`?sort=` param)
+ * - Removes the param when selecting the default "Recommended"
+ *
+ * Used in desktop layouts and optionally inside mobile filter panels.
+ *
+ * @returns {JSX.Element} A button + dropdown menu for choosing sort order.
+ */
 export default function SortMenu() {
   const router = useRouter();
   const sp = useSearchParams();
@@ -30,7 +44,7 @@ export default function SortMenu() {
   const btnRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
-  // close on outside / esc
+  // Close on outside click / Escape
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false);
@@ -38,9 +52,11 @@ export default function SortMenu() {
     function onClick(e: MouseEvent) {
       if (!open) return;
       const t = e.target as Node;
-      if (!menuRef.current?.contains(t) && !btnRef.current?.contains(t))
+      if (!menuRef.current?.contains(t) && !btnRef.current?.contains(t)) {
         setOpen(false);
+      }
     }
+
     window.addEventListener('keydown', onKey);
     window.addEventListener('click', onClick);
     return () => {
@@ -49,11 +65,14 @@ export default function SortMenu() {
     };
   }, [open]);
 
+  /**
+   * Applies a new sort value and syncs it to the URL.
+   */
   function applySort(v: SortValue) {
     setValue(v);
     setOpen(false);
 
-    // sync till URL (?sort=...)
+    // sync to URL (?sort=...)
     const q = new URLSearchParams(sp.toString());
     if (v === 'reco') q.delete('sort');
     else q.set('sort', v);

@@ -6,6 +6,26 @@ import type { JwtPayload, Profile } from '@/types/venue';
 
 export type Role = 'customer' | 'manager';
 
+/**
+ * Initializes and bootstraps the user's profile state.
+ *
+ * Responsibilities:
+ * - Reads the auth token from `localStorage`
+ * - Decodes the JWT to extract basic payload info
+ * - Fetches the user's full profile from the API (if logged in)
+ * - Determines the user's role (`customer` or `manager`)
+ * - Exposes loading state while bootstrapping
+ *
+ * This hook is typically used by a global UserProvider.
+ *
+ * @returns {{
+ *   payload: JwtPayload | null;
+ *   profile: Profile | null;
+ *   setProfile: React.Dispatch<React.SetStateAction<Profile | null>>;
+ *   role: Role;
+ *   loading: boolean;
+ * }} Bootstrapped user state.
+ */
 export function useProfileBootstrap() {
   const [payload, setPayload] = React.useState<JwtPayload | null>(null);
   const [profile, setProfile] = React.useState<Profile | null>(null);
@@ -14,15 +34,21 @@ export function useProfileBootstrap() {
 
   React.useEffect(() => {
     let alive = true;
+
     (async () => {
       try {
+        // Pull token from localStorage
         const t =
           typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+        // Decode token → payload
         const p = t ? decodeJwt(t) : null;
         if (!alive) return;
         setPayload(p);
 
         const name = p?.name;
+
+        // Not logged in
         if (!t || !name) {
           if (!alive) return;
           setRole('customer');
@@ -30,8 +56,10 @@ export function useProfileBootstrap() {
           return;
         }
 
+        // Logged in → fetch profile
         const pData = await getProfile(name);
         if (!alive) return;
+
         setProfile(pData);
         setRole(pData.venueManager ? 'manager' : 'customer');
       } catch {
@@ -41,6 +69,7 @@ export function useProfileBootstrap() {
         if (alive) setLoading(false);
       }
     })();
+
     return () => {
       alive = false;
     };

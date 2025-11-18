@@ -3,8 +3,19 @@
 import * as React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
+/**
+ * User role that determines which profile tabs are available.
+ * - `customer` → bookings & saved
+ * - `manager` → bookings, my venues, venue bookings & saved
+ */
 type Role = 'customer' | 'manager';
 
+/**
+ * Returns the CSS classes for a profile tab based on its active state.
+ *
+ * @param {boolean} active - Whether the tab is currently active.
+ * @returns {string} A className string for the tab button.
+ */
 export function tabClass(active: boolean) {
   return `
     inline-flex items-center shrink-0 snap-start
@@ -19,6 +30,22 @@ export function tabClass(active: boolean) {
   `;
 }
 
+/**
+ * ProfileTabsBar renders the tab bar at the top of the profile page.
+ *
+ * - For `customer` role: shows "Bookings" and "Saved".
+ * - For `manager` role: shows "Bookings", "My Venues", "Venue Bookings" and "Saved".
+ * - Keeps the current tab in sync with the `tab` query parameter in the URL.
+ *
+ * @param {{
+ *   role: Role;
+ *   custTab?: 'bookings' | 'saved';
+ *   setCustTab?: (t: 'bookings' | 'saved') - void;
+ *   mgrTab?: 'bookings' | 'myVenues' | 'venueBookings' | 'saved';
+ *   setMgrTab?: (t: 'bookings' | 'myVenues' | 'venueBookings' | 'saved') - void;
+ *   className?: string;
+ * }} props - Role and tab state handlers.
+ */
 export default function ProfileTabsBar({
   role,
   custTab,

@@ -41,6 +41,9 @@ export type Venue = {
   updated?: string;
 };
 
+/**
+ * Decoded JWT payload used for authentication and user roles.
+ */
 export type JwtPayload = {
   email?: string;
   name?: string;
@@ -57,7 +60,13 @@ export type Profile = {
   venueManager: boolean;
 };
 
+/**
+ * Standard API envelope wrapper containing `data` and optional metadata.
+ */
 export type ApiEnvelope<T> = { data: T; meta?: unknown };
+/**
+ * A response that may be wrapped in an API envelope.
+ */
 export type MaybeEnvelope<T> = T | ApiEnvelope<T>;
 
 /**

@@ -3,7 +3,7 @@ import { unwrap } from '@/lib/envelope';
 import type { Venue, VenueWithBookings, MaybeEnvelope } from '@/types/venue';
 
 /* -------------------------------------------------------------------------- */
-/*                                CRUD Methods                                */
+/*                            CRUD Methods                                */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -48,7 +48,7 @@ export async function deleteVenue(id: string): Promise<void> {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                Query Methods                               */
+/*                            Query Methods                               */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -91,7 +91,7 @@ export async function getMyVenues(profileName: string): Promise<Venue[]> {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                            Search & List Methods                           */
+/*                        Search & List Methods                           */
 /* -------------------------------------------------------------------------- */
 
 /**
