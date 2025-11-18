@@ -9,7 +9,7 @@ import Pagination from '@/components/ui/Pagination';
 import SearchHeaderCard from '@/features/search/SearchHeaderCard';
 import { normalizeCountry } from '@/lib/normalizeCountry';
 import VenuesHero from '@/features/venues/components/VenuesHero';
-import { matchVenueTerm, normalizePlain } from '@/lib/textMatch';
+import { matchVenueTerm } from '@/lib/textMatch';
 
 /**
  * Returns `true` when two date ranges overlap.
@@ -129,16 +129,6 @@ export default async function SearchPage({
     return true;
   });
 
-  // ----- Location filter (country or city) -----
-  if (loc) {
-    const term = normalizePlain(loc);
-    results = results.filter((v) => {
-      const city = normalizePlain(v.location?.city ?? '');
-      const country = normalizePlain(v.location?.country ?? '');
-      return city.includes(term) || country.includes(term);
-    });
-  }
-
   // ----- Extra filters -----
   const hideZzz = true;
   const hideTest = true;
@@ -206,7 +196,10 @@ export default async function SearchPage({
 
       {/* --- Panel over hero --- */}
       <div className="relative z-10 flex justify-center -mt-8 sm:-mt-10">
-        <div className="pointer-events-auto w-[min(100%,1150px)] pb-4">
+        <div
+          id="search-header"
+          className="pointer-events-auto w-[min(100%,1150px)] pb-4"
+        >
           <div
             className="
             rounded-app border shadow-elev p-4 md:p-5
@@ -233,7 +226,7 @@ export default async function SearchPage({
           <SearchFilters />
         </aside>
 
-        <section className="space-y-4">
+        <section id="results" className="space-y-4">
           {results.length === 0 ? (
             <p className="text-ink/70">No venues match your filters.</p>
           ) : (
