@@ -37,7 +37,7 @@
 /* components */
 @layer components {
   .card {
-    @apply bg-shell  rounded-app border shadow-elev;
+    @apply bg-shell rounded-app border shadow-elev;
   }
   .panel {
     @apply bg-shell rounded-app border shadow-elev p-4 sm:p-6;

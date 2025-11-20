@@ -16,7 +16,7 @@ module.exports = {
         card: '#FFFFFF',
         aegean: '#0E7490',
         lagoon: '#3BBAD6',
-        coral: '#FF8A65',
+        coral: '#FFA284',
         sunset: '#C13033',
       },
       borderRadius: {
