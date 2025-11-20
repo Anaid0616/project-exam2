@@ -109,7 +109,6 @@ export default function ProfileScreen() {
     if (!profile?.name) return;
 
     const payloadToSend = {
-      ...(values.name ? { name: values.name } : {}),
       ...(values.bio !== undefined ? { bio: values.bio } : {}),
       ...(values.avatarUrl !== undefined
         ? values.avatarUrl
@@ -182,7 +181,7 @@ export default function ProfileScreen() {
         initial={{
           avatarUrl: profile?.avatar?.url ?? '',
           bannerUrl: profile?.banner?.url ?? '',
-          name: profile?.name ?? '',
+
           bio: profile?.bio ?? '',
         }}
         onSave={handleSaveProfile}

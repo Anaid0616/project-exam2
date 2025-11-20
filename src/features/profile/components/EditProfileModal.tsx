@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 export type EditProfileForm = {
   avatarUrl: string;
   bannerUrl: string;
-  name: string;
+
   bio: string;
 };
 
@@ -42,7 +42,7 @@ export default function EditProfileModal({
     defaultValues: {
       avatarUrl: initial.avatarUrl ?? '',
       bannerUrl: initial.bannerUrl ?? '',
-      name: initial.name ?? '',
+
       bio: initial.bio ?? '',
     },
   });
@@ -53,7 +53,7 @@ export default function EditProfileModal({
       reset({
         avatarUrl: initial.avatarUrl ?? '',
         bannerUrl: initial.bannerUrl ?? '',
-        name: initial.name ?? '',
+
         bio: initial.bio ?? '',
       });
     }
@@ -138,18 +138,6 @@ export default function EditProfileModal({
               className="input"
               placeholder="https://..."
               {...register('bannerUrl')}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="name" className="text-sm font-medium">
-              Name
-            </label>
-            <input
-              id="name"
-              className="input"
-              placeholder="Your name"
-              {...register('name')}
             />
           </div>
 
