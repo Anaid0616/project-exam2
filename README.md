@@ -2,8 +2,7 @@
 
 **Diana Bergelin**
 
-![Holidaze Banner]("https://github.com/user-attachments/assets/d668a04a-d7eb-404e-b13e-8227e1b04e4d"
-)
+![Holidaze Banner](https://github.com/user-attachments/assets/d668a04a-d7eb-404e-b13e-8227e1b04e4d)
 
 
 ## 🎯 Assignment Goal
