@@ -63,7 +63,7 @@ export default function ProfileMenu({ onLogout }: Props) {
         aria-haspopup="menu"
         aria-expanded={open}
         data-active={active || open ? 'true' : undefined}
-        className="nav-link-underline text-base"
+        className="nav-link-underline text-base font-medium"
         onClick={() => setOpen((v) => !v)}
       >
         My Profile
@@ -78,7 +78,7 @@ export default function ProfileMenu({ onLogout }: Props) {
           <Link
             href="/profile"
             role="menuitem"
-            className="block rounded-app px-3 py-2 text-sm hover:bg-sand"
+            className="block rounded-app px-3 py-2 font-medium hover:bg-sand"
             onClick={() => setOpen(false)}
           >
             My Profile
@@ -87,7 +87,7 @@ export default function ProfileMenu({ onLogout }: Props) {
           <Link
             href="/contact"
             role="menuitem"
-            className="block rounded-app px-3 py-2 text-sm hover:bg-sand"
+            className="block rounded-app px-3 py-2 font-medium hover:bg-sand"
             onClick={() => setOpen(false)}
           >
             Contact
@@ -95,7 +95,7 @@ export default function ProfileMenu({ onLogout }: Props) {
 
           <button
             role="menuitem"
-            className="block w-full rounded-app px-3 py-2 text-left text-sm hover:bg-sand"
+            className="block w-full rounded-app px-3 py-2 text-left font-medium hover:bg-sand"
             onClick={onLogout}
           >
             Logout

@@ -17,7 +17,7 @@ import VenueSearchForm from '@/features/search/VenueSearchForm';
  */
 export default function HomeHero() {
   return (
-    <section className="bleed relative">
+    <section className="bleed relative z-10">
       {/* --- Hero image --- */}
       <div className="relative h-[340px] md:h-[420px] shadow-elev">
         <Image

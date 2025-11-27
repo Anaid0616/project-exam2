@@ -142,7 +142,7 @@ export default function VenueSearchForm({
         label="Where"
         className="min-w-0 min-[420px]:col-span-2 min-[845px]:col-span-1"
       >
-        <div className="relative w-full min-w-0">
+        <div className="relative z-[20] w-full min-w-0">
           <input
             name="where"
             id="where"
@@ -177,7 +177,7 @@ export default function VenueSearchForm({
           />
 
           {open && sugs.length > 0 && (
-            <ul className="panel absolute left-0 right-0 top-[calc(100%+6px)] z-50 w-full max-h-64 overflow-auto p-1">
+            <ul className="panel absolute left-0 right-0 top-[calc(100%+6px)] z-[9999] w-full max-h-64 overflow-auto p-1">
               {sugs.map((s, i) => (
                 <li key={`${s}-${i}`}>
                   <button

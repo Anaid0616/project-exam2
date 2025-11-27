@@ -92,7 +92,7 @@ export default function MobileNav({
           </button>
         </div>
 
-        <nav className="flex-1 p-2 bg-white">
+        <nav className="flex-1 p-2 bg-white font-medium">
           {!isAuthed ? (
             <>
               <Link

@@ -144,9 +144,7 @@ export default function Header() {
         ) : !isAuthed ? (
           <nav className="hidden items-center gap-6 md:flex">
             <NavLink href="/venues">Venues</NavLink>
-            <NavLink href="/auth/register" size="sm">
-              Register
-            </NavLink>
+            <NavLink href="/auth/register">Register</NavLink>
             <Link href="/auth/login" className="btn btn-primary">
               Login
             </Link>

@@ -48,7 +48,7 @@ export default function NavLink({
     <Link
       href={href}
       data-active={active ? 'true' : undefined}
-      className={`nav-link-underline ${sizeCls} ${className}`}
+      className={`nav-link-underline font-medium ${sizeCls} ${className}`}
     >
       {children}
     </Link>
