@@ -39,9 +39,24 @@ export default function HomeHero() {
 
             <Link
               href="/venues"
-              className="mt-6 inline-block btn btn-primary px-4 py-2 shadow-md transition-all"
+              className="group mt-6 inline-block btn btn-primary px-4 py-2 shadow-md transition-all"
             >
-              Explore Venues
+              <div className="flex items-center justify-between">
+                <span>Venues</span>{' '}
+                <svg
+                  className="w-4 h-4 mt-0.5 translate-x-0 group-hover:translate-x-1 transition-transform duration-200"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
             </Link>
           </div>
         </div>
