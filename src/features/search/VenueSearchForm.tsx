@@ -3,6 +3,10 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import GuestsPicker from '@/components/ui/GuestsPicker';
 
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
+
 /**
  * Field
  *
@@ -147,7 +151,7 @@ export default function VenueSearchForm({
             name="where"
             id="where"
             ref={whereRef}
-            className="input h-11 w-full placeholder:text-ink/70"
+            className="input h-11 w-full font-medium placeholder:text-ink/70"
             placeholder="Santorini, Greece"
             value={where}
             onChange={(e) => setWhere(e.target.value)}
@@ -204,16 +208,19 @@ export default function VenueSearchForm({
       {/* Check-in */}
       <Field id="from" label="Check-in" className="min-w-0">
         <div className="relative min-w-0">
-          <input
-            name="from"
+          <DatePicker
             id="from"
-            type="date"
-            className="input h-11 dateph"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
+            selected={from ? new Date(from) : null}
+            onChange={(date) =>
+              setFrom(date ? format(date as Date, 'yyyy-MM-dd') : '')
+            }
+            dateFormat="yyyy-MM-dd"
+            minDate={new Date()}
+            className="input h-11 w-full cursor-pointer font-medium"
+            calendarClassName="holidaze-calendar"
           />
           {!from && (
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/70">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/70 font-medium">
               Add date
             </span>
           )}
@@ -223,16 +230,19 @@ export default function VenueSearchForm({
       {/* Check-out */}
       <Field id="to" label="Check-out" className="min-w-0">
         <div className="relative min-w-0">
-          <input
-            name="to"
+          <DatePicker
             id="to"
-            type="date"
-            className="input h-11 dateph"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
+            selected={to ? new Date(to) : null}
+            onChange={(date) =>
+              setTo(date ? format(date as Date, 'yyyy-MM-dd') : '')
+            }
+            dateFormat="yyyy-MM-dd"
+            minDate={from ? new Date(from) : new Date()}
+            className="input h-11 w-full cursor-pointer font-medium"
+            calendarClassName="holidaze-calendar"
           />
           {!to && (
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/70">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink/70 font-medium">
               Add date
             </span>
           )}

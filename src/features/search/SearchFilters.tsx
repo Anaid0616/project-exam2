@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import Image from 'next/image';
+import { PlusIcon, MinusIcon } from '@/components/ui/GuestIcons';
 
 /**
  * SearchFilters
@@ -108,13 +109,13 @@ export default function SearchFilters() {
       <fieldset className="mt-4" aria-label="Number of guests">
         <legend className="block font-medium mb-2">Guests</legend>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setLocalGuests((g) => Math.max(1, g - 1))}
-            className="p-2 text-aegean hover:opacity-80"
+            className="size-6 rounded-full bg-aegean text-white flex items-center justify-center hover:opacity-90"
           >
-            <Image src="/minus.svg" alt="" width={20} height={20} />
+            <MinusIcon className="w-4 h-4" />
           </button>
 
           <span className="w-8 text-center font-semibold select-none">
@@ -124,9 +125,9 @@ export default function SearchFilters() {
           <button
             type="button"
             onClick={() => setLocalGuests((g) => Math.min(10, g + 1))}
-            className="p-2 text-aegean hover:opacity-80"
+            className="size-6 rounded-full bg-aegean text-white flex items-center justify-center hover:opacity-90"
           >
-            <Image src="/plus.svg" alt="" width={20} height={20} />
+            <PlusIcon className="w-4 h-4" />
           </button>
         </div>
       </fieldset>
@@ -156,7 +157,7 @@ export default function SearchFilters() {
                 ].join(' ')}
               >
                 {Array.from({ length: r }).map((_, i) => (
-                  <Image key={i} src={logoSrc} alt="" width={18} height={18} />
+                  <Image key={i} src={logoSrc} alt="" width={22} height={22} />
                 ))}
               </label>
             </div>

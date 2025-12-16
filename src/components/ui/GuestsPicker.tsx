@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import Image from 'next/image';
+import { PlusIcon, MinusIcon } from '@/components/ui/GuestIcons';
 
 /**
  * Props for the GuestsPicker component.
@@ -98,9 +98,9 @@ export default function GuestsPicker({
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="input h-11 w-full flex items-center justify-between px-4"
+        className="input h-11 w-full flex items-center justify-between font-medium px-4"
       >
-        <span className={isPh ? 'text-ink/70' : ''}>
+        <span className={isPh ? 'text-ink/70 font-medium' : 'font-medium'}>
           {isPh ? `${suggest} guests` : `${shown} guest${shown > 1 ? 's' : ''}`}
         </span>
         <svg
@@ -130,16 +130,9 @@ export default function GuestsPicker({
                   internal !== null && handleChange(Math.max(min, internal - 1))
                 }
                 disabled={internal === null || internal <= min}
-                className="size-9 flex items-center justify-center disabled:opacity-40 hover:bg-ink/5"
+                className="size-6 rounded-full bg-aegean text-white flex items-center justify-center disabled:opacity-40 hover:opacity-90"
               >
-                <Image
-                  src="/minus.svg"
-                  alt="minus"
-                  width={24}
-                  height={24}
-                  className="w-6 h-6"
-                  aria-hidden
-                />
+                <MinusIcon className="w-4 h-4" />
               </button>
 
               <div
@@ -157,16 +150,9 @@ export default function GuestsPicker({
                     internal === null ? suggest : Math.min(max, internal + 1)
                   )
                 }
-                className="size-9 flex items-center justify-center hover:bg-ink/5"
+                className="size-6 rounded-full bg-aegean text-white flex items-center justify-center hover:opacity-90"
               >
-                <Image
-                  src="/plus.svg"
-                  alt="plus icon"
-                  width={24}
-                  height={24}
-                  className="w-6 h-6"
-                  aria-hidden
-                />
+                <PlusIcon className="w-4 h-4" />
               </button>
             </div>
           </div>
